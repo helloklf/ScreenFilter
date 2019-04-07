@@ -112,7 +112,7 @@ class SampleEditActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sample_edit)
         // 最高亮度锁定
         val lp = getWindow().getAttributes()
-        lp.screenBrightness = 1.0f
+        lp.screenBrightness = 1.0f // (GlobalStatus.sampleData!!.getScreentMinLight() / 100.0).toFloat()
         getWindow().setAttributes(lp)
 
         // 全屏
@@ -136,6 +136,22 @@ class SampleEditActivity : AppCompatActivity() {
                     .create()
                     .show()
         }
+
+        screen_light_min.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (GlobalStatus.sampleData!!.getScreentMinLight() != progress) {
+                    GlobalStatus.sampleData!!.setScreentMinLight(progress)
+                    hasChange = true
+                }
+                screen_light_min_ratio.text = progress.toString()
+            }
+        })
+        screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
+        screen_light_min_ratio.text = screen_light_min.progress.toString()
     }
 
     override fun onPause() {
@@ -216,9 +232,7 @@ class SampleEditActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 sampleLuxValueView.text = progress.toString()
                 val sample = GlobalStatus.sampleData!!.getVitualSample(progress)
-                if (sample > -1) {
-                    sampleFilterView.progress = sample
-                }
+                sampleFilterView.progress = sample.filterAlpha
             }
         })
         sampleFilterView.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

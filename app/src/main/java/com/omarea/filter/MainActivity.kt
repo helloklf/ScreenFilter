@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateInfo(){
         myHandler.post {
             light_lux.text = GlobalStatus.currentLux.toString()
-            screen_light.text = GlobalStatus.currentSystemBrightness.toString()
+            screen_light.text = if(GlobalStatus.filterEnabled) GlobalStatus.currentSystemBrightness.toString() else Utils.getSystemBrightness(applicationContext).toString()
             filter_alpha.text = GlobalStatus.currentFilterAlpah.toString()
         }
     }

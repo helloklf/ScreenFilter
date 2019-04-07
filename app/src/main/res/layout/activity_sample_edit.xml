@@ -5,70 +5,122 @@
     android:layout_height="match_parent"
     tools:context=".SampleEditActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingBottom="5dp"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                style="@style/option_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/sample_chart" />
-
-            <com.omarea.filter.SampleDataView
-                android:id="@+id/sample_chart"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="10dp"
+                android:paddingBottom="5dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp">
+                <TextView
+                    style="@style/option_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/sample_chart" />
 
-            <TextView
-                style="@style/option_title"
+                <com.omarea.filter.SampleDataView
+                    android:id="@+id/sample_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    style="@style/option_title"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/sample_desc_title" />
+
+                <TextView
+                    style="@style/option_desc"
+                    android:text="@string/sample_desc" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/sample_desc_title" />
+                android:orientation="vertical"
+                android:padding="10dp">
 
-            <TextView
-                style="@style/option_desc"
-                android:text="@string/sample_desc" />
+                <TextView
+                    style="@style/option_title"
+                    android:text="@string/screen_min_light" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <SeekBar
+                        android:id="@+id/screen_light_min"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:elevation="1dp"
+                        android:enabled="false"
+                        android:max="100"
+                        android:min="1"
+                        android:progress="100" />
+                    <TextView
+                        android:id="@+id/screen_light_min_ratio"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="end"
+                        android:layout_width="30dp"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:text="%"
+                        android:layout_gravity="center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/option_desc"
+                    android:text="@string/screen_min_light_desc" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp">
+
+                <Button
+                    android:id="@+id/smaple_clear"
+                    style="@android:style/Widget.ActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/smaple_clear"
+                    android:textSize="12dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
         </LinearLayout>
-        <LinearLayout
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/smaple_clear"
-                android:text="@string/smaple_clear"
-                android:textSize="12dp"
-                style="@android:style/Widget.ActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/smaple_add"
-        android:src="@drawable/add"
-        android:layout_margin="20dp"
-        android:layout_gravity="right|bottom"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_margin="20dp"
+        android:src="@drawable/add" />
 </android.support.design.widget.CoordinatorLayout>

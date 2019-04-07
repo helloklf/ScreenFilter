@@ -13,10 +13,7 @@ import android.os.Build
 import android.os.Handler
 import android.provider.Settings
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 
@@ -25,6 +22,11 @@ class FilterAccessibilityService : AccessibilityService() {
     private var lightSensorManager: LightSensorManager = LightSensorManager.getInstance()
     private var handler = Handler()
     private var isLandscapf = false
+
+    private var systemBrightness = 0 // 当前由滤镜控制的屏幕亮度（0-100）
+
+    private lateinit var mWindowManager:WindowManager
+    private lateinit var display: Display
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
     }
@@ -98,16 +100,6 @@ class FilterAccessibilityService : AccessibilityService() {
         return result
     }
 
-    private fun getSystemBrightness(): Int {
-        var systemBrightness = 0;
-        try {
-            systemBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-        } catch (e: Settings.SettingNotFoundException) {
-            e.printStackTrace();
-        }
-        return systemBrightness;
-    }
-
     private fun filterOpen() {
         if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
             Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
@@ -116,6 +108,9 @@ class FilterAccessibilityService : AccessibilityService() {
         if (view != null) {
             filterClose()
         }
+
+        mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        display = mWindowManager.getDefaultDisplay()
 
         val params = WindowManager.LayoutParams()
 
@@ -136,15 +131,12 @@ class FilterAccessibilityService : AccessibilityService() {
         // 无法覆盖状态栏和导航栏图标
         // params.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_FULLSCREEN or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
 
-        val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
-        val display = mWindowManager.getDefaultDisplay()
         val p = Point()
         display.getRealSize(p)
         params.width = p.y // p.x
         params.height = p.y
 
-        // 貌似无效
+        // 不知道是不是真的有效
         params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
 
         view = LayoutInflater.from(this).inflate(R.layout.filter, null)
@@ -173,6 +165,7 @@ class FilterAccessibilityService : AccessibilityService() {
         // lp.screenBrightness = 1.0f
         // getWindow().setAttributes(lp)
 
+        systemBrightness = 100
         GlobalStatus.filterEnabled = true
     }
 
@@ -196,44 +189,62 @@ class FilterAccessibilityService : AccessibilityService() {
             GlobalStatus.currentFilterAlpah = 0
         } else {
             val sample = GlobalStatus.sampleData!!.getVitualSample(lux)
-            if (sample > -1) {
-                val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
-                var alpha =  sample + ((sample * offset).toInt())
-                if (isLandscapf) {
-                    alpha -= 25
-                }
-                if (alpha > 250) {
-                    alpha = 250
-                } else if (alpha < 0) {
-                    alpha = 0
-                }
-
-                val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
-
-                if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
-                    handler.postDelayed({
-                        if (GlobalStatus.currentLux == lux) {
-                            if (isLandscapf) {
-                                filterView.setFilterColor(alpha, 0, 0, 0, true)
-                            } else {
-                                filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
-                            }
-                            GlobalStatus.currentFilterAlpah = alpha
-                        }
-                    }, 1000)
-                } else {
-                    if (isLandscapf) {
-                        filterView.setFilterColor(alpha, 0, 0, 0, true)
-                    } else {
-                        filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
-                    }
-                    GlobalStatus.currentFilterAlpah = alpha
-                }
-            } else {
-                Log.d("获取样本失败", lux.toString())
+            val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
+            var alpha =  sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
+            if (isLandscapf) {
+                alpha -= 25
             }
+            if (alpha > 250) {
+                alpha = 250
+            } else if (alpha < 0) {
+                alpha = 0
+            }
+
+            val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
+
+            if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
+                handler.postDelayed({
+                    if (GlobalStatus.currentLux == lux) {
+                        if (isLandscapf) {
+                            filterView.setFilterColor(alpha, 0, 0, 0, true)
+                        } else {
+                            filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
+                        }
+
+                        if (sample.systemBrightness != systemBrightness) {
+                            val layoutParams = view!!.layoutParams as WindowManager.LayoutParams?
+                            if (layoutParams != null) {
+                                layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
+                                // Toast.makeText(this, "设置亮度" + sample.systemBrightness,Toast.LENGTH_SHORT).show()
+                                mWindowManager.updateViewLayout(view, layoutParams)
+                            }
+                            systemBrightness = sample.systemBrightness
+                        }
+
+                        GlobalStatus.currentFilterAlpah = alpha
+                    }
+                }, 1000)
+            } else {
+                if (isLandscapf) {
+                    filterView.setFilterColor(alpha, 0, 0, 0, true)
+                } else {
+                    filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
+                }
+                if (sample.systemBrightness != systemBrightness) {
+                    val layoutParams = view!!.layoutParams as WindowManager.LayoutParams?
+                    if (layoutParams != null) {
+                        layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
+                        // Toast.makeText(this, "设置亮度" + sample.systemBrightness,Toast.LENGTH_SHORT).show()
+                        mWindowManager.updateViewLayout(view, layoutParams)
+                    }
+                    systemBrightness = sample.systemBrightness
+                }
+
+                GlobalStatus.currentFilterAlpah = alpha
+            }
+            GlobalStatus.currentSystemBrightness = systemBrightness
         }
         GlobalStatus.currentLux = lux
-        GlobalStatus.currentSystemBrightness = getSystemBrightness()
+        // GlobalStatus.currentSystemBrightness = Utils.getSystemBrightness(applicationContext)
     }
 }

@@ -23,4 +23,11 @@ public class SpfConfig {
     // 自动启动服务
     public static String FILTER_AUTO_START = "FILTER_AUTO_START";
     public static boolean FILTER_AUTO_START_DEFAULT = false;
+
+    // 屏幕最大亮度数值（通常是1-255，但是也有发现最大值可到2047甚至4095的）
+    public static String SCREENT_MAX_LIGHT = "SCREENT_MAX_LIGHT";
+    public static int SCREENT_MAX_LIGHT_DEFAULT = 255;
+
+    public static String SCREENT_MIN_LIGHT = "SCREENT_MAX_LIGHT";
+    public static int SCREENT_MIN_LIGHT_DEFAULT = 255;
 }

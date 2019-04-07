@@ -13,6 +13,10 @@ import java.nio.charset.Charset
 class SampleData {
     // 样本数据（lux, Sample）
     private var samples = HashMap<Int, Int>()
+
+    // 屏幕亮度低于此值时才开启滤镜功能
+    private var screentMinLight  = 100
+
     private var filterConfig = "filterConfig.json"
 
     constructor (context: Context) {
@@ -36,6 +40,17 @@ class SampleData {
                 }
                 this.samples.put(lux, filterAlpha)
             }
+            if (jsonObject.has("screentMinLight")) {
+                var screentMinLight = jsonObject.getInt("screentMinLight")
+                if (screentMinLight > 100) {
+                    screentMinLight = 100
+                } else if (screentMinLight < 1) {
+                    screentMinLight = 1
+                }
+                this.screentMinLight = screentMinLight
+            } else {
+                this.screentMinLight = 100
+            }
             Log.d("obj", "1")
         } catch (ex: Exception) {
             samples.put(0, 240)
@@ -50,6 +65,7 @@ class SampleData {
         }
         val config = JSONObject()
         config.putOpt("samples", sampleConfig)
+        config.put("screentMinLight", this.screentMinLight)
         val jsonStr = config.toString(2)
 
         if (FileWrite.writePrivateFile(jsonStr.toByteArray(Charset.defaultCharset()), filterConfig, context)) {
@@ -96,39 +112,69 @@ class SampleData {
     /**
      * 获取虚拟样本（根据其它样本获取某个环境光下的理论样本数值）
      */
-    public fun getVitualSample(lux: Int): Int {
+    public fun getVitualSample(lux: Int): FilterViewConfig {
+        val config = FilterViewConfig()
         if (samples.size > 1) {
+            var sampleValue = 0
             if (samples.containsKey(lux)) {
-                return samples.get(lux) as Int
-            }
+                sampleValue = samples.get(lux) as Int
+            } else {
+                val keys = samples.keys.sorted()
+                var min = keys[0]
+                var max = keys[keys.size - 1]
+                for (item in keys) {
+                    if (item < lux) {
+                        min = item
+                    } else {
+                        max = item
+                        break
+                    }
+                }
 
-            val keys = samples.keys.sorted()
-            var min = keys[0]
-            var max = keys[keys.size - 1]
-            for (item in keys) {
-                if (item < lux) {
-                    min = item
+                val minSample = if (min > lux) 240 else (samples[min] as Int)
+                val maxSample = samples[max] as Int
+
+                val ratio = (lux - min) * 1.0 / (max - min)
+
+                if (minSample != maxSample) {
+                    sampleValue = minSample + ((maxSample - minSample) * ratio).toInt()
                 } else {
-                    max = item
-                    break
+                    sampleValue = minSample
                 }
             }
-
-            val minSample = if (min > lux) 240 else (samples[min] as Int)
-            val maxSample = samples[max] as Int
-
-            val ratio = (lux - min) * 1.0 / (max - min)
-
-            if (minSample != maxSample) {
-                return minSample + ((maxSample - minSample) * ratio).toInt()
+            if (this.screentMinLight == 100) {
+                config.filterAlpha = sampleValue
+                return config
             } else {
-                return minSample
+                val ratio = sampleValue / 2.4 // 2.0 = 240 / 100.0，由于滤镜强度240亮度和屏幕亮度1%相近，因此以240作为有效最大值换算
+                if (ratio < (100 - this.screentMinLight)) {
+                    config.filterAlpha = 0
+                    config.systemBrightness = 100 - ratio.toInt()
+                } else {
+                    config.filterAlpha = (sampleValue * ((this.screentMinLight + ((100 - this.screentMinLight) / 8)) / 100.0)).toInt()
+                    config.systemBrightness = this.screentMinLight
+                }
+                return config
             }
         }
-        return -1
+        return config
     }
 
     public fun getAllSamples(): HashMap<Int, Int> {
         return this.samples
+    }
+
+    public fun getScreentMinLight(): Int {
+        return screentMinLight
+    }
+
+    public fun setScreentMinLight(value: Int) {
+        if (value > 100) {
+            this.screentMinLight = 100
+        } else if (value < 1) {
+            this.screentMinLight = 1
+        } else {
+            this.screentMinLight = value
+        }
     }
 }
