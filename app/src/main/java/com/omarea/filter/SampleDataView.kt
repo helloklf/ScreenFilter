@@ -44,12 +44,45 @@ class SampleDataView : View {
 
         val innerPadding = 60f
 
-        val ratioX = (this.width - innerPadding - innerPadding) * 1.0 / (xPoints.max() as Int) // 横向比率
-        val ratioY = ((this.height - innerPadding - innerPadding) * 1.0 / 256).toFloat() // 纵向比率
+        // val ratioX = (this.width - innerPadding - innerPadding) * 1.0 / (xPoints.max() as Int) // 横向比率
+        val ratioX = (this.width - innerPadding - innerPadding) * 1.0 / 500 // 横向比率
+        val ratioY = ((this.height - innerPadding - innerPadding) * 1.0 / 255).toFloat() // 纵向比率
         val stratY = height - innerPadding
 
         val pathFilterAlpha = Path()
         var isFirstPoint = true
+
+        paint.textSize = 20f
+        for (point in 0..10) {
+            canvas.drawText(
+                    (point * 100).toString(),
+                    (point * 100 * ratioX).toInt() + innerPadding - 20f,
+                    this.height - innerPadding + 35, paint
+            )
+            paint.color = Color.parseColor("#000000")
+            canvas.drawCircle(
+                    (point * 100 * ratioX).toInt() + innerPadding,
+                    this.height - innerPadding,
+                    potintRadius,
+                    paint
+            )
+        }
+
+        for (point in 0..10) {
+            canvas.drawText(
+                    (point * 25).toString(),
+                    10f,
+                    innerPadding + ((255 - point * 25) * ratioY).toInt() + 8,
+                    paint
+            )
+            paint.color = Color.parseColor("#000000")
+            canvas.drawCircle(
+                    innerPadding - 1.5f,
+                    innerPadding + ((255 - point * 25) * ratioY).toInt(),
+                    3f,
+                    paint
+            )
+        }
 
         for (point in xPoints) {
             val pointX = (point * ratioX).toFloat() + innerPadding
@@ -67,10 +100,8 @@ class SampleDataView : View {
                 canvas.drawCircle(pointX, stratY - (sample * ratioY), potintRadius, paint)
             }
 
-            paint.textSize = 30f
-            paint.color = Color.parseColor("#000000")
-            canvas.drawText(point.toString(), pointX - 30, this.height - innerPadding + 35, paint)
-            canvas.drawCircle(pointX, this.height - innerPadding, potintRadius, paint)
+            // paint.color = Color.parseColor("#000000")
+            // canvas.drawCircle(pointX, this.height - innerPadding, potintRadius, paint)
         }
 
         paint.reset()
