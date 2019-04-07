@@ -9,7 +9,7 @@
     <string name="filter_enable">启用滤镜</string>
     <string name="filter_disabled">禁用滤镜</string>
     <string name="screen_min_light">最低屏幕亮度</string>
-    <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，通常应设为屏幕开启DC调光的亮度级别。对于全程PWM调光的屏幕，则应设为最高值。\n\n该功能的细节正在优化，可能会有些细节问题！\n\n小米 9和MIX3建议设为30%，其它机型自测哦！</string>
+    <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，通常应设为屏幕开启DC调光的亮度级别。对于全程PWM调光的屏幕，则应设为最高值。\n该功能的细节正在优化，可能会有些细节问题！\n\n小米9、MIX3 建议设为30%，三星S8 建议设为95%，其它机型自测哦！</string>
     <string name="filter_level_offset">滤镜微调</string>
     <string name="filter_level_offset_desc">滤镜浓度全局微调，数值越高屏幕显示效果越暗。如果你不想编辑样本，可以尝试调整它！</string>
     <string name="filter_dynamic_color">环境色温</string>

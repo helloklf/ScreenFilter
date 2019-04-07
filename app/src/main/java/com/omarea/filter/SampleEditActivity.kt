@@ -265,13 +265,13 @@ class SampleEditActivity : AppCompatActivity() {
             }
         }
         dialogView.findViewById<TextView>(R.id.sample_edit_alpha_minus).setOnClickListener {
-            if (sampleLuxView.progress > 0) {
-                sampleLuxView.progress -= 1
+            if (sampleFilterView.progress > 0) {
+                sampleFilterView.progress -= 1
             }
         }
         dialogView.findViewById<TextView>(R.id.sample_edit_alpha_plus).setOnClickListener {
-            if (sampleLuxView.progress < sampleLuxView.max) {
-                sampleLuxView.progress += 1
+            if (sampleFilterView.progress < sampleLuxView.max) {
+                sampleFilterView.progress += 1
             }
         }
     }
