@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="17dp"
+    android:paddingTop="10dp"
+    android:paddingRight="17dp">
+
+    <TextView
+        style="@style/option_title"
+        android:text="@string/ambient_light" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <SeekBar
+            android:id="@+id/sample_lux"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:max="1000"
+            android:min="0" />
+
+        <TextView
+            android:id="@+id/sample_lux_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="0lux" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/option_desc"
+            android:layout_width="wrap_content"
+            android:paddingRight="0dp"
+            android:text="@string/sample_edit_currentlux" />
+
+        <TextView
+            android:id="@+id/sample_edit_currentlux"
+            style="@style/option_desc"
+            android:layout_width="0dp"
+            android:gravity="start"
+            android:paddingLeft="0dp" />
+
+        <TextView
+            android:id="@+id/sample_edit_applay"
+            android:text="@string/sample_edit_applay"
+            style="@style/option_desc"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_marginLeft="10dp"
+            android:id="@+id/sample_edit_minus"
+            android:text="－"
+            style="@style/option_desc"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:id="@+id/sample_edit_plus"
+            android:text="＋"
+            style="@style/option_desc"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView
+        style="@style/option_title"
+        android:text="@string/filter_alpha" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <SeekBar
+            android:id="@+id/sample_filter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:max="240"
+            android:min="0" />
+
+        <TextView
+            android:id="@+id/sample_filter_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            style="@style/option_desc"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/sample_edit_filter_alpha_desc" />
+        <TextView
+            android:layout_marginLeft="10dp"
+            android:id="@+id/sample_edit_alpha_minus"
+            android:text="－"
+            style="@style/option_desc"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dp"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:id="@+id/sample_edit_alpha_plus"
+            android:text="＋"
+            style="@style/option_desc"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dp"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            style="@android:style/Widget.ActionButton"
+            android:id="@+id/sample_edit_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sample_edit_cancel" />
+
+        <Button
+            style="@android:style/Widget.ActionButton"
+            android:id="@+id/sample_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sample_edit_confirm" />
+    </LinearLayout>
+</LinearLayout>

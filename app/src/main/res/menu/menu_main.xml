@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.omarea.filter.MainActivity">
+    <item
+        android:visible="true"
+        android:id="@+id/sample_edit"
+        android:orderInCategory="100"
+        android:title="@string/sample_edit"
+        app:showAsAction="never" />
+</menu>

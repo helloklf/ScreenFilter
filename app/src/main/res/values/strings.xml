@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">屏幕滤镜(实验版)</string>
+    <string name="sample_edit">样本数据修改</string>
+
+    <string name="ambient_light">环境光(lux)</string>
+    <string name="scrient_light">屏幕亮度</string>
+    <string name="filter_alpha">滤镜浓度</string>
+
+    <string name="filter_enable">启用滤镜</string>
+    <string name="filter_disabled">禁用滤镜</string>
+    <string name="screen_min_light">最低屏幕亮度 *敬请期待</string>
+    <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，通常应设为屏幕开启DC调光的亮度级别。对于全程PWM调光的屏幕，则应设为最高值</string>
+    <string name="filter_level_offset">滤镜微调</string>
+    <string name="filter_level_offset_desc">滤镜浓度全局微调，数值越高屏幕显示效果越暗。如果你不想编辑样本，可以尝试调整它！</string>
+    <string name="filter_dynamic_color">环境色温</string>
+    <string name="filter_dynamic_color_desc">当环境光逐渐变暗，开始缓慢的根据环境光调整屏幕色温，相当于平滑的夜间模式，此值将调整其色温变化浓度</string>
+    <string name="pixel_filter">像素滤镜 *敬请期待</string>
+    <string name="pixel_filter_desc">使用关闭相邻像素 + 全局叠加层，双重方案来调整屏幕亮度。略微提升低亮度下的色彩表现，但会出现明显的锯齿感！</string>
+    <string name="smooth_adjustment">平滑亮度</string>
+    <string name="smooth_adjustment_desc">延缓亮度调整的速度，避免环境光线变化过快导致屏幕闪烁。如果你正在测试样本的准确性，请暂时关闭此选项！</string>
+    <string name="landscape_optimize">横屏优化</string>
+    <string name="landscape_optimize_desc">在横屏状态下暂停“环境色温”并适当提高亮度(10%)，优化游戏体验</string>
+
+    <string name="accessibility_description">通过辅助服务，提高滤镜显示层级，以便能够覆盖状态栏、导航栏、锁屏界面。</string>
+    <string name="statement">声明</string>
+    <string name="statement_content">大多数Amoled屏幕都采用调光，通过不断的“暗-亮”切换，达到调整单位时间内平均亮度的效果。暗光环境下的低频闪烁，更容易造成眼睛疲劳。\n\n将屏幕固定最大亮度，再通过改变屏幕叠加层（滤镜）的浓度，来实现亮度调整，是民间一种“另辟蹊径”的手法，并非本应用首创！！！\n\n启用滤镜后，屏幕会根据亮度不同出现不同程度的色彩失真，并且会导致屏幕截图变暗！</string>
+    <string name="author">—— 嘟嘟斯基\n http://vtools.omarea.com</string>
+
+    <string name="sample_chart">当前样本数据</string>
+    <string name="sample_desc_title">样本说明</string>
+    <string name="sample_desc">样本是用于计算不同光照强度下，屏幕物理亮度和滤镜浓度组合关系的数据。\n\n如果你在使用滤镜过程中出现屏幕过亮或过暗的情况，则需要修改样本数据，以适应设备和环境。\n\n样本配置文件保存位置：/data/data/com.example.filter/files/private/filterConfig.json\n\n如果你觉得从本界面配置样本过于繁琐，可使用编辑器直接修改样本配置文件（重启应用后生效）。</string>
+
+    <string name="accessibility_service_required">需要先启动辅助服务，才能使用本功能！</string>
+    <string name="overlays_required">还未授予“显示悬浮窗/在应用上层显示”权限</string>
+
+    <string name="sample_add_title">添加/覆盖 样本</string>
+    <string name="sample_edit_currentlux">当前环境光亮度(lux)：</string>
+    <string name="sample_edit_filter_alpha_desc">拖动滑块到屏幕亮度合适为止，然后点击确定保存样本</string>
+    <string name="sample_edit_cancel">取消</string>
+    <string name="sample_edit_confirm">确定</string>
+    <string name="sample_edit_applay">使用</string>
+    <string name="sample_edit_delete">删除</string>
+    <string name="smaple_clear">清空自定义</string>
+</resources>
