@@ -30,6 +30,10 @@ class FilterAccessibilityService : AccessibilityService() {
     private lateinit var mWindowManager:WindowManager
     private lateinit var display: Display
 
+    var popupView: View? = null
+
+    private var smoothLightTimer: Timer? = null
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
     }
 
@@ -60,19 +64,18 @@ class FilterAccessibilityService : AccessibilityService() {
         filterClose()
     }
 
-    var view: View? = null
-
     private fun filterClose() {
-        if (view != null) {
+        if (popupView != null) {
             val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            mWindowManager.removeView(view)
-            view = null
+            mWindowManager.removeView(popupView)
+            popupView = null
             lightSensorManager.stop()
         }
 
         GlobalStatus.filterRefresh = null
         GlobalStatus.filterEnabled = false
         lightHistory.empty()
+        stopSmoothLightTimer()
     }
 
     /**
@@ -108,7 +111,7 @@ class FilterAccessibilityService : AccessibilityService() {
             Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
             return
         }
-        if (view != null) {
+        if (popupView != null) {
             filterClose()
         }
 
@@ -142,9 +145,9 @@ class FilterAccessibilityService : AccessibilityService() {
         // 不知道是不是真的有效
         params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
 
-        view = LayoutInflater.from(this).inflate(R.layout.filter, null)
-        mWindowManager.addView(view, params)
-        val filterView = view!!.findViewById<FilterView>(R.id.filter_view)
+        popupView = LayoutInflater.from(this).inflate(R.layout.filter, null)
+        mWindowManager.addView(popupView, params)
+        val filterView = popupView!!.findViewById<FilterView>(R.id.filter_view)
 
         lightSensorManager.start(this, object : SensorEventListener {
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -193,17 +196,52 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     /**
+     * 启动平滑亮度定时任务
+     */
+    private fun startSmoothLightTimer(filterView:FilterView) {
+        if (smoothLightTimer == null) {
+            smoothLightTimer = Timer()
+            smoothLightTimer!!.schedule(object : TimerTask() {
+                override fun run() {
+                    val currentTime = System.currentTimeMillis()
+                    val historys = lightHistory.filter {
+                        currentTime - it.time < 100001
+                    }
+                    if (historys.size > 0) {
+                        var total = 0
+                        for (history in historys) {
+                            total += history.lux
+                        }
+                        handler.post {
+                            updateFilterNow(total / historys.size, filterView)
+                        }
+                    }
+                }
+            }, 2000, 2000)
+        }
+    }
+
+    private fun stopSmoothLightTimer() {
+        if (smoothLightTimer != null) {
+            smoothLightTimer!!.cancel()
+            smoothLightTimer = null
+        }
+    }
+
+    /**
      * 更新滤镜
      */
     private fun updateFilter(lux:Int, filterView:FilterView) {
         if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
+            startSmoothLightTimer(filterView)
+            /*
             handler.postDelayed({
                 if (GlobalStatus.currentLux == lux) {
                     updateFilterNow(lux, filterView)
                 } else {
                     val currentTime = System.currentTimeMillis()
                     val historys = lightHistory.filter {
-                        it.time - currentTime < 5001
+                        it.time - currentTime < 100001
                     }
                     if (historys.size > 0) {
                         var total = 0
@@ -213,8 +251,10 @@ class FilterAccessibilityService : AccessibilityService() {
                         updateFilterNow(total / historys.size, filterView)
                     }
                 }
-            }, 1000)
+            }, 2000)
+            */
         } else {
+            stopSmoothLightTimer()
             updateFilterNow(lux, filterView)
         }
         GlobalStatus.currentSystemBrightness = systemBrightness
@@ -242,11 +282,11 @@ class FilterAccessibilityService : AccessibilityService() {
             filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
         }
         if (sample.systemBrightness != systemBrightness) {
-            val layoutParams = view!!.layoutParams as WindowManager.LayoutParams?
+            val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
             if (layoutParams != null) {
                 layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
                 // Toast.makeText(this, "设置亮度" + sample.systemBrightness,Toast.LENGTH_SHORT).show()
-                mWindowManager.updateViewLayout(view, layoutParams)
+                mWindowManager.updateViewLayout(popupView, layoutParams)
             }
             systemBrightness = sample.systemBrightness
         }
