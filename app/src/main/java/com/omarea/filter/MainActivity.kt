@@ -1,5 +1,6 @@
 package com.omarea.filter
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        setExcludeFromRecents()
 
         // 启用滤镜
         filter_switch.setOnClickListener { v ->
@@ -94,6 +96,13 @@ class MainActivity : AppCompatActivity() {
         landscape_optimize.isChecked = config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)
         landscape_optimize.setOnClickListener {
             config.edit().putBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, (it as Switch).isChecked).apply()
+        }
+
+        // 从最近任务隐藏
+        hide_in_recent.isChecked = config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT)
+        hide_in_recent.setOnClickListener {
+            config.edit().putBoolean(SpfConfig.HIDE_IN_RECENT, (it as Switch).isChecked).apply()
+            setExcludeFromRecents()
         }
     }
 
@@ -169,5 +178,18 @@ class MainActivity : AppCompatActivity() {
             }
             return true
         } else super.onOptionsItemSelected(item)
+    }
+
+    private fun setExcludeFromRecents(exclude: Boolean? = null) {
+        try {
+            val service = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            for (task in service.appTasks) {
+                if (task.taskInfo.id == this.taskId) {
+                    val b = if (exclude == null) config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT) else exclude
+                    task.setExcludeFromRecents(b)
+                }
+            }
+        } catch (ex: Exception) {
+        }
     }
 }

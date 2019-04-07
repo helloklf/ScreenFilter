@@ -199,6 +199,15 @@
                     <TextView
                         style="@style/option_desc"
                         android:text="@string/landscape_optimize_desc" />
+
+                    <Switch
+                        android:id="@+id/hide_in_recent"
+                        style="@style/option_title"
+                        android:text="@string/hide_in_recent" />
+
+                    <TextView
+                        style="@style/option_desc"
+                        android:text="@string/hide_in_recent_desc" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 

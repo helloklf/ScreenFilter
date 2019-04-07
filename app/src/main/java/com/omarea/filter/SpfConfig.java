@@ -30,4 +30,7 @@ public class SpfConfig {
 
     public static String SCREENT_MIN_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MIN_LIGHT_DEFAULT = 255;
+
+    public static String HIDE_IN_RECENT = "HIDE_IN_RECENT";
+    public static boolean HIDE_IN_RECENT_DEFAULT = false;
 }

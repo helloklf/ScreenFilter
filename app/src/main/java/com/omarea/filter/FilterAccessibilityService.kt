@@ -16,12 +16,14 @@ import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
+import java.util.*
 
 class FilterAccessibilityService : AccessibilityService() {
     private lateinit var config: SharedPreferences
     private var lightSensorManager: LightSensorManager = LightSensorManager.getInstance()
     private var handler = Handler()
     private var isLandscapf = false
+    private val lightHistory  = Stack<LightHistory>()
 
     private var systemBrightness = 0 // 当前由滤镜控制的屏幕亮度（0-100）
 
@@ -70,6 +72,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
         GlobalStatus.filterRefresh = null
         GlobalStatus.filterEnabled = false
+        lightHistory.empty()
     }
 
     /**
@@ -151,6 +154,15 @@ class FilterAccessibilityService : AccessibilityService() {
                 if (event != null && event.values.size > 0) {
                     // 获取光线强度
                     val lux = event.values[0].toInt()
+                    val history = LightHistory()
+                    history.time = System.currentTimeMillis()
+                    history.lux = lux
+
+                    if (lightHistory.size > 10) {
+                        lightHistory.pop()
+                    }
+                    lightHistory.push(history)
+
                     updateFilter(lux, filterView)
                 }
             }
@@ -184,67 +196,65 @@ class FilterAccessibilityService : AccessibilityService() {
      * 更新滤镜
      */
     private fun updateFilter(lux:Int, filterView:FilterView) {
-        if (lux > 254) {
-            filterView.setFilterColor(0)
-            GlobalStatus.currentFilterAlpah = 0
-        } else {
-            val sample = GlobalStatus.sampleData!!.getVitualSample(lux)
-            val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
-            var alpha =  sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
-            if (isLandscapf) {
-                alpha -= 25
-            }
-            if (alpha > 250) {
-                alpha = 250
-            } else if (alpha < 0) {
-                alpha = 0
-            }
-
-            val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
-
-            if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
-                handler.postDelayed({
-                    if (GlobalStatus.currentLux == lux) {
-                        if (isLandscapf) {
-                            filterView.setFilterColor(alpha, 0, 0, 0, true)
-                        } else {
-                            filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
-                        }
-
-                        if (sample.systemBrightness != systemBrightness) {
-                            val layoutParams = view!!.layoutParams as WindowManager.LayoutParams?
-                            if (layoutParams != null) {
-                                layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
-                                // Toast.makeText(this, "设置亮度" + sample.systemBrightness,Toast.LENGTH_SHORT).show()
-                                mWindowManager.updateViewLayout(view, layoutParams)
-                            }
-                            systemBrightness = sample.systemBrightness
-                        }
-
-                        GlobalStatus.currentFilterAlpah = alpha
-                    }
-                }, 1000)
-            } else {
-                if (isLandscapf) {
-                    filterView.setFilterColor(alpha, 0, 0, 0, true)
+        if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
+            handler.postDelayed({
+                if (GlobalStatus.currentLux == lux) {
+                    updateFilterNow(lux, filterView)
                 } else {
-                    filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
-                }
-                if (sample.systemBrightness != systemBrightness) {
-                    val layoutParams = view!!.layoutParams as WindowManager.LayoutParams?
-                    if (layoutParams != null) {
-                        layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
-                        // Toast.makeText(this, "设置亮度" + sample.systemBrightness,Toast.LENGTH_SHORT).show()
-                        mWindowManager.updateViewLayout(view, layoutParams)
+                    val currentTime = System.currentTimeMillis()
+                    val historys = lightHistory.filter {
+                        it.time - currentTime < 5001
                     }
-                    systemBrightness = sample.systemBrightness
+                    if (historys.size > 0) {
+                        var total = 0
+                        for (history in historys) {
+                            total += history.lux
+                        }
+                        updateFilterNow(total / historys.size, filterView)
+                    }
                 }
-
-                GlobalStatus.currentFilterAlpah = alpha
-            }
-            GlobalStatus.currentSystemBrightness = systemBrightness
+            }, 1000)
+        } else {
+            updateFilterNow(lux, filterView)
         }
+        GlobalStatus.currentSystemBrightness = systemBrightness
         GlobalStatus.currentLux = lux
+    }
+
+    private fun updateFilterNow(lux:Int, filterView:FilterView) {
+        val sample = GlobalStatus.sampleData!!.getVitualSample(lux)
+        val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
+        var alpha =  sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
+        if (isLandscapf) {
+            alpha -= 25
+        }
+        if (alpha > 250) {
+            alpha = 250
+        } else if (alpha < 0) {
+            alpha = 0
+        }
+
+        val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
+
+        if (isLandscapf) {
+            filterView.setFilterColor(alpha, 0, 0, 0, true)
+        } else {
+            filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
+        }
+        if (sample.systemBrightness != systemBrightness) {
+            val layoutParams = view!!.layoutParams as WindowManager.LayoutParams?
+            if (layoutParams != null) {
+                layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
+                // Toast.makeText(this, "设置亮度" + sample.systemBrightness,Toast.LENGTH_SHORT).show()
+                mWindowManager.updateViewLayout(view, layoutParams)
+            }
+            systemBrightness = sample.systemBrightness
+        }
+
+        GlobalStatus.currentFilterAlpah = alpha
+
+        GlobalStatus.currentSystemBrightness = systemBrightness
+
         // GlobalStatus.currentSystemBrightness = Utils.getSystemBrightness(applicationContext)
     }
 }
