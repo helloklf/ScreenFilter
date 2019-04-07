@@ -1,30 +1,10 @@
 {
-  "samples_desc": "systemBrightness 取值为0~1020（越大屏幕越亮），filterAlpha取值为0-255（越大屏幕越暗，建议不超过240），pixelFilter可设为true、false。每个样本，以环境光强度（lux）作为key，不要出现重复！",
+  "samples_desc": "sample配置格式为[lux]:[filterAlpha]。lux为环境光亮度，filterAlpha取值为0-255，代表滤镜不透明度（越大屏幕越暗，建议不超过240）。每个样本，以环境光强度（lux）作为key，不要出现重复！",
   "samples": {
-    "0": {
-      "systemBrightness": "1020",
-      "filterAlpha": "240",
-      "pixelFilter": false
-    },
-    "1": {
-      "systemBrightness": "1020",
-      "filterAlpha": "210",
-      "pixelFilter": false
-    },
-    "100": {
-      "systemBrightness": "1020",
-      "filterAlpha": "128",
-      "pixelFilter": false
-    },
-    "350": {
-      "systemBrightness": "1020",
-      "filterAlpha": "75",
-      "pixelFilter": false
-    },
-    "500": {
-      "systemBrightness": "1020",
-      "filterAlpha": "0",
-      "pixelFilter": false
-    }
+    "0": "240",
+    "1": "210",
+    "100": "128",
+    "350": "75",
+    "500": "0"
   }
 }

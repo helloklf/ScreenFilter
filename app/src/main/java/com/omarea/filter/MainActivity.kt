@@ -153,6 +153,11 @@ class MainActivity : AppCompatActivity() {
         val id = item.itemId
 
         return if (id == R.id.sample_edit) {
+            if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
+                Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
+                return true
+            }
+
             try {
                 val intent = Intent(this, SampleEditActivity::class.java)
                 startActivityForResult(intent, if (GlobalStatus.filterEnabled) 1 else 0)

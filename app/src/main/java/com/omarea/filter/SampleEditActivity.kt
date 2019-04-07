@@ -172,10 +172,7 @@ class SampleEditActivity : AppCompatActivity() {
         }
 
         dialogView.findViewById<Button>(R.id.sample_save).setOnClickListener {
-            val newSample = Sample()
-            newSample.systemBrightness = 1024
-            newSample.filterAlpha = sampleFilterView.progress
-            GlobalStatus.sampleData!!.replaceSample(sampleLuxView.progress, newSample)
+            GlobalStatus.sampleData!!.replaceSample(sampleLuxView.progress, sampleFilterView.progress)
 
             dialog.dismiss()
         }
@@ -219,8 +216,8 @@ class SampleEditActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 sampleLuxValueView.text = progress.toString()
                 val sample = GlobalStatus.sampleData!!.getVitualSample(progress)
-                if (sample != null) {
-                    sampleFilterView.progress = sample.filterAlpha
+                if (sample > -1) {
+                    sampleFilterView.progress = sample
                 }
             }
         })

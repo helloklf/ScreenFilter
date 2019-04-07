@@ -48,7 +48,6 @@ class SampleDataView : View {
         val ratioY = ((this.height - innerPadding - innerPadding) * 1.0 / 256).toFloat() // 纵向比率
         val stratY = height - innerPadding
 
-        val pathSystemBrightness = Path()
         val pathFilterAlpha = Path()
         var isFirstPoint = true
 
@@ -57,19 +56,15 @@ class SampleDataView : View {
             val sample = samples.get(point)!!
 
             if (isFirstPoint) {
-                pathSystemBrightness.moveTo(pointX, stratY - (sample.systemBrightness / 4 * ratioY))
-                pathFilterAlpha.moveTo(pointX, stratY - (sample.filterAlpha * ratioY))
+                pathFilterAlpha.moveTo(pointX, stratY - (sample * ratioY))
                 isFirstPoint = false
                 canvas.drawLine(innerPadding, innerPadding / 2, innerPadding, this.height - innerPadding, paint)
                 canvas.drawLine(innerPadding, this.height - innerPadding, this.width - innerPadding / 2, this.height - innerPadding, paint)
             } else {
-                pathSystemBrightness.lineTo(pointX, stratY - (sample.systemBrightness / 4 * ratioY))
-                pathFilterAlpha.lineTo(pointX, stratY - (sample.filterAlpha * ratioY))
+                pathFilterAlpha.lineTo(pointX, stratY - (sample * ratioY))
 
-                paint.color = Color.parseColor("#FF9800")
-                canvas.drawCircle(pointX, stratY - (sample.systemBrightness / 4 * ratioY), potintRadius, paint)
                 paint.color = Color.parseColor("#8BC34A")
-                canvas.drawCircle(pointX, stratY - (sample.filterAlpha * ratioY), potintRadius, paint)
+                canvas.drawCircle(pointX, stratY - (sample * ratioY), potintRadius, paint)
             }
 
             paint.textSize = 30f
@@ -82,9 +77,6 @@ class SampleDataView : View {
         paint.isAntiAlias = true
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 4f
-
-        paint.color = Color.parseColor("#FF9800")
-        canvas.drawPath(pathSystemBrightness, paint)
 
         paint.color = Color.parseColor("#8BC34A")
         canvas.drawPath(pathFilterAlpha, paint)

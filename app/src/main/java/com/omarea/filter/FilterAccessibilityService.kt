@@ -110,7 +110,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private fun filterOpen() {
         if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
-            Toast.makeText(this, "还未授予“显示悬浮窗/在应用上层显示”权限", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
             return
         }
         if (view != null) {
@@ -196,9 +196,9 @@ class FilterAccessibilityService : AccessibilityService() {
             GlobalStatus.currentFilterAlpah = 0
         } else {
             val sample = GlobalStatus.sampleData!!.getVitualSample(lux)
-            if (sample != null) {
+            if (sample > -1) {
                 val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
-                var alpha =  sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
+                var alpha =  sample + ((sample * offset).toInt())
                 if (isLandscapf) {
                     alpha -= 25
                 }
