@@ -273,19 +273,23 @@ class FilterAccessibilityService : AccessibilityService() {
      * 更新滤镜 使用最近的光线传感器样本平均值
      */
     private fun updateFilterSmooth(filterView: FilterView) {
-        val currentTime = System.currentTimeMillis()
-        val historys = lightHistory.filter {
-            currentTime - it.time < 50001
-        }
-        if (historys.size > 0 && this.filterView != null) {
-            var total = 0
-            for (history in historys) {
-                total += history.lux
+        try {
+            val currentTime = System.currentTimeMillis()
+            val historys = lightHistory.filter {
+                (currentTime - it.time) < 5001
             }
-            val avg = total / historys.size
-            handler.post {
-                updateFilterNow(avg, filterView)
+            if (historys.size > 0 && this.filterView != null) {
+                var total:Long = 0
+                for (history in historys) {
+                    total += history.lux
+                }
+                val avg = total / historys.size
+                handler.post {
+                    updateFilterNow(avg.toInt(), filterView)
+                }
             }
+        } catch (ex: Exception) {
+            Toast.makeText(this, "更新滤镜异常：" + ex.message, Toast.LENGTH_SHORT).show()
         }
     }
 

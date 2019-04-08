@@ -136,33 +136,17 @@ class SampleData {
             } else {
                 val x = 2.424
 
-                val ratio = Math.pow(sampleValue / x, filterExchangeRate / 4.0) * 10 // 滤镜浓度百分比（越高表示屏幕越暗）
+                val ratio = sampleValue / x // 滤镜浓度百分比（越高表示屏幕越暗）
                 if (ratio <= 100 - this.screentMinLight) { // 如果还能通过调整物理亮度解决问题，那就别开滤镜
                     config.filterAlpha = 0
                     config.systemBrightness = (100 - ratio).toInt()
                 } else {
-                    val filterRatio = ratio - (100 - this.screentMinLight)
-                    config.filterAlpha = (Math.pow(filterRatio / 10, filterExchangeRate) * x).toInt()
+                    val screenRatio = (100 - this.screentMinLight)
+                    val filterRatio = ratio - screenRatio
+                    val filterAlpha = ((screenRatio * 0.8 + filterRatio) * sampleValue / 100.0).toInt()
+                    config.filterAlpha = filterAlpha
                     config.systemBrightness = this.screentMinLight
                 }
-
-                /*
-                val ratio = sampleValue / 2.424 // 2.424 = 240 / 99.0，由于滤镜强度240亮度和屏幕亮度1%相近，因此以240作为有效最大值换算
-                if (ratio < (100 - this.screentMinLight)) {
-                    val screenLight = 100 - ratio.toInt()
-                    val offset = (((100 - screenLight) / 4) * sampleValue / 100.0).toInt()
-                    if (screenLight - offset < this.screentMinLight) {
-                        config.filterAlpha = (screenLight + offset - this.screentMinLight)
-                        config.systemBrightness = this.screentMinLight
-                    } else {
-                        config.filterAlpha = 0
-                        config.systemBrightness = screenLight - offset
-                    }
-                } else {
-                    config.filterAlpha = (sampleValue * ((this.screentMinLight + ((100 - this.screentMinLight) / 4)) / 100.0)).toInt()
-                    config.systemBrightness = this.screentMinLight
-                }
-                */
                 return config
             }
         }

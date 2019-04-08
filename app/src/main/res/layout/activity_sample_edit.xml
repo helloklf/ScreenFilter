@@ -95,8 +95,10 @@
 
                 <TextView
                     style="@style/option_title"
+                    android:visibility="gone"
                     android:text="@string/filter_exchange_rate" />
                 <LinearLayout
+                    android:visibility="gone"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
