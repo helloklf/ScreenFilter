@@ -1,12 +1,15 @@
 *.iml
+.idea/*
 .gradle
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
 /build
-./app/build
+./app/build/*
 ./app/release
 /captures
 app/release/app-release.apk
-app/build.gradle
+
+.idea/misc.xml
+.idea/caches/build_file_checksums.ser
