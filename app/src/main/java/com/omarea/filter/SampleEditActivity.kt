@@ -1,14 +1,17 @@
 package com.omarea.filter
 
 import android.content.Context
+import android.database.ContentObserver
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
+import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
@@ -23,6 +26,7 @@ import kotlinx.android.synthetic.main.activity_sample_edit.*
 class SampleEditActivity : AppCompatActivity() {
     private var filterPopup: View? = null
     private var hasChange = false
+    private var alertDialog:AlertDialog? = null
 
     /**
      * 获取导航栏高度
@@ -107,13 +111,17 @@ class SampleEditActivity : AppCompatActivity() {
         sample_chart.invalidate()
     }
 
+    private fun setWindowLight() {
+        // 亮度锁定
+        val lp = getWindow().getAttributes()
+        lp.screenBrightness = (GlobalStatus.sampleData!!.getScreentMinLight() / 100.0).toFloat() // 1.0f //
+        getWindow().setAttributes(lp)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sample_edit)
-        // 最高亮度锁定
-        val lp = getWindow().getAttributes()
-        lp.screenBrightness = 1.0f // (GlobalStatus.sampleData!!.getScreentMinLight() / 100.0).toFloat()
-        getWindow().setAttributes(lp)
+        setWindowLight()
 
         // 全屏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -148,16 +156,33 @@ class SampleEditActivity : AppCompatActivity() {
                     hasChange = true
                 }
                 screen_light_min_ratio.text = progress.toString()
+                setWindowLight()
             }
         })
         screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
         screen_light_min_ratio.text = screen_light_min.progress.toString()
+
+        /*
+        getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS), true, object:ContentObserver(Handler()) {
+            override fun onChange(selfChange: Boolean, uri: Uri?) {
+                super.onChange(selfChange, uri)
+            }
+        })
+        getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, object:ContentObserver(Handler()) {
+            override fun onChange(selfChange: Boolean, uri: Uri?) {
+                super.onChange(selfChange, uri)
+            }
+        })
+        */
     }
 
     override fun onPause() {
         filterClose()
         if (hasChange) {
             GlobalStatus.sampleData!!.saveConfig(applicationContext)
+        }
+        if (alertDialog != null) {
+            alertDialog!!.dismiss()
         }
         super.onPause()
     }
@@ -174,28 +199,29 @@ class SampleEditActivity : AppCompatActivity() {
         val sampleFilterView = dialogView.findViewById<SeekBar>(R.id.sample_filter)
         var currentLux = -1
 
-        val dialog = AlertDialog.Builder(this)
+        alertDialog = AlertDialog.Builder(this)
                 .setTitle(R.string.sample_add_title)
                 .setView(dialogView)
                 .setCancelable(false)
                 .create()
-        dialog.show()
+        alertDialog!!.show()
         filterOpen()
 
         dialogView.findViewById<Button>(R.id.sample_edit_cancel).setOnClickListener {
             // GlobalStatus.sampleData!!.removeSample(sampleFilterView.progress)
-            dialog.dismiss()
+            alertDialog!!.dismiss()
         }
 
         dialogView.findViewById<Button>(R.id.sample_save).setOnClickListener {
             GlobalStatus.sampleData!!.replaceSample(sampleLuxView.progress, sampleFilterView.progress)
 
-            dialog.dismiss()
+            alertDialog!!.dismiss()
         }
-        dialog.setOnDismissListener {
+        alertDialog!!.setOnDismissListener {
             lightSensorManager.stop()
             filterClose()
             updateChart()
+            alertDialog = null
         }
         val currentLuxView = dialogView.findViewById<TextView>(R.id.sample_edit_currentlux)
         val filterView = filterPopup!!.findViewById<FilterView>(R.id.filter_view)
@@ -211,8 +237,8 @@ class SampleEditActivity : AppCompatActivity() {
                     currentLuxView.text = lux.toString()
                     if (currentLux == -1) {
                         var limitLux = lux
-                        if (limitLux > 1000) {
-                            limitLux = 1000
+                        if (limitLux > sampleLuxView.max) {
+                            limitLux = sampleLuxView.max
                         }
                         sampleLuxValueView.text = limitLux.toString()
                         sampleLuxView.progress = limitLux

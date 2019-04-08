@@ -149,7 +149,7 @@ class SampleData {
                 val ratio = sampleValue / 2.4 // 2.0 = 240 / 100.0，由于滤镜强度240亮度和屏幕亮度1%相近，因此以240作为有效最大值换算
                 if (ratio < (100 - this.screentMinLight)) {
                     val screenLight = 100 - ratio.toInt()
-                    val offset = (((100 - screenLight) / 8) * sampleValue / 100.0).toInt()
+                    val offset = (((100 - screenLight) / 4) * sampleValue / 100.0).toInt()
                     if (screenLight - offset < this.screentMinLight) {
                         config.filterAlpha = (screenLight + offset - this.screentMinLight)
                         config.systemBrightness = this.screentMinLight
@@ -158,7 +158,7 @@ class SampleData {
                         config.systemBrightness = screenLight - offset
                     }
                 } else {
-                    config.filterAlpha = (sampleValue * ((this.screentMinLight + ((100 - this.screentMinLight) / 8)) / 100.0)).toInt()
+                    config.filterAlpha = (sampleValue * ((this.screentMinLight + ((100 - this.screentMinLight) / 4)) / 100.0)).toInt()
                     config.systemBrightness = this.screentMinLight
                 }
                 return config

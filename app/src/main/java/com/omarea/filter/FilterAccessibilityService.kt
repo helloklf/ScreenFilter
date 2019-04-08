@@ -4,11 +4,13 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.database.ContentObserver
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.provider.Settings
@@ -16,6 +18,7 @@ import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
+import java.lang.Exception
 import java.util.*
 
 class FilterAccessibilityService : AccessibilityService() {
@@ -25,14 +28,77 @@ class FilterAccessibilityService : AccessibilityService() {
     private var isLandscapf = false
     private val lightHistory  = Stack<LightHistory>()
 
-    private var systemBrightness = 0 // 当前由滤镜控制的屏幕亮度（0-100）
+    private var filterBrightness = 0 // 当前由滤镜控制的屏幕亮度（0-100）
 
     private lateinit var mWindowManager:WindowManager
     private lateinit var display: Display
 
-    var popupView: View? = null
-
+    // 悬浮窗
+    private var popupView: View? = null
+    // 滤镜控件
+    private var filterView: FilterView? = null
+    // 计算平滑亮度的定时器
     private var smoothLightTimer: Timer? = null
+
+    private var systemBrightness = 0 // 当前由系统控制的亮度
+    private var systemBrightnessMode = Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC // Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+    private var systemBrightnessObserver: ContentObserver = object: ContentObserver(Handler()) {
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            super.onChange(selfChange, uri)
+            updateFilterByBrightness()
+        }
+    }
+    private var systemBrightnessModeObserver = object: ContentObserver(Handler()) {
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            super.onChange(selfChange, uri)
+            val currentMode =  Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE)
+            if (systemBrightnessMode != currentMode) {
+                systemBrightnessMode = currentMode
+                if (currentMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                    // 切换到自动模式
+                    updateFilterSmooth(filterView!!)
+                } else if (currentMode == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL) {
+                    // 切换到手动模式
+                    updateFilterByBrightness()
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据当前系统亮度调整滤镜浓度
+     */
+    private fun updateFilterByBrightness() {
+        // 获取当前系统亮度
+        systemBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)
+        // 系统最大亮度值
+        val maxLight = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT)
+        // 当前亮度比率
+        val ratio = (systemBrightness.toFloat() / maxLight)
+
+        // 如果不是自动亮度模式（直接调整滤镜）
+        if (systemBrightnessMode != Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+            if (filterView != null) {
+                // TODO:系统亮度转换为滤镜浓度
+                // TODO:如果当前滤镜控制的亮度不是100%，应该怎么处理？
+                var alpha = 255 - (ratio * 255).toInt()
+                if (alpha > 245) {
+                    alpha = 245
+                } else if (alpha < 0) {
+                    alpha = 0
+                }
+                GlobalStatus.currentFilterAlpah = alpha
+                val layoutParams =  popupView!!.layoutParams as WindowManager.LayoutParams?
+                if (layoutParams != null) {
+                    GlobalStatus.currentSystemBrightness = (layoutParams.screenBrightness * 100).toInt()
+                }
+                filterView!!.setFilterColor(alpha, 0, 0, 0, false)
+            }
+        } else { // 如果是自动亮度（微调offset）
+            config.edit().putInt(SpfConfig.FILTER_LEVEL_OFFSET, (ratio * 100 - 50).toInt()).apply()
+            updateFilterSmooth(filterView!!)
+        }
+    }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
     }
@@ -53,7 +119,6 @@ class FilterAccessibilityService : AccessibilityService() {
         if (config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)) {
             filterOpen()
         }
-
         super.onServiceConnected()
     }
 
@@ -65,45 +130,23 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun filterClose() {
-        if (popupView != null) {
-            val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            mWindowManager.removeView(popupView)
-            popupView = null
-            lightSensorManager.stop()
-        }
+        try {
+            if (popupView != null) {
+                val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                mWindowManager.removeView(popupView)
+                popupView = null
+                lightSensorManager.stop()
+            }
 
-        GlobalStatus.filterRefresh = null
-        GlobalStatus.filterEnabled = false
-        lightHistory.empty()
-        stopSmoothLightTimer()
-    }
-
-    /**
-     * 获取导航栏高度
-     * @param context
-     * @return
-     */
-    fun getNavBarHeight(): Int {
-        val resourceId: Int
-        val rid = resources.getIdentifier("config_showNavigationBar", "bool", "android")
-        if (rid != 0) {
-            resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-            return resources.getDimensionPixelSize(resourceId)
-        } else {
-            return 0
+            GlobalStatus.filterRefresh = null
+            GlobalStatus.filterEnabled = false
+            lightHistory.empty()
+            stopSmoothLightTimer()
+            getContentResolver().unregisterContentObserver(systemBrightnessObserver)
+            getContentResolver().unregisterContentObserver(systemBrightnessModeObserver)
+        } catch (ex: Exception) {
+            Toast.makeText(this, "关闭滤镜服务时出现异常\n" + ex.message, Toast.LENGTH_SHORT).show()
         }
-    }
-
-    /**
-     * 获取状态栏高度
-     */
-    fun getStatusHeight(): Int {
-        var result = 0;
-        val resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result
     }
 
     private fun filterOpen() {
@@ -147,7 +190,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
         popupView = LayoutInflater.from(this).inflate(R.layout.filter, null)
         mWindowManager.addView(popupView, params)
-        val filterView = popupView!!.findViewById<FilterView>(R.id.filter_view)
+        filterView = popupView!!.findViewById(R.id.filter_view)
 
         lightSensorManager.start(this, object : SensorEventListener {
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -157,6 +200,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 if (event != null && event.values.size > 0) {
                     // 获取光线强度
                     val lux = event.values[0].toInt()
+                    GlobalStatus.currentLux = lux
                     val history = LightHistory()
                     history.time = System.currentTimeMillis()
                     history.lux = lux
@@ -166,13 +210,16 @@ class FilterAccessibilityService : AccessibilityService() {
                     }
                     lightHistory.push(history)
 
-                    updateFilter(lux, filterView)
+                    // 自动亮度模式下才根据环境光自动调整滤镜强度
+                    if (systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                        updateFilter(lux, filterView!!)
+                    }
                 }
             }
         })
 
         GlobalStatus.filterRefresh = Runnable {
-            updateFilter(GlobalStatus.currentLux, filterView)
+            updateFilter(GlobalStatus.currentLux, filterView!!)
         }
 
         // 最高亮度锁定
@@ -180,7 +227,21 @@ class FilterAccessibilityService : AccessibilityService() {
         // lp.screenBrightness = 1.0f
         // getWindow().setAttributes(lp)
 
-        systemBrightness = 100
+        filterBrightness = 100
+
+        // 监控屏幕亮度
+        getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS), true, systemBrightnessObserver)
+        getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
+
+        // 获取屏幕亮度
+        systemBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)
+        systemBrightnessMode =  Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE)
+
+        // 如果是手动亮度
+        if (systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL) {
+            updateFilterByBrightness()
+        }
+
         GlobalStatus.filterEnabled = true
     }
 
@@ -203,21 +264,28 @@ class FilterAccessibilityService : AccessibilityService() {
             smoothLightTimer = Timer()
             smoothLightTimer!!.schedule(object : TimerTask() {
                 override fun run() {
-                    val currentTime = System.currentTimeMillis()
-                    val historys = lightHistory.filter {
-                        currentTime - it.time < 100001
-                    }
-                    if (historys.size > 0) {
-                        var total = 0
-                        for (history in historys) {
-                            total += history.lux
-                        }
-                        handler.post {
-                            updateFilterNow(total / historys.size, filterView)
-                        }
-                    }
+                    updateFilterSmooth(filterView)
                 }
             }, 2000, 2000)
+        }
+    }
+
+    /**
+     * 更新滤镜 使用最近的光线传感器样本平均值
+     */
+    private fun updateFilterSmooth(filterView: FilterView) {
+        val currentTime = System.currentTimeMillis()
+        val historys = lightHistory.filter {
+            currentTime - it.time < 100001
+        }
+        if (historys.size > 0 && this.filterView != null) {
+            var total = 0
+            for (history in historys) {
+                total += history.lux
+            }
+            handler.post {
+                updateFilterNow(total / historys.size, filterView)
+            }
         }
     }
 
@@ -257,8 +325,7 @@ class FilterAccessibilityService : AccessibilityService() {
             stopSmoothLightTimer()
             updateFilterNow(lux, filterView)
         }
-        GlobalStatus.currentSystemBrightness = systemBrightness
-        GlobalStatus.currentLux = lux
+        GlobalStatus.currentSystemBrightness = filterBrightness
     }
 
     private fun updateFilterNow(lux:Int, filterView:FilterView) {
@@ -281,19 +348,19 @@ class FilterAccessibilityService : AccessibilityService() {
         } else {
             filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
         }
-        if (sample.systemBrightness != systemBrightness) {
+        if (sample.systemBrightness != filterBrightness) {
             val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
             if (layoutParams != null) {
                 layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
-                // Toast.makeText(this, "设置亮度" + sample.systemBrightness,Toast.LENGTH_SHORT).show()
+                // Toast.makeText(this, "设置亮度" + sample.filterBrightness,Toast.LENGTH_SHORT).show()
                 mWindowManager.updateViewLayout(popupView, layoutParams)
             }
-            systemBrightness = sample.systemBrightness
+            filterBrightness = sample.systemBrightness
         }
 
         GlobalStatus.currentFilterAlpah = alpha
 
-        GlobalStatus.currentSystemBrightness = systemBrightness
+        GlobalStatus.currentSystemBrightness = filterBrightness
 
         // GlobalStatus.currentSystemBrightness = Utils.getSystemBrightness(applicationContext)
     }

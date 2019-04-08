@@ -4,6 +4,8 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.database.ContentObserver
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -22,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var config: SharedPreferences
     private var timer: Timer? = null
     private var myHandler = Handler()
+    private lateinit var systemBrightnessModeObserver: ContentObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +32,12 @@ class MainActivity : AppCompatActivity() {
             GlobalStatus.sampleData = SampleData(applicationContext)
         }
         config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
+
+        if (!config.contains(SpfConfig.SCREENT_MAX_LIGHT)) {
+            if (android.os.Build.PRODUCT == "perseus") { // Xiaomi MIX3 屏幕最大亮度2047
+                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
+            }
+        }
 
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -104,6 +113,9 @@ class MainActivity : AppCompatActivity() {
             config.edit().putBoolean(SpfConfig.HIDE_IN_RECENT, (it as Switch).isChecked).apply()
             setExcludeFromRecents()
         }
+
+        // 自动亮度
+        auto_adjustment.isChecked = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
     }
 
     private fun filterRefresh() {
@@ -132,10 +144,19 @@ class MainActivity : AppCompatActivity() {
                 updateInfo()
             }
         }, 0, 1000)
+
+        systemBrightnessModeObserver =  object: ContentObserver(Handler()) {
+            override fun onChange(selfChange: Boolean, uri: Uri?) {
+                super.onChange(selfChange, uri)
+                auto_adjustment.isChecked = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+            }
+        }
+        getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
     }
 
     override fun onPause() {
         stopTimer()
+        getContentResolver().unregisterContentObserver(systemBrightnessModeObserver)
         super.onPause()
     }
 
@@ -181,15 +202,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setExcludeFromRecents(exclude: Boolean? = null) {
-        try {
-            val service = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            for (task in service.appTasks) {
-                if (task.taskInfo.id == this.taskId) {
-                    val b = if (exclude == null) config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT) else exclude
-                    task.setExcludeFromRecents(b)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            try {
+                val service = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                for (task in service.appTasks) {
+                    if (task.taskInfo.id == this.taskId) {
+                        val b = if (exclude == null) config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT) else exclude
+                        task.setExcludeFromRecents(b)
+                    }
                 }
+            } catch (ex: Exception) {
             }
-        } catch (ex: Exception) {
+        } else {
+            Toast.makeText(this, "您的系统版本过低，暂不支持本功能~", Toast.LENGTH_SHORT).show()
         }
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -120,6 +121,16 @@
                     android:orientation="vertical"
                     android:padding="10dp">
 
+                    <Switch
+                        android:id="@+id/auto_adjustment"
+                        style="@style/option_title"
+                        android:enabled="false"
+                        android:text="@string/auto_adjustment" />
+
+                    <TextView
+                        style="@style/option_desc"
+                        android:text="@string/auto_adjustment_desc" />
+
                     <TextView
                         style="@style/option_title"
                         android:text="@string/filter_level_offset" />
@@ -174,11 +185,13 @@
                     android:padding="10dp">
 
                     <Switch
+                        android:visibility="gone"
                         style="@style/option_title"
                         android:enabled="false"
                         android:text="@string/pixel_filter" />
 
                     <TextView
+                        android:visibility="gone"
                         style="@style/option_desc"
                         android:text="@string/pixel_filter_desc" />
 
