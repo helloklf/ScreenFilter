@@ -1,5 +1,5 @@
 *.iml
-.idea/*
+.idea
 .gradle
 /local.properties
 /.idea/workspace.xml
@@ -8,8 +8,4 @@
 /build
 ./app/build/*
 ./app/release
-/captures
 app/release/app-release.apk
-
-.idea/misc.xml
-.idea/caches/build_file_checksums.ser
