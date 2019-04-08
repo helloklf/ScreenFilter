@@ -3,10 +3,13 @@
   "samples": {
     "0": "240",
     "1": "210",
-    "100": "128",
-    "350": "75",
+    "100": "170",
+    "250": "150",
+    "350": "115",
     "1500": "0"
   },
   "screentMinLight_desc": "屏幕最低亮度百分比（当屏幕亮度低于此值时，开启屏幕滤镜。例如，小米9 30%亮度以上启用DC调光，则此值可设为30。）",
-  "screentMinLight": "100"
+  "screentMinLight": "100",
+  "screentMinLight_desc": "",
+  "filterExchangeRate": "2.0.2"
 }

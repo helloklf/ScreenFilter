@@ -216,7 +216,7 @@ class FilterAccessibilityService : AccessibilityService() {
                     history.time = System.currentTimeMillis()
                     history.lux = lux
 
-                    if (lightHistory.size > 10) {
+                    if (lightHistory.size > 100) {
                         lightHistory.pop()
                     }
                     lightHistory.push(history)
@@ -282,8 +282,9 @@ class FilterAccessibilityService : AccessibilityService() {
             for (history in historys) {
                 total += history.lux
             }
+            val avg = total / historys.size
             handler.post {
-                updateFilterNow(total / historys.size, filterView)
+                updateFilterNow(avg, filterView)
             }
         }
     }
@@ -309,7 +310,7 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun updateFilterNow(lux: Int, filterView: FilterView) {
-        val sample = GlobalStatus.sampleData!!.getVitualSample(lux)
+        val sample = GlobalStatus.sampleData!!.getFilterConfig(lux)
         val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
         var alpha = sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
         if (isLandscapf) {

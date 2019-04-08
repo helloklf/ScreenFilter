@@ -16,6 +16,8 @@ class SampleData {
 
     // 屏幕亮度低于此值时才开启滤镜功能
     private var screentMinLight  = 100
+    //
+    private var filterExchangeRate = 2.0
 
     private var filterConfig = "filterConfig.json"
 
@@ -51,6 +53,17 @@ class SampleData {
             } else {
                 this.screentMinLight = 100
             }
+            if (jsonObject.has("filterExchangeRate")) {
+                var filterExchangeRate = jsonObject.getDouble("filterExchangeRate")
+                if (filterExchangeRate > 2.1) {
+                    filterExchangeRate = 2.1
+                } else if (filterExchangeRate < 1.9) {
+                    filterExchangeRate = 1.9
+                }
+                this.filterExchangeRate = filterExchangeRate
+            } else {
+                this.filterExchangeRate = 2.02
+            }
             Log.d("obj", "1")
         } catch (ex: Exception) {
             samples.put(0, 240)
@@ -66,6 +79,7 @@ class SampleData {
         val config = JSONObject()
         config.putOpt("samples", sampleConfig)
         config.put("screentMinLight", this.screentMinLight)
+        config.put("filterExchangeRate", this.filterExchangeRate)
         val jsonStr = config.toString(2)
 
         if (FileWrite.writePrivateFile(jsonStr.toByteArray(Charset.defaultCharset()), filterConfig, context)) {
@@ -110,10 +124,55 @@ class SampleData {
     }
 
     /**
-     * 获取虚拟样本（根据其它样本获取某个环境光下的理论样本数值）
+     * 根据样本计算滤镜浓度和屏幕亮度
      */
-    public fun getVitualSample(lux: Int): FilterViewConfig {
+    public fun getFilterConfig(lux: Int): FilterViewConfig {
         val config = FilterViewConfig()
+        val sampleValue = getVitualSample(lux)
+        if (sampleValue != null) {
+            if (this.screentMinLight == 100) {
+                config.filterAlpha = sampleValue
+                return config
+            } else {
+                val x = 2.424
+
+                val ratio = Math.pow(sampleValue / x, filterExchangeRate / 4.0) * 10 // 滤镜浓度百分比（越高表示屏幕越暗）
+                if (ratio <= 100 - this.screentMinLight) { // 如果还能通过调整物理亮度解决问题，那就别开滤镜
+                    config.filterAlpha = 0
+                    config.systemBrightness = (100 - ratio).toInt()
+                } else {
+                    val filterRatio = ratio - (100 - this.screentMinLight)
+                    config.filterAlpha = (Math.pow(filterRatio / 10, filterExchangeRate) * x).toInt()
+                    config.systemBrightness = this.screentMinLight
+                }
+
+                /*
+                val ratio = sampleValue / 2.424 // 2.424 = 240 / 99.0，由于滤镜强度240亮度和屏幕亮度1%相近，因此以240作为有效最大值换算
+                if (ratio < (100 - this.screentMinLight)) {
+                    val screenLight = 100 - ratio.toInt()
+                    val offset = (((100 - screenLight) / 4) * sampleValue / 100.0).toInt()
+                    if (screenLight - offset < this.screentMinLight) {
+                        config.filterAlpha = (screenLight + offset - this.screentMinLight)
+                        config.systemBrightness = this.screentMinLight
+                    } else {
+                        config.filterAlpha = 0
+                        config.systemBrightness = screenLight - offset
+                    }
+                } else {
+                    config.filterAlpha = (sampleValue * ((this.screentMinLight + ((100 - this.screentMinLight) / 4)) / 100.0)).toInt()
+                    config.systemBrightness = this.screentMinLight
+                }
+                */
+                return config
+            }
+        }
+        return config
+    }
+
+    /**
+     * 获取虚拟样本，根据已有样本计算数值
+     */
+    public fun getVitualSample(lux: Int): Int? {
         if (samples.size > 1) {
             var sampleValue = 0
             if (samples.containsKey(lux)) {
@@ -142,39 +201,28 @@ class SampleData {
                     sampleValue = minSample
                 }
             }
-            if (this.screentMinLight == 100) {
-                config.filterAlpha = sampleValue
-                return config
-            } else {
-                val ratio = sampleValue / 2.4 // 2.0 = 240 / 100.0，由于滤镜强度240亮度和屏幕亮度1%相近，因此以240作为有效最大值换算
-                if (ratio < (100 - this.screentMinLight)) {
-                    val screenLight = 100 - ratio.toInt()
-                    val offset = (((100 - screenLight) / 4) * sampleValue / 100.0).toInt()
-                    if (screenLight - offset < this.screentMinLight) {
-                        config.filterAlpha = (screenLight + offset - this.screentMinLight)
-                        config.systemBrightness = this.screentMinLight
-                    } else {
-                        config.filterAlpha = 0
-                        config.systemBrightness = screenLight - offset
-                    }
-                } else {
-                    config.filterAlpha = (sampleValue * ((this.screentMinLight + ((100 - this.screentMinLight) / 4)) / 100.0)).toInt()
-                    config.systemBrightness = this.screentMinLight
-                }
-                return config
-            }
+            return sampleValue
         }
-        return config
+        return null
     }
 
+    /**
+     * 获取所有样本
+     */
     public fun getAllSamples(): HashMap<Int, Int> {
         return this.samples
     }
 
+    /**
+     * 设置屏幕最低亮度百分比
+     */
     public fun getScreentMinLight(): Int {
         return screentMinLight
     }
 
+    /**
+     * 获取屏幕最低亮度百分比
+     */
     public fun setScreentMinLight(value: Int) {
         if (value > 100) {
             this.screentMinLight = 100
@@ -182,6 +230,26 @@ class SampleData {
             this.screentMinLight = 1
         } else {
             this.screentMinLight = value
+        }
+    }
+
+    /**
+     *
+     */
+    public fun getFilterExchangeRate(): Double {
+        return filterExchangeRate
+    }
+
+    /**
+     *
+     */
+    public fun setFilterExchangeRate(value: Double) {
+        if (value > 2.1) {
+            this.filterExchangeRate = 2.1
+        } else if (value < 1.9) {
+            this.filterExchangeRate = 1.9
+        } else {
+            this.filterExchangeRate = value
         }
     }
 }

@@ -33,7 +33,7 @@
 
     <string name="sample_chart">当前样本数据</string>
     <string name="sample_desc_title">样本说明</string>
-    <string name="sample_desc">样本是用于计算不同光照强度下，屏幕物理亮度和滤镜浓度组合关系的数据。\n\n如果你在使用滤镜过程中出现屏幕过亮或过暗的情况，则需要修改样本数据，以适应设备和环境。\n\n样本配置文件保存位置：/data/data/com.example.filter/files/private/filterConfig.json\n\n如果你觉得从本界面配置样本过于繁琐，可使用编辑器直接修改样本配置文件（重启应用后生效）。</string>
+    <string name="sample_desc">样本是用于计算不同光照强度下，屏幕物理亮度和滤镜浓度组合关系的数据。\n\n如果你在使用滤镜过程中出现屏幕过亮或过暗的情况，则需要修改样本数据，以适应设备和环境。\n\n样本配置文件保存位置：/data/data/com.omarea.filter/files/private/filterConfig.json\n\n如果你觉得从本界面配置样本过于繁琐，可使用编辑器直接修改样本配置文件（重启应用后生效）。</string>
 
     <string name="accessibility_service_required">需要先启动辅助服务，才能使用本功能！</string>
     <string name="overlays_required">还未授予“显示悬浮窗/在应用上层显示”权限</string>
@@ -46,4 +46,7 @@
     <string name="sample_edit_applay">使用</string>
     <string name="sample_edit_delete">删除</string>
     <string name="smaple_clear">清空自定义</string>
+    <string name="title_activity_filter_test">FilterTestActivity</string>
+    <string name="filter_exchange_rate">滤镜和屏幕亮度转换率</string>
+    <string name="filter_exchange_rate_desc">此值的设定关系到“最低屏幕亮度”与“滤镜开启”之间的衔接关系，暂时没有办法描述这个</string>
 </resources>

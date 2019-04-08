@@ -1,26 +1,20 @@
 package com.omarea.filter
 
 import android.content.Context
-import android.database.ContentObserver
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
-import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import kotlinx.android.synthetic.main.activity_sample_edit.*
 
 class SampleEditActivity : AppCompatActivity() {
@@ -108,13 +102,17 @@ class SampleEditActivity : AppCompatActivity() {
      * 更新图表
      */
     private fun updateChart() {
+        screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
+        screen_light_min_ratio.text = screen_light_min.progress.toString()
+        filter_exchange_rate_text.text = GlobalStatus.sampleData!!.getFilterExchangeRate().toString()
+
         sample_chart.invalidate()
     }
 
     private fun setWindowLight() {
         // 亮度锁定
         val lp = getWindow().getAttributes()
-        lp.screenBrightness = (GlobalStatus.sampleData!!.getScreentMinLight() / 100.0).toFloat() // 1.0f //
+        lp.screenBrightness = 1.0f // (GlobalStatus.sampleData!!.getScreentMinLight() / 100.0).toFloat()
         getWindow().setAttributes(lp)
     }
 
@@ -145,6 +143,7 @@ class SampleEditActivity : AppCompatActivity() {
                     .show()
         }
 
+        // 屏幕最低亮度调整
         screen_light_min.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
@@ -155,12 +154,25 @@ class SampleEditActivity : AppCompatActivity() {
                     GlobalStatus.sampleData!!.setScreentMinLight(progress)
                     hasChange = true
                 }
-                screen_light_min_ratio.text = progress.toString()
                 setWindowLight()
+                screen_light_min_ratio.text = progress.toString()
             }
         })
-        screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
-        screen_light_min_ratio.text = screen_light_min.progress.toString()
+
+
+        filter_exchange_rate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val value = 2.0 + ((progress - 100) / 1000.0)
+                filter_exchange_rate_text.text = value.toString()
+
+                GlobalStatus.sampleData!!.setFilterExchangeRate(value)
+                hasChange = true
+            }
+        })
 
         /*
         getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS), true, object:ContentObserver(Handler()) {
@@ -174,6 +186,7 @@ class SampleEditActivity : AppCompatActivity() {
             }
         })
         */
+        updateChart()
     }
 
     override fun onPause() {
@@ -258,7 +271,9 @@ class SampleEditActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 sampleLuxValueView.text = progress.toString()
                 val sample = GlobalStatus.sampleData!!.getVitualSample(progress)
-                sampleFilterView.progress = sample.filterAlpha
+                if (sample != null) {
+                    sampleFilterView.progress = sample
+                }
             }
         })
         sampleFilterView.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

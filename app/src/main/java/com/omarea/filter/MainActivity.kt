@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         if (!config.contains(SpfConfig.SCREENT_MAX_LIGHT)) {
             if (android.os.Build.PRODUCT == "perseus") { // Xiaomi MIX3 屏幕最大亮度2047
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
+                // GlobalStatus.sampleData!!.setScreentMinLight(30)
             }
         }
 

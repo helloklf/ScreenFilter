@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".FilterTestActivity"
+    tools:showIn="@layout/activity_filter_test">
+
+    <LinearLayout
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:text="屏幕亮度"
+            style="@style/option_title" />
+        <SeekBar
+            android:progress="50"
+            android:min="1"
+            android:max="240"
+            android:id="@+id/screen_light_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            style="@style/option_desc" />
+        <Switch
+            android:id="@+id/screen_light_filter"
+            android:text="使用滤镜"
+            style="@style/option_title"  />
+        <TextView
+            style="@style/option_desc" />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

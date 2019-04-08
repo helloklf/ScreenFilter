@@ -57,14 +57,22 @@ class FilterView : View {
     private fun invalidateTextPaintAndMeasurements() {}
 
     fun setFilterColor(alpha: Int, red: Int = 0, green: Int = 0, blue: Int = 0, soomth:Boolean = false) {
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
-        if (soomth) {
-            cgangePer(alpha)
-        } else {
-            this.alpha = alpha
-            invalidate()
+        var effectiveValue = alpha
+        if (effectiveValue < 0) {
+            effectiveValue = 0
+        } else if (effectiveValue > 240) {
+            effectiveValue = 240
+        }
+        if (this.alpha != effectiveValue || this.red != red || this.blue != blue || this.green != green) {
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            if (soomth) {
+                cgangePer(effectiveValue)
+            } else {
+                this.alpha = effectiveValue
+                invalidate()
+            }
         }
     }
 
