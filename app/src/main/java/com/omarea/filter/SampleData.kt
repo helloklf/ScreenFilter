@@ -127,27 +127,43 @@ class SampleData {
      * 根据样本计算滤镜浓度和屏幕亮度
      */
     public fun getFilterConfig(lux: Int): FilterViewConfig {
-        val config = FilterViewConfig()
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
             if (this.screentMinLight == 100) {
+                val config = FilterViewConfig()
                 config.filterAlpha = sampleValue
                 return config
             } else {
                 val x = 2.424
 
                 val ratio = sampleValue / x // 滤镜浓度百分比（越高表示屏幕越暗）
-                if (ratio <= 100 - this.screentMinLight) { // 如果还能通过调整物理亮度解决问题，那就别开滤镜
-                    config.filterAlpha = 0
-                    config.systemBrightness = (100 - ratio).toInt()
-                } else {
-                    val screenRatio = (100 - this.screentMinLight)
-                    val filterRatio = ratio - screenRatio
-                    val filterAlpha = ((screenRatio * 0.8 + filterRatio) * sampleValue / 100.0).toInt()
-                    config.filterAlpha = filterAlpha
-                    config.systemBrightness = this.screentMinLight
-                }
-                return config
+
+                return getFilterConfigByRatio(ratio)
+            }
+        }
+        return FilterViewConfig()
+    }
+
+    /**
+     * 根据意图亮度百分比，获取滤镜配置
+     */
+    public fun getFilterConfigByRatio(ratio:Double): FilterViewConfig {
+        val config = FilterViewConfig()
+
+        if (this.screentMinLight == 100) {
+            config.filterAlpha = (240 * ratio / 100.0).toInt()
+            config.systemBrightness = 100
+        } else {
+            if (ratio <= 100 - this.screentMinLight) { // 如果还能通过调整物理亮度解决问题，那就别开滤镜
+                config.filterAlpha = 0
+                config.systemBrightness = (100 - ratio).toInt()
+            } else {
+                val sampleValue = 240 * ratio / 100.0
+                val screenRatio = (100 - this.screentMinLight)
+                val filterRatio = ratio - screenRatio
+                val filterAlpha = ((screenRatio * 0.8 + filterRatio) * sampleValue / 100.0).toInt()
+                config.filterAlpha = filterAlpha
+                config.systemBrightness = this.screentMinLight
             }
         }
         return config

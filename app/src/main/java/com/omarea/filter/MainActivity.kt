@@ -1,5 +1,6 @@
 package com.omarea.filter
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -125,10 +126,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateInfo(){
         myHandler.post {
-            light_lux.text = GlobalStatus.currentLux.toString()
-            screen_light.text = if(GlobalStatus.filterEnabled) GlobalStatus.currentSystemBrightness.toString() else Utils.getSystemBrightness(applicationContext).toString()
+            light_lux.text = GlobalStatus.currentLux.toString() + "lux"
+            screen_light.text = Utils.getSystemBrightness(applicationContext).toString()
+            if (GlobalStatus.filterEnabled) {
+                filter_light.text = GlobalStatus.currentFilterBrightness.toString() + "%"
+            } else {
+                filter_light.text = "0%"
+            }
             filter_alpha.text = GlobalStatus.currentFilterAlpah.toString()
         }
     }

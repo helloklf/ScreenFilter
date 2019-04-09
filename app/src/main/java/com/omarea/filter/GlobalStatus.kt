@@ -4,7 +4,7 @@ object GlobalStatus {
     var filterEnabled = false
 
     var currentLux: Int = 0
-    var currentSystemBrightness: Int = 0
+    var currentFilterBrightness: Int = 0
     var currentFilterAlpah: Int = 0
     var sampleData:SampleData? = null
 

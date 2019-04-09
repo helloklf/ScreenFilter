@@ -89,20 +89,8 @@ class FilterAccessibilityService : AccessibilityService() {
         // 如果不是自动亮度模式（直接调整滤镜）
         if (systemBrightnessMode != Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
             if (filterView != null) {
-                // TODO:系统亮度转换为滤镜浓度
-                // TODO:如果当前滤镜控制的亮度不是100%，应该怎么处理？
-                var alpha = 255 - (ratio * 255).toInt()
-                if (alpha > 245) {
-                    alpha = 245
-                } else if (alpha < 0) {
-                    alpha = 0
-                }
-                GlobalStatus.currentFilterAlpah = alpha
-                val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
-                if (layoutParams != null) {
-                    GlobalStatus.currentSystemBrightness = (layoutParams.screenBrightness * 100).toInt()
-                }
-                filterView!!.setFilterColor(alpha, 0, 0, 0, false)
+                val config = GlobalStatus.sampleData!!.getFilterConfigByRatio(ratio * 100.0)
+                updateFilterNow(config, filterView!!)
             }
         } else { // 如果是自动亮度
             Toast.makeText(this, "自动模式下，检测到屏幕亮度改变...", Toast.LENGTH_SHORT).show()
@@ -310,11 +298,15 @@ class FilterAccessibilityService : AccessibilityService() {
             stopSmoothLightTimer()
             updateFilterNow(lux, filterView)
         }
-        GlobalStatus.currentSystemBrightness = filterBrightness
+        GlobalStatus.currentFilterBrightness = filterBrightness
     }
 
     private fun updateFilterNow(lux: Int, filterView: FilterView) {
         val sample = GlobalStatus.sampleData!!.getFilterConfig(lux)
+        updateFilterNow(sample, filterView)
+    }
+
+    private fun updateFilterNow(sample:FilterViewConfig, filterView: FilterView) {
         val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
         var alpha = sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
         if (isLandscapf) {
@@ -345,8 +337,6 @@ class FilterAccessibilityService : AccessibilityService() {
 
         GlobalStatus.currentFilterAlpah = alpha
 
-        GlobalStatus.currentSystemBrightness = filterBrightness
-
-        // GlobalStatus.currentSystemBrightness = Utils.getSystemBrightness(applicationContext)
+        GlobalStatus.currentFilterBrightness = filterBrightness
     }
 }
