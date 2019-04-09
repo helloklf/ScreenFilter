@@ -62,30 +62,33 @@
                     android:text="@string/screen_min_light" />
 
                 <LinearLayout
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
                     <SeekBar
                         android:id="@+id/screen_light_min"
-                        android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:elevation="1dp"
                         android:enabled="false"
                         android:max="100"
                         android:min="1"
                         android:progress="100" />
+
                     <TextView
                         android:id="@+id/screen_light_min_ratio"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="end"
                         android:layout_width="30dp"
-                        android:layout_height="wrap_content" />
-                    <TextView
-                        android:text="%"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:gravity="end" />
+
+                    <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="%" />
                 </LinearLayout>
 
                 <TextView
@@ -95,29 +98,32 @@
 
                 <TextView
                     style="@style/option_title"
-                    android:visibility="gone"
-                    android:text="@string/filter_exchange_rate" />
+                    android:text="@string/filter_exchange_rate"
+                    android:visibility="gone" />
+
                 <LinearLayout
-                    android:visibility="gone"
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
                     <SeekBar
-                        android:layout_weight="1"
+                        android:id="@+id/filter_exchange_rate"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:elevation="1dp"
                         android:enabled="true"
-                        android:progress="100"
                         android:max="200"
                         android:min="1"
-                        android:id="@+id/filter_exchange_rate" />
+                        android:progress="100" />
+
                     <TextView
                         android:id="@+id/filter_exchange_rate_text"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="end"
                         android:layout_width="30dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="end" />
                 </LinearLayout>
 
                 <TextView

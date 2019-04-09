@@ -52,39 +52,40 @@
 
         <TextView
             android:id="@+id/sample_edit_applay"
+            style="@style/option_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dp"
             android:text="@string/sample_edit_applay"
-            style="@style/option_desc"
-            android:background="@android:color/transparent"
-            android:paddingRight="0dp"
-            android:textColor="@color/colorPrimary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textColor="@color/colorPrimary" />
 
         <TextView
-            android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:layout_marginLeft="10dp"
-            android:id="@+id/sample_edit_minus"
-            android:text="－"
-            style="@style/option_desc"
-            android:background="@android:color/transparent"
-            android:paddingRight="0dp"
-            android:textColor="@color/colorPrimary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <TextView
-            android:layout_marginLeft="20dp"
-            android:id="@+id/sample_edit_plus"
-            android:text="＋"
+            android:id="@+id/sample_edit_minus"
             style="@style/option_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:background="@android:color/transparent"
             android:paddingRight="0dp"
-            android:textColor="@color/colorPrimary"
+            android:text="－"
+            android:textColor="@color/colorPrimary" />
+
+        <TextView
+            android:id="@+id/sample_edit_plus"
+            style="@style/option_desc"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dp"
+            android:text="＋"
+            android:textColor="@color/colorPrimary" />
     </LinearLayout>
 
     <TextView
@@ -109,40 +110,43 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
+
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <TextView
             style="@style/option_desc"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:text="@string/sample_edit_filter_alpha_desc" />
-        <TextView
-            android:layout_marginLeft="10dp"
-            android:id="@+id/sample_edit_alpha_minus"
-            android:text="－"
-            style="@style/option_desc"
-            android:background="@android:color/transparent"
-            android:paddingRight="0dp"
-            android:layout_gravity="center_vertical"
-            android:textColor="@color/colorPrimary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
         <TextView
-            android:layout_marginLeft="20dp"
-            android:id="@+id/sample_edit_alpha_plus"
-            android:text="＋"
+            android:id="@+id/sample_edit_alpha_minus"
             style="@style/option_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
             android:background="@android:color/transparent"
             android:paddingRight="0dp"
-            android:layout_gravity="center_vertical"
-            android:textColor="@color/colorPrimary"
+            android:text="－"
+            android:textColor="@color/colorPrimary" />
+
+        <TextView
+            android:id="@+id/sample_edit_alpha_plus"
+            style="@style/option_desc"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:background="@android:color/transparent"
+            android:paddingRight="0dp"
+            android:text="＋"
+            android:textColor="@color/colorPrimary" />
     </LinearLayout>
 
     <LinearLayout
@@ -151,16 +155,16 @@
         android:orientation="horizontal">
 
         <Button
-            style="@android:style/Widget.ActionButton"
             android:id="@+id/sample_edit_cancel"
+            style="@android:style/Widget.ActionButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/sample_edit_cancel" />
 
         <Button
-            style="@android:style/Widget.ActionButton"
             android:id="@+id/sample_save"
+            style="@android:style/Widget.ActionButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

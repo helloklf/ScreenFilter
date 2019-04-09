@@ -6,6 +6,7 @@
     android:background="@android:color/transparent"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
+
     <com.omarea.filter.FilterView
         android:id="@+id/filter_view"
         android:layout_width="match_parent"

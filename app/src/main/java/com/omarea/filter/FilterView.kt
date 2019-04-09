@@ -16,7 +16,7 @@ class FilterView : View {
     private var green = 0
     private var blue = 0
 
-    private var valueAnimator:ValueAnimator? = null
+    private var valueAnimator: ValueAnimator? = null
 
     constructor(context: Context) : super(context) {
         init(null, 0)
@@ -56,7 +56,7 @@ class FilterView : View {
 
     private fun invalidateTextPaintAndMeasurements() {}
 
-    fun setFilterColor(alpha: Int, red: Int = 0, green: Int = 0, blue: Int = 0, soomth:Boolean = false) {
+    fun setFilterColor(alpha: Int, red: Int = 0, green: Int = 0, blue: Int = 0, soomth: Boolean = false) {
         var effectiveValue = alpha
         if (effectiveValue < 0) {
             effectiveValue = 0

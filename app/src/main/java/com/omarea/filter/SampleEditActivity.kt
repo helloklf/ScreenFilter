@@ -7,20 +7,23 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.os.Build
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.*
+import android.widget.Button
+import android.widget.SeekBar
+import android.widget.TextView
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_sample_edit.*
 
 class SampleEditActivity : AppCompatActivity() {
     private var filterPopup: View? = null
     private var hasChange = false
-    private var alertDialog:AlertDialog? = null
+    private var alertDialog: AlertDialog? = null
 
     /**
      * 获取导航栏高度
@@ -122,7 +125,7 @@ class SampleEditActivity : AppCompatActivity() {
         setWindowLight()
 
         // 全屏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         smaple_add.setOnClickListener {
             openSampleCreate()
@@ -130,14 +133,12 @@ class SampleEditActivity : AppCompatActivity() {
         smaple_clear.setOnClickListener {
             AlertDialog.Builder(this)
                     .setTitle(R.string.smaple_clear)
-                    .setPositiveButton(R.string.sample_edit_confirm, {
-                        _, _ ->
+                    .setPositiveButton(R.string.sample_edit_confirm, { _, _ ->
                         GlobalStatus.sampleData!!.readConfig(this.applicationContext, true)
                         this.hasChange = true
                         updateChart()
                     })
-                    .setNegativeButton(R.string.sample_edit_cancel, {
-                        _, _ ->
+                    .setNegativeButton(R.string.sample_edit_cancel, { _, _ ->
                     })
                     .create()
                     .show()
@@ -147,8 +148,10 @@ class SampleEditActivity : AppCompatActivity() {
         screen_light_min.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
+
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (GlobalStatus.sampleData!!.getScreentMinLight() != progress) {
                     GlobalStatus.sampleData!!.setScreentMinLight(progress)
@@ -163,8 +166,10 @@ class SampleEditActivity : AppCompatActivity() {
         filter_exchange_rate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
+
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val value = 2.0 + ((progress - 100) / 1000.0)
                 filter_exchange_rate_text.text = value.toString()

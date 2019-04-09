@@ -18,7 +18,6 @@ import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
-import java.lang.Exception
 import java.util.*
 
 class FilterAccessibilityService : AccessibilityService() {
@@ -267,7 +266,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 (currentTime - it.time) < 5001
             }
             if (historys.size > 0 && this.filterView != null) {
-                var total:Long = 0
+                var total: Long = 0
                 for (history in historys) {
                     total += history.lux
                 }
@@ -306,7 +305,7 @@ class FilterAccessibilityService : AccessibilityService() {
         updateFilterNow(sample, filterView)
     }
 
-    private fun updateFilterNow(sample:FilterViewConfig, filterView: FilterView) {
+    private fun updateFilterNow(sample: FilterViewConfig, filterView: FilterView) {
         val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
         var alpha = sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
         if (isLandscapf) {
