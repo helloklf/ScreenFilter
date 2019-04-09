@@ -15,7 +15,7 @@ class SampleData {
     private var samples = HashMap<Int, Int>()
 
     // 屏幕亮度低于此值时才开启滤镜功能
-    private var screentMinLight  = 100
+    private var screentMinLight = 100
     //
     private var filterExchangeRate = 2.0
 
@@ -134,9 +134,7 @@ class SampleData {
                 config.filterAlpha = sampleValue
                 return config
             } else {
-                val x = 2.424
-
-                val ratio = sampleValue / x // 滤镜浓度百分比（越高表示屏幕越暗）
+                val ratio = 100.0 - (sampleValue / 2.42424).toInt() // 100 - Math.pow(sampleValue.toDouble(), 0.84) // 滤镜浓度百分比（越高表示屏幕越暗）
 
                 return getFilterConfigByRatio(ratio)
             }
@@ -147,21 +145,22 @@ class SampleData {
     /**
      * 根据意图亮度百分比，获取滤镜配置
      */
-    public fun getFilterConfigByRatio(ratio:Double): FilterViewConfig {
+    public fun getFilterConfigByRatio(ratio: Double): FilterViewConfig {
         val config = FilterViewConfig()
+        if (ratio > 100 || ratio < 0) {
+            //
+            return config
+        }
 
         if (this.screentMinLight == 100) {
             config.filterAlpha = (240 * ratio / 100.0).toInt()
             config.systemBrightness = 100
         } else {
-            if (ratio <= 100 - this.screentMinLight) { // 如果还能通过调整物理亮度解决问题，那就别开滤镜
+            if (ratio >= this.screentMinLight) { // 如果还能通过调整物理亮度解决问题，那就别开滤镜
                 config.filterAlpha = 0
-                config.systemBrightness = (100 - ratio).toInt()
+                config.systemBrightness = ratio.toInt()
             } else {
-                val sampleValue = 240 * ratio / 100.0
-                val screenRatio = (100 - this.screentMinLight)
-                val filterRatio = ratio - screenRatio
-                val filterAlpha = ((screenRatio * 0.8 + filterRatio) * sampleValue / 100.0).toInt()
+                val filterAlpha = 240 - (ratio / this.screentMinLight * 240).toInt()
                 config.filterAlpha = filterAlpha
                 config.systemBrightness = this.screentMinLight
             }

@@ -18,7 +18,7 @@ import android.view.MenuItem
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -59,7 +59,8 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                         startActivity(intent)
-                    } catch (ex: java.lang.Exception) {}
+                    } catch (ex: java.lang.Exception) {
+                    }
                 } else {
                     config.edit().putBoolean(SpfConfig.FILTER_AUTO_START, true).apply()
                     GlobalStatus.filterOpen!!.run()
@@ -73,9 +74,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 屏幕滤镜强度偏移量
-        filter_level_offset.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onStopTrackingTouch(seekBar: SeekBar?) { }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {  }
+        filter_level_offset.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 config.edit().putInt(SpfConfig.FILTER_LEVEL_OFFSET, progress - 50).apply()
@@ -85,9 +86,9 @@ class MainActivity : AppCompatActivity() {
         filter_level_offset.progress = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) + 50
 
         // 动态颜色
-        filter_dynamic_color.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onStopTrackingTouch(seekBar: SeekBar?) { }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {  }
+        filter_dynamic_color.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 config.edit().putInt(SpfConfig.FILTER_DYNAMIC_COLOR, progress).apply()
@@ -127,14 +128,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateInfo(){
+    private fun updateInfo() {
         myHandler.post {
             light_lux.text = GlobalStatus.currentLux.toString() + "lux"
-            screen_light.text = Utils.getSystemBrightness(applicationContext).toString()
             if (GlobalStatus.filterEnabled) {
                 filter_light.text = GlobalStatus.currentFilterBrightness.toString() + "%"
+                screen_light.text = "×"
             } else {
-                filter_light.text = "0%"
+                filter_light.text = "×"
+                screen_light.text = Utils.getSystemBrightness(applicationContext).toString()
             }
             filter_alpha.text = GlobalStatus.currentFilterAlpah.toString()
         }
@@ -153,7 +155,7 @@ class MainActivity : AppCompatActivity() {
             }
         }, 0, 1000)
 
-        systemBrightnessModeObserver =  object: ContentObserver(Handler()) {
+        systemBrightnessModeObserver = object : ContentObserver(Handler()) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 super.onChange(selfChange, uri)
                 auto_adjustment.isChecked = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
@@ -210,7 +212,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setExcludeFromRecents(exclude: Boolean? = null) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
                 val service = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 for (task in service.appTasks) {
