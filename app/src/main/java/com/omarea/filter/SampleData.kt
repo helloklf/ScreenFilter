@@ -153,7 +153,7 @@ class SampleData {
         }
 
         if (this.screentMinLight == 100) {
-            config.filterAlpha = (240 * ratio / 100.0).toInt()
+            config.filterAlpha = (240 * (100 - ratio) / 100.0).toInt()
             config.systemBrightness = 100
         } else {
             if (ratio >= this.screentMinLight) { // 如果还能通过调整物理亮度解决问题，那就别开滤镜

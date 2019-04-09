@@ -276,11 +276,18 @@ class FilterAccessibilityService : AccessibilityService() {
                 }
                 val avg = total / historys.size
                 handler.post {
-                    updateFilterNow(avg.toInt(), filterView)
+                    // if (avg > 0 && avg < 1) {
+                        // 小数精确度问题，如果0.5也当做1，=0才理解为全黑环境
+                    //    updateFilterNow(1, filterView)
+                    //} else {
+                        updateFilterNow(avg.toInt(), filterView)
+                    //}
                 }
             }
         } catch (ex: Exception) {
-            Toast.makeText(this, "更新滤镜异常：" + ex.message, Toast.LENGTH_SHORT).show()
+            handler.post {
+                Toast.makeText(this, "更新滤镜异常：" + ex.message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -309,17 +316,13 @@ class FilterAccessibilityService : AccessibilityService() {
         if (lux == 0 && config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)) {
             val calendar = Calendar.getInstance()
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            if (hour >= 22 && hour < 6) {
+            if (hour >= 22 || hour < 6) {
                 val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0.toDouble())
                 updateFilterNow(filterViewConfig, filterView)
                 return
             }
         }
         val sample = GlobalStatus.sampleData!!.getFilterConfig(lux)
-        updateFilterNow(sample, filterView)
-    }
-
-    private fun updateFilterNow(sample: FilterViewConfig, filterView: FilterView) {
         val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
         var alpha = sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
         if (isLandscapf) {
@@ -330,25 +333,28 @@ class FilterAccessibilityService : AccessibilityService() {
         } else if (alpha < 0) {
             alpha = 0
         }
+        sample.filterAlpha = alpha
 
-        val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
+        updateFilterNow(sample, filterView)
+    }
 
-        if (isLandscapf) {
-            filterView.setFilterColor(alpha, 0, 0, 0, true)
+    private fun updateFilterNow(sample: FilterViewConfig, filterView: FilterView) {
+        if (isLandscapf && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
+            filterView.setFilterColor(sample.filterAlpha, 0, 0, 0, true)
         } else {
-            filterView.setFilterColor(alpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
+            val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
+            filterView.setFilterColor(sample.filterAlpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
         }
         if (sample.systemBrightness != filterBrightness) {
             val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
             if (layoutParams != null) {
                 layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
-                // Toast.makeText(this, "设置亮度" + sample.filterBrightness,Toast.LENGTH_SHORT).show()
                 mWindowManager.updateViewLayout(popupView, layoutParams)
             }
             filterBrightness = sample.systemBrightness
         }
 
-        GlobalStatus.currentFilterAlpah = alpha
+        GlobalStatus.currentFilterAlpah = sample.filterAlpha
 
         GlobalStatus.currentFilterBrightness = filterBrightness
     }

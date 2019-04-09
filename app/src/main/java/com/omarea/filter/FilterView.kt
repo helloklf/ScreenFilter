@@ -60,8 +60,8 @@ class FilterView : View {
         var effectiveValue = alpha
         if (effectiveValue < 0) {
             effectiveValue = 0
-        } else if (effectiveValue > 240) {
-            effectiveValue = 240
+        } else if (effectiveValue > 250) {
+            effectiveValue = 250
         }
         if (this.alpha != effectiveValue || this.red != red || this.blue != blue || this.green != green) {
             this.red = red;
