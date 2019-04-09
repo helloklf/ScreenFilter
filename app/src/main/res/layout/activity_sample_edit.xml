@@ -94,41 +94,6 @@
                 <TextView
                     style="@style/option_desc"
                     android:text="@string/screen_min_light_desc" />
-
-
-                <TextView
-                    style="@style/option_title"
-                    android:text="@string/filter_exchange_rate"
-                    android:visibility="gone" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <SeekBar
-                        android:id="@+id/filter_exchange_rate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:elevation="1dp"
-                        android:enabled="true"
-                        android:max="200"
-                        android:min="1"
-                        android:progress="100" />
-
-                    <TextView
-                        android:id="@+id/filter_exchange_rate_text"
-                        android:layout_width="30dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="end" />
-                </LinearLayout>
-
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/filter_exchange_rate_desc" />
             </LinearLayout>
 
             <LinearLayout

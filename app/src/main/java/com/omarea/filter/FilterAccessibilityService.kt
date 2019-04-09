@@ -263,7 +263,7 @@ class FilterAccessibilityService : AccessibilityService() {
         try {
             val currentTime = System.currentTimeMillis()
             val historys = lightHistory.filter {
-                (currentTime - it.time) < 5001
+                (currentTime - it.time) < 10001
             }
             if (historys.size > 0 && this.filterView != null) {
                 var total: Long = 0
@@ -301,6 +301,16 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun updateFilterNow(lux: Int, filterView: FilterView) {
+        // 深夜极暗光 22:00~06:00
+        if (lux == 0 && config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)) {
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            if (hour >= 22 && hour < 6) {
+                val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0.toDouble())
+                updateFilterNow(filterViewConfig, filterView)
+                return
+            }
+        }
         val sample = GlobalStatus.sampleData!!.getFilterConfig(lux)
         updateFilterNow(sample, filterView)
     }

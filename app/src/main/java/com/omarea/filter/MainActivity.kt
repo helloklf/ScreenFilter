@@ -110,6 +110,12 @@ class MainActivity : AppCompatActivity() {
             config.edit().putBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, (it as Switch).isChecked).apply()
         }
 
+        // 深夜极暗光模式
+        night_mode.setOnClickListener {
+            config.edit().putBoolean(SpfConfig.NIGHT_MODE, (it as Switch).isChecked).apply()
+        }
+        night_mode.isChecked = config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)
+
         // 从最近任务隐藏
         hide_in_recent.isChecked = config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT)
         hide_in_recent.setOnClickListener {

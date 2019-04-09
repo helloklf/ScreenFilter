@@ -14,10 +14,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import kotlinx.android.synthetic.main.activity_sample_edit.*
 
 class SampleEditActivity : AppCompatActivity() {
@@ -107,7 +104,6 @@ class SampleEditActivity : AppCompatActivity() {
     private fun updateChart() {
         screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
         screen_light_min_ratio.text = screen_light_min.progress.toString()
-        filter_exchange_rate_text.text = GlobalStatus.sampleData!!.getFilterExchangeRate().toString()
 
         sample_chart.invalidate()
     }
@@ -159,23 +155,6 @@ class SampleEditActivity : AppCompatActivity() {
                 }
                 setWindowLight()
                 screen_light_min_ratio.text = progress.toString()
-            }
-        })
-
-
-        filter_exchange_rate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val value = 2.0 + ((progress - 100) / 1000.0)
-                filter_exchange_rate_text.text = value.toString()
-
-                GlobalStatus.sampleData!!.setFilterExchangeRate(value)
-                hasChange = true
             }
         })
 

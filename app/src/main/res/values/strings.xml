@@ -10,7 +10,7 @@
     <string name="filter_enable">启用滤镜</string>
     <string name="filter_disabled">禁用滤镜</string>
     <string name="screen_min_light">最低屏幕亮度</string>
-    <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，通常应设为屏幕开启DC调光的亮度级别。对于全程PWM调光的屏幕，则应设为最高值。\n该功能的细节正在优化，可能会有些细节问题！\n\n小米9、MIX3 建议设为30%，三星S8 建议设为95%，其它机型自测哦！</string>
+    <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，可设为屏幕开启DC调光的亮度级别，对于全程PWM调光的屏幕，则应设为最高值。\n\n小米9、MIX3 建议设为30%，三星S8 建议设为95%，其它机型自测哦！</string>
     <string name="auto_adjustment">自动调整亮度</string>
     <string name="auto_adjustment_desc">此选项跟随系统“自动亮度”开关。关闭自动亮度后，滤镜浓度将直接跟随系统亮度</string>
     <string name="filter_level_offset">滤镜微调</string>
@@ -23,6 +23,8 @@
     <string name="smooth_adjustment_desc">延缓亮度调整的速度，避免环境光线变化过快导致屏幕闪烁。如果你正在测试样本的准确性，请暂时关闭此选项！</string>
     <string name="landscape_optimize">横屏优化</string>
     <string name="landscape_optimize_desc">在横屏状态下暂停“环境色温”并适当提高亮度(10%)，优化游戏体验</string>
+    <string name="night_mode">深夜极暗光</string>
+    <string name="night_mode_desc">自动亮度模式下，晚上22:00~06:00期间，允许忽视样本数据和微调参数，将屏幕降低到极低亮度，以便在夜间关灯时使用手机</string>
 
     <string name="hide_in_recent">从最近任务隐藏</string>
     <string name="hide_in_recent_desc">不要在最近任务列表显示本应用，如果要长期使用，建议锁定后再勾选此选项</string>
@@ -47,7 +49,4 @@
     <string name="sample_edit_applay">使用</string>
     <string name="sample_edit_delete">删除</string>
     <string name="smaple_clear">清空自定义</string>
-    <string name="title_activity_filter_test">FilterTestActivity</string>
-    <string name="filter_exchange_rate">滤镜和屏幕亮度转换率</string>
-    <string name="filter_exchange_rate_desc">此值的设定关系到“最低屏幕亮度”与“滤镜开启”之间的衔接关系，暂时没有办法描述这个</string>
 </resources>

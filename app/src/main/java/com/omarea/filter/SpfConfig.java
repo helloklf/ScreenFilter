@@ -2,9 +2,8 @@ package com.omarea.filter;
 
 public class SpfConfig {
     public static String FILTER_SPF = "FILTER_SPF";
-    /**
-     * 动态环境光
-     */
+
+    // 环境光动态色温
     public static String FILTER_DYNAMIC_COLOR = "FILTER_DYNAMIC_COLOR";
     public static int FILTER_DYNAMIC_COLOR_DEFAULT = 0;
 
@@ -28,9 +27,15 @@ public class SpfConfig {
     public static String SCREENT_MAX_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MAX_LIGHT_DEFAULT = 255;
 
+    // 屏幕最大亮度
     public static String SCREENT_MIN_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MIN_LIGHT_DEFAULT = 255;
 
+    // 隐藏最近任务
     public static String HIDE_IN_RECENT = "HIDE_IN_RECENT";
     public static boolean HIDE_IN_RECENT_DEFAULT = false;
+
+    // 深夜极暗光
+    public static String NIGHT_MODE = "NIGHT_MODE";
+    public static boolean NIGHT_MODE_DEFAULT = false;
 }
