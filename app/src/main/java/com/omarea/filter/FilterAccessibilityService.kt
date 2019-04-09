@@ -178,8 +178,12 @@ class FilterAccessibilityService : AccessibilityService() {
 
         val p = Point()
         display.getRealSize(p)
-        params.width = p.y // p.x // 直接按屏幕最大宽度x最大宽度显示，避免屏幕旋转后盖不住全屏
-        params.height = p.y
+        var maxSize = p.y
+        if (p.x > maxSize) {
+            maxSize = p.x
+        }
+        params.width = maxSize // p.x // 直接按屏幕最大宽度x最大宽度显示，避免屏幕旋转后盖不住全屏
+        params.height = maxSize
 
         // 不知道是不是真的有效
         params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
