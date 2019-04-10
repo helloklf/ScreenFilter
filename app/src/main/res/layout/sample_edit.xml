@@ -25,8 +25,9 @@
             android:min="0" />
 
         <TextView
+            android:layout_width="50dp"
+            android:gravity="center_horizontal"
             android:id="@+id/sample_lux_text"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="0lux" />
@@ -90,23 +91,25 @@
 
     <TextView
         style="@style/option_title"
-        android:text="@string/filter_alpha" />
+        android:text="@string/sample_brightness" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <SeekBar
-            android:id="@+id/sample_filter"
+            android:id="@+id/sample_brightness"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:max="240"
+            android:max="1000"
             android:min="0" />
 
         <TextView
-            android:id="@+id/sample_filter_value"
-            android:layout_width="wrap_content"
+            android:id="@+id/sample_brightness_text"
+            android:layout_width="50dp"
+            android:text="0"
+            android:gravity="center_horizontal"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
@@ -122,7 +125,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:text="@string/sample_edit_filter_alpha_desc" />
+            android:text="@string/sample_brightness_desc" />
 
         <TextView
             android:id="@+id/sample_edit_alpha_minus"

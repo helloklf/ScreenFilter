@@ -8,7 +8,10 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <!--android:layout_marginTop="?attr/actionBarSize"-->
+    <!--
+        android:layout_marginTop="?attr/actionBarSize"
+        android:textColor="?android:attr/colorPrimary"
+    -->
 
     <ScrollView
         android:layout_width="match_parent"
@@ -128,7 +131,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:text="@string/filter_enable"
-                android:textColor="?android:attr/colorPrimary" />
+                android:textColor="@color/colorAccent" />
 
             <!--微调栏-->
             <android.support.v7.widget.CardView

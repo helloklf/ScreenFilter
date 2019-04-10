@@ -10,6 +10,13 @@ class FilterViewConfig {
     // 0  - 1000，1000 表示最大亮度
     internal var filterBrightness = FILTER_BRIGHTNESS_MAX
 
+    /**
+     * 获取亮度的比率（0.00 ~ 1.00）
+     */
+    internal fun getFilterBrightnessRatio (): Float {
+        return (filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX)
+    }
+
     companion object {
         var FILTER_BRIGHTNESS_MAX = 1000
         var FILTER_BRIGHTNESS_MIN = 1

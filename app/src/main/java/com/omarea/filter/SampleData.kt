@@ -127,6 +127,13 @@ class SampleData {
     }
 
     /**
+     * 根据意向屏幕亮度获取配置
+     */
+    public fun getConfigByBrightness(brightness: Int): FilterViewConfig {
+        return FilterViewConfig.getConfigByBrightness(brightness, screentMinLight)
+    }
+
+    /**
      * 获取虚拟样本，根据已有样本计算数值
      */
     public fun getVitualSample(lux: Int): Int? {

@@ -30,12 +30,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <FrameLayout
-                            android:layout_width="2000dp"
-                            android:layout_height="200dp">
+                            android:layout_width="4000dp"
+                            android:layout_height="400dp">
                             <com.omarea.filter.SampleDataView
                                 android:id="@+id/sample_chart"
                                 android:layout_width="4000dp"
-                                android:layout_height="200dp" />
+                                android:layout_height="400dp" />
                         </FrameLayout>
                     </HorizontalScrollView>
             </LinearLayout>
@@ -79,12 +79,12 @@
                         android:layout_weight="1"
                         android:elevation="1dp"
                         android:enabled="false"
-                        android:max="1000"
+                        android:max="100"
                         android:min="1"
                         android:progress="1000" />
 
                     <TextView
-                        android:text="100.0"
+                        android:text="100"
                         android:id="@+id/screen_light_min_ratio"
                         android:layout_width="40dp"
                         android:layout_height="wrap_content"
@@ -111,6 +111,7 @@
                 android:paddingRight="5dp">
 
                 <Button
+                    android:textColor="@color/colorAccent"
                     android:id="@+id/smaple_clear"
                     style="@android:style/Widget.ActionButton"
                     android:layout_width="wrap_content"

@@ -317,14 +317,14 @@ class FilterAccessibilityService : AccessibilityService() {
             val calendar = Calendar.getInstance()
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
             if (hour >= 22 || hour < 6) {
-                val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0f)
+                val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0.05f)
                 updateFilterNow(filterViewConfig, filterView)
                 return
             }
         }
-        val sample = GlobalStatus.sampleData!!.getFilterConfig(lux)
+        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(lux)
         val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
-        var alpha = sample.filterAlpha + ((sample.filterAlpha * offset).toInt())
+        var alpha = filterViewConfig.filterAlpha + ((filterViewConfig.filterAlpha * offset).toInt())
         if (isLandscapf) {
             alpha -= 25
         }
@@ -333,28 +333,28 @@ class FilterAccessibilityService : AccessibilityService() {
         } else if (alpha < 0) {
             alpha = 0
         }
-        sample.filterAlpha = alpha
+        filterViewConfig.filterAlpha = alpha
 
-        updateFilterNow(sample, filterView)
+        updateFilterNow(filterViewConfig, filterView)
     }
 
-    private fun updateFilterNow(sample: FilterViewConfig, filterView: FilterView) {
+    private fun updateFilterNow(filterViewConfig: FilterViewConfig, filterView: FilterView) {
         if (isLandscapf && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
-            filterView.setFilterColor(sample.filterAlpha, 0, 0, 0, true)
+            filterView.setFilterColor(filterViewConfig.filterAlpha, 0, 0, 0, true)
         } else {
             val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
-            filterView.setFilterColor(sample.filterAlpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
+            filterView.setFilterColor(filterViewConfig.filterAlpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
         }
-        if (sample.filterBrightness != filterBrightness) {
+        if (filterViewConfig.filterBrightness != filterBrightness) {
             val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
             if (layoutParams != null) {
-                layoutParams.screenBrightness = (sample.filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX)
+                layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
                 mWindowManager.updateViewLayout(popupView, layoutParams)
             }
-            filterBrightness = sample.filterBrightness
+            filterBrightness = filterViewConfig.filterBrightness
         }
 
-        GlobalStatus.currentFilterAlpah = sample.filterAlpha
+        GlobalStatus.currentFilterAlpah = filterViewConfig.filterAlpha
 
         GlobalStatus.currentFilterBrightness = filterBrightness
     }

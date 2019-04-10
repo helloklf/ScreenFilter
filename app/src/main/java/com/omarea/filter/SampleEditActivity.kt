@@ -98,27 +98,40 @@ class SampleEditActivity : AppCompatActivity() {
         mWindowManager.addView(filterPopup, params)
     }
 
+    private fun filterUpdate(screenBrightness: Int) {
+        val filterView = filterPopup!!.findViewById<FilterView>(R.id.filter_view)
+        val filterViewConfig = GlobalStatus.sampleData!!.getConfigByBrightness(screenBrightness)
+
+        val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
+        val layoutParams = filterPopup!!.layoutParams as WindowManager.LayoutParams?
+        if (layoutParams != null) {
+            val filterBrightness = filterViewConfig.getFilterBrightnessRatio()
+            layoutParams.screenBrightness = filterBrightness
+            mWindowManager.updateViewLayout(filterPopup, layoutParams)
+        }
+
+        filterView.setFilterColor(filterViewConfig.filterAlpha)
+
+        // 亮度锁定
+        // val lp = getWindow().getAttributes()
+        // lp.screenBrightness = config.getFilterBrightnessRatio()
+        // getWindow().setAttributes(lp)
+    }
+
     /**
      * 更新图表
      */
     private fun updateChart() {
-        screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
-        screen_light_min_ratio.text = (screen_light_min.progress / 10f).toString()
+        screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight() / 10
+        screen_light_min_ratio.text = (screen_light_min.progress).toString()
 
         sample_chart.invalidate()
-    }
-
-    private fun setWindowLight() {
-        // 亮度锁定
-        val lp = getWindow().getAttributes()
-        lp.screenBrightness = 1.0f // (GlobalStatus.sampleData!!.getScreentMinLight() / 100.0).toFloat()
-        getWindow().setAttributes(lp)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sample_edit)
-        setWindowLight()
 
         // 全屏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -141,10 +154,6 @@ class SampleEditActivity : AppCompatActivity() {
         }
 
         // 屏幕最低亮度调整
-        screen_light_min.max = FilterViewConfig.FILTER_BRIGHTNESS_MAX
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            screen_light_min.min = FilterViewConfig.FILTER_BRIGHTNESS_MIN
-        }
         screen_light_min.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
@@ -153,12 +162,11 @@ class SampleEditActivity : AppCompatActivity() {
             }
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (GlobalStatus.sampleData!!.getScreentMinLight() != progress) {
-                    GlobalStatus.sampleData!!.setScreentMinLight(progress)
+                if (GlobalStatus.sampleData!!.getScreentMinLight() != (progress * 10)) {
+                    GlobalStatus.sampleData!!.setScreentMinLight(progress * 10)
                     hasChange = true
                 }
-                setWindowLight()
-                screen_light_min_ratio.text = (progress / 10f).toString()
+                screen_light_min_ratio.text = progress.toString()
             }
         })
 
@@ -197,7 +205,8 @@ class SampleEditActivity : AppCompatActivity() {
         val lightSensorManager = LightSensorManager()
         val sampleLuxView = dialogView.findViewById<SeekBar>(R.id.sample_lux)
         val sampleLuxValueView = dialogView.findViewById<TextView>(R.id.sample_lux_text)
-        val sampleFilterView = dialogView.findViewById<SeekBar>(R.id.sample_filter)
+        val sampleBrightness = dialogView.findViewById<SeekBar>(R.id.sample_brightness)
+        val sampleBrightnessText = dialogView.findViewById<TextView>(R.id.sample_brightness_text)
         var currentLux = -1
 
         alertDialog = AlertDialog.Builder(this)
@@ -209,12 +218,12 @@ class SampleEditActivity : AppCompatActivity() {
         filterOpen()
 
         dialogView.findViewById<Button>(R.id.sample_edit_cancel).setOnClickListener {
-            // GlobalStatus.sampleData!!.removeSample(sampleFilterView.progress)
+            // GlobalStatus.sampleData!!.removeSample(sampleBrightness.progress)
             alertDialog!!.dismiss()
         }
 
         dialogView.findViewById<Button>(R.id.sample_save).setOnClickListener {
-            GlobalStatus.sampleData!!.replaceSample(sampleLuxView.progress, sampleFilterView.progress)
+            GlobalStatus.sampleData!!.replaceSample(sampleLuxView.progress, sampleBrightness.progress)
 
             alertDialog!!.dismiss()
         }
@@ -260,11 +269,12 @@ class SampleEditActivity : AppCompatActivity() {
                 sampleLuxValueView.text = progress.toString()
                 val sample = GlobalStatus.sampleData!!.getVitualSample(progress)
                 if (sample != null) {
-                    sampleFilterView.progress = FilterViewConfig.getConfigByBrightness(sample).filterAlpha
+                    sampleBrightness.progress = sample
+                    sampleBrightnessText.text = sample.toString()
                 }
             }
         })
-        sampleFilterView.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        sampleBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
 
@@ -272,7 +282,9 @@ class SampleEditActivity : AppCompatActivity() {
             }
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                filterView.setFilterColor(progress)
+                filterUpdate(progress)
+
+                sampleBrightnessText.text = progress.toString()
             }
         })
         dialogView.findViewById<TextView>(R.id.sample_edit_applay).setOnClickListener {
@@ -294,13 +306,13 @@ class SampleEditActivity : AppCompatActivity() {
             }
         }
         dialogView.findViewById<TextView>(R.id.sample_edit_alpha_minus).setOnClickListener {
-            if (sampleFilterView.progress > 0) {
-                sampleFilterView.progress -= 1
+            if (sampleBrightness.progress > 0) {
+                sampleBrightness.progress -= 1
             }
         }
         dialogView.findViewById<TextView>(R.id.sample_edit_alpha_plus).setOnClickListener {
-            if (sampleFilterView.progress < sampleLuxView.max) {
-                sampleFilterView.progress += 1
+            if (sampleBrightness.progress < sampleLuxView.max) {
+                sampleBrightness.progress += 1
             }
         }
     }
