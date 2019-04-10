@@ -92,7 +92,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 updateFilterNow(config, filterView!!)
             }
         } else { // 如果是自动亮度
-            Toast.makeText(this, "自动模式下，检测到屏幕亮度改变...", Toast.LENGTH_SHORT).show()
+            // Toast.makeText(this, "自动模式下，检测到屏幕亮度改变...", Toast.LENGTH_SHORT).show()
             // config.edit().putInt(SpfConfig.FILTER_LEVEL_OFFSET, ((1 - ratio) * 100 - 50).toInt()).apply() // 有时候自动亮度模式也会出现屏幕亮度变化...所以，不能跟随调整
             updateFilterSmooth(filterView!!)
         }

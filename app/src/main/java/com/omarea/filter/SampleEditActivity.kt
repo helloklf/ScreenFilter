@@ -234,7 +234,6 @@ class SampleEditActivity : AppCompatActivity() {
             alertDialog = null
         }
         val currentLuxView = dialogView.findViewById<TextView>(R.id.sample_edit_currentlux)
-        val filterView = filterPopup!!.findViewById<FilterView>(R.id.filter_view)
 
         lightSensorManager.start(this, object : SensorEventListener {
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -274,6 +273,9 @@ class SampleEditActivity : AppCompatActivity() {
                 }
             }
         })
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            sampleBrightness.min = 1
+        }
         sampleBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
