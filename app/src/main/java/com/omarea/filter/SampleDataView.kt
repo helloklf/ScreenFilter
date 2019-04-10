@@ -100,7 +100,7 @@ class SampleDataView : View {
                     3f,
                     paint
             )
-            if (point < 9) {
+            if (point > 0) {
                 paint.color = Color.parseColor("#dddddd")
                 canvas.drawLine(
                         innerPadding, innerPadding + ((1000 - point * 100) * ratioY).toInt(),

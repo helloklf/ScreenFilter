@@ -17,8 +17,15 @@
         <activity
             android:name=".GuideActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_guide"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullscreenTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <meta-data
             android:name="com.google.android.actions"
@@ -29,13 +36,7 @@
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SampleEditActivity"
             android:label="@string/app_name"

@@ -50,7 +50,9 @@
     <string name="sample_edit_delete">删除</string>
     <string name="smaple_clear">清空自定义</string>
 
-    <string name="title_activity_guide">GuideActivity</string>
     <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="guide_center">向导</string>
+    <string name="get_permission_fail">获取悬浮窗显示权限失败！</string>
+    <string name="pwm_amoled">为PWM调光的AMOLED屏幕而准备</string>
+    <string name="permission_required">应用需要显示悬浮窗(叠加层)权限</string>
 </resources>
