@@ -27,7 +27,7 @@ public class SpfConfig {
     public static String SCREENT_MAX_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MAX_LIGHT_DEFAULT = 255;
 
-    // 屏幕最大亮度
+    // 屏幕最小亮度
     public static String SCREENT_MIN_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MIN_LIGHT_DEFAULT = 255;
 
@@ -37,5 +37,5 @@ public class SpfConfig {
 
     // 深夜极暗光
     public static String NIGHT_MODE = "NIGHT_MODE";
-    public static boolean NIGHT_MODE_DEFAULT = false;
+    public static boolean NIGHT_MODE_DEFAULT = true;
 }

@@ -15,11 +15,9 @@ class SampleData {
     private var samples = HashMap<Int, Int>()
 
     // 屏幕亮度低于此值时才开启滤镜功能
-    private var screentMinLight = 100
-    //
-    private var filterExchangeRate = 2.0
+    private var screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
 
-    private var filterConfig = "filterConfig.json"
+    private var filterConfig = "Samples.json"
 
     constructor (context: Context) {
         this.readConfig(context)
@@ -44,30 +42,18 @@ class SampleData {
             }
             if (jsonObject.has("screentMinLight")) {
                 var screentMinLight = jsonObject.getInt("screentMinLight")
-                if (screentMinLight > 100) {
-                    screentMinLight = 100
-                } else if (screentMinLight < 1) {
-                    screentMinLight = 1
+                if (screentMinLight > FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                    screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                } else if (screentMinLight < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
+                    screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MIN
                 }
                 this.screentMinLight = screentMinLight
             } else {
-                this.screentMinLight = 100
+                this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
             }
-            if (jsonObject.has("filterExchangeRate")) {
-                var filterExchangeRate = jsonObject.getDouble("filterExchangeRate")
-                if (filterExchangeRate > 2.1) {
-                    filterExchangeRate = 2.1
-                } else if (filterExchangeRate < 1.9) {
-                    filterExchangeRate = 1.9
-                }
-                this.filterExchangeRate = filterExchangeRate
-            } else {
-                this.filterExchangeRate = 2.02
-            }
-            Log.d("obj", "1")
         } catch (ex: Exception) {
-            samples.put(0, 240)
-            samples.put(1000, 0)
+            samples.put(0, FilterViewConfig.FILTER_BRIGHTNESS_MIN)
+            samples.put(10000, FilterViewConfig.FILTER_BRIGHTNESS_MAX)
         }
     }
 
@@ -79,11 +65,10 @@ class SampleData {
         val config = JSONObject()
         config.putOpt("samples", sampleConfig)
         config.put("screentMinLight", this.screentMinLight)
-        config.put("filterExchangeRate", this.filterExchangeRate)
         val jsonStr = config.toString(2)
 
-        if (FileWrite.writePrivateFile(jsonStr.toByteArray(Charset.defaultCharset()), filterConfig, context)) {
-
+        if (!FileWrite.writePrivateFile(jsonStr.toByteArray(Charset.defaultCharset()), filterConfig, context)) {
+            Log.e("ScreenFilter", "存储样本失败！！！")
         }
     }
 
@@ -129,43 +114,16 @@ class SampleData {
     public fun getFilterConfig(lux: Int): FilterViewConfig {
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
-            if (this.screentMinLight == 100) {
-                val config = FilterViewConfig()
-                config.filterAlpha = sampleValue
-                return config
-            } else {
-                val ratio = 100.0 - (sampleValue / 2.42424).toInt() // 100 - Math.pow(sampleValue.toDouble(), 0.84) // 滤镜浓度百分比（越高表示屏幕越暗）
-
-                return getFilterConfigByRatio(ratio)
-            }
+            return FilterViewConfig.getConfigByBrightness(sampleValue, screentMinLight)
         }
-        return FilterViewConfig()
+        return FilterViewConfig.getDefault()
     }
 
     /**
      * 根据意图亮度百分比，获取滤镜配置
      */
-    public fun getFilterConfigByRatio(ratio: Double): FilterViewConfig {
-        val config = FilterViewConfig()
-        if (ratio > 100 || ratio < 0) {
-            //
-            return config
-        }
-
-        if (this.screentMinLight == 100) {
-            config.filterAlpha = (240 * (100 - ratio) / 100.0).toInt()
-            config.systemBrightness = 100
-        } else {
-            if (ratio >= this.screentMinLight) { // 如果还能通过调整物理亮度解决问题，那就别开滤镜
-                config.filterAlpha = 0
-                config.systemBrightness = ratio.toInt()
-            } else {
-                val filterAlpha = 240 - (ratio / this.screentMinLight * 240).toInt()
-                config.filterAlpha = filterAlpha
-                config.systemBrightness = this.screentMinLight
-            }
-        }
-        return config
+    public fun getFilterConfigByRatio(ratio: Float): FilterViewConfig {
+        return FilterViewConfig.getConfigByRatio(ratio, screentMinLight)
     }
 
     /**
@@ -189,7 +147,7 @@ class SampleData {
                     }
                 }
 
-                val minSample = if (min > lux) 240 else (samples[min] as Int)
+                val minSample = if (min > lux) FilterViewConfig.FILTER_BRIGHTNESS_MAX else (samples[min] as Int)
                 val maxSample = samples[max] as Int
 
                 val ratio = (lux - min) * 1.0 / (max - min)
@@ -220,35 +178,15 @@ class SampleData {
     }
 
     /**
-     * 获取屏幕最低亮度百分比
+     * 设置屏幕最低亮度百分比
      */
     public fun setScreentMinLight(value: Int) {
-        if (value > 100) {
-            this.screentMinLight = 100
-        } else if (value < 1) {
-            this.screentMinLight = 1
+        if (value > FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+            this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+        } else if (value < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
+            this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MIN
         } else {
             this.screentMinLight = value
-        }
-    }
-
-    /**
-     *
-     */
-    public fun getFilterExchangeRate(): Double {
-        return filterExchangeRate
-    }
-
-    /**
-     *
-     */
-    public fun setFilterExchangeRate(value: Double) {
-        if (value > 2.1) {
-            this.filterExchangeRate = 2.1
-        } else if (value < 1.9) {
-            this.filterExchangeRate = 1.9
-        } else {
-            this.filterExchangeRate = value
         }
     }
 }

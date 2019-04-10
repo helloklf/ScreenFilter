@@ -103,7 +103,7 @@ class SampleEditActivity : AppCompatActivity() {
      */
     private fun updateChart() {
         screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
-        screen_light_min_ratio.text = screen_light_min.progress.toString()
+        screen_light_min_ratio.text = (screen_light_min.progress / 10f).toString()
 
         sample_chart.invalidate()
     }
@@ -141,6 +141,10 @@ class SampleEditActivity : AppCompatActivity() {
         }
 
         // 屏幕最低亮度调整
+        screen_light_min.max = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            screen_light_min.min = FilterViewConfig.FILTER_BRIGHTNESS_MIN
+        }
         screen_light_min.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }
@@ -154,7 +158,7 @@ class SampleEditActivity : AppCompatActivity() {
                     hasChange = true
                 }
                 setWindowLight()
-                screen_light_min_ratio.text = progress.toString()
+                screen_light_min_ratio.text = (progress / 10f).toString()
             }
         })
 
@@ -256,7 +260,7 @@ class SampleEditActivity : AppCompatActivity() {
                 sampleLuxValueView.text = progress.toString()
                 val sample = GlobalStatus.sampleData!!.getVitualSample(progress)
                 if (sample != null) {
-                    sampleFilterView.progress = sample
+                    sampleFilterView.progress = FilterViewConfig.getConfigByBrightness(sample).filterAlpha
                 }
             }
         })

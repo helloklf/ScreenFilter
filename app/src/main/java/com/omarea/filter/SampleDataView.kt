@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
+import android.view.WindowManager
 
 /**
  * TODO: document your custom view class.
@@ -38,6 +39,7 @@ class SampleDataView : View {
 
         val potintRadius = 6f
         val paint = Paint()
+        paint.strokeWidth = 2f
 
         val samples = GlobalStatus.sampleData!!.getAllSamples()
         val xPoints = samples.keys.sorted()
@@ -45,45 +47,68 @@ class SampleDataView : View {
         val innerPadding = 60f
 
         // val ratioX = (this.width - innerPadding - innerPadding) * 1.0 / (xPoints.max() as Int) // 横向比率
-        val ratioX = (this.width - innerPadding - innerPadding) * 1.0 / 500 // 横向比率
-        val ratioY = ((this.height - innerPadding - innerPadding) * 1.0 / 255).toFloat() // 纵向比率
+        val ratioX = (this.width - innerPadding - innerPadding) * 1.0 / 40000 // 横向比率
+        val ratioY = ((this.height - innerPadding - innerPadding) * 1.0 / 1000).toFloat() // 纵向比率
         val stratY = height - innerPadding
 
         val pathFilterAlpha = Path()
         var isFirstPoint = true
 
         paint.textSize = 20f
-        for (point in 0..10) {
-            canvas.drawText(
-                    (point * 100).toString(),
-                    (point * 100 * ratioX).toInt() + innerPadding - 20f,
-                    this.height - innerPadding + 35, paint
-            )
-            paint.color = Color.parseColor("#000000")
-            canvas.drawCircle(
-                    (point * 100 * ratioX).toInt() + innerPadding,
-                    this.height - innerPadding,
-                    potintRadius,
-                    paint
-            )
+        for (point in 1..400) {
+            if (point % 10 == 0) {
+                paint.color = Color.parseColor("#000000")
+                canvas.drawText(
+                        (point * 100).toString() + "(lux)",
+                        (point * 100 * ratioX).toInt() + innerPadding - 40f,
+                        this.height - innerPadding + 35, paint
+                )
+                canvas.drawCircle(
+                        (point * 100 * ratioX).toInt() + innerPadding,
+                        this.height - innerPadding,
+                        potintRadius,
+                        paint
+                )
+            } else {
+                paint.color = Color.parseColor("#dddddd")
+                canvas.drawCircle(
+                        (point * 100 * ratioX).toInt() + innerPadding,
+                        this.height - innerPadding,
+                        potintRadius,
+                        paint
+                )
+            }
+            if (point % 5 == 0) {
+                paint.color = Color.parseColor("#dddddd")
+                canvas.drawLine(
+                        (point * 100 * ratioX).toInt() + innerPadding, innerPadding,
+                        (point * 100 * ratioX).toInt() + innerPadding ,this.height - innerPadding, paint)
+            }
         }
 
         for (point in 0..10) {
+            paint.color = Color.parseColor("#000000")
             canvas.drawText(
-                    (point * 25).toString(),
+                    (point * 100).toString(),
                     10f,
-                    innerPadding + ((255 - point * 25) * ratioY).toInt() + 8,
+                    innerPadding + ((1000 - point * 100) * ratioY).toInt() + 8,
                     paint
             )
-            paint.color = Color.parseColor("#000000")
             canvas.drawCircle(
-                    innerPadding - 1.5f,
-                    innerPadding + ((255 - point * 25) * ratioY).toInt(),
+                    innerPadding,
+                    innerPadding + ((1000 - point * 100) * ratioY).toInt(),
                     3f,
                     paint
             )
+            if (point < 9) {
+                paint.color = Color.parseColor("#dddddd")
+                canvas.drawLine(
+                        innerPadding, innerPadding + ((1000 - point * 100) * ratioY).toInt(),
+                        (this.width - innerPadding) ,innerPadding + ((1000 - point * 100) * ratioY).toInt(), paint)
+            }
         }
 
+        paint.color = Color.parseColor("#000000")
         for (point in xPoints) {
             val pointX = (point * ratioX).toFloat() + innerPadding
             val sample = samples.get(point)!!

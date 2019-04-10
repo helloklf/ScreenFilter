@@ -14,6 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".GuideActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_guide"
+            android:theme="@style/FullscreenTheme"></activity>
 
         <meta-data
             android:name="com.google.android.actions"

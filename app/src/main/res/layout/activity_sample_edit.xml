@@ -20,18 +20,24 @@
                 android:orientation="vertical"
                 android:paddingTop="10dp"
                 android:paddingBottom="5dp">
-
                 <TextView
                     style="@style/option_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/sample_chart" />
-
-                <com.omarea.filter.SampleDataView
-                    android:id="@+id/sample_chart"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp" />
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <FrameLayout
+                            android:layout_width="2000dp"
+                            android:layout_height="200dp">
+                            <com.omarea.filter.SampleDataView
+                                android:id="@+id/sample_chart"
+                                android:layout_width="4000dp"
+                                android:layout_height="200dp" />
+                        </FrameLayout>
+                    </HorizontalScrollView>
             </LinearLayout>
 
             <LinearLayout
@@ -73,13 +79,14 @@
                         android:layout_weight="1"
                         android:elevation="1dp"
                         android:enabled="false"
-                        android:max="100"
+                        android:max="1000"
                         android:min="1"
-                        android:progress="100" />
+                        android:progress="1000" />
 
                     <TextView
+                        android:text="100.0"
                         android:id="@+id/screen_light_min_ratio"
-                        android:layout_width="30dp"
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:gravity="end" />

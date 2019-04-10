@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
         myHandler.post {
             light_lux.text = GlobalStatus.currentLux.toString() + "lux"
             if (GlobalStatus.filterEnabled) {
-                filter_light.text = GlobalStatus.currentFilterBrightness.toString() + "%"
+                filter_light.text = (GlobalStatus.currentFilterBrightness / 10f).toString() + "%"
                 screen_light.text = "×"
             } else {
                 filter_light.text = "×"

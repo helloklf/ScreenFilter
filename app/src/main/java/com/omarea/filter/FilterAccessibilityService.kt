@@ -27,7 +27,7 @@ class FilterAccessibilityService : AccessibilityService() {
     private var isLandscapf = false
     private val lightHistory = Stack<LightHistory>()
 
-    private var filterBrightness = 0 // 当前由滤镜控制的屏幕亮度（0-100）
+    private var filterBrightness = 0 // 当前由滤镜控制的屏幕亮度
 
     private lateinit var mWindowManager: WindowManager
     private lateinit var display: Display
@@ -88,7 +88,7 @@ class FilterAccessibilityService : AccessibilityService() {
         // 如果不是自动亮度模式（直接调整滤镜）
         if (systemBrightnessMode != Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
             if (filterView != null) {
-                val config = GlobalStatus.sampleData!!.getFilterConfigByRatio(ratio * 100.0)
+                val config = GlobalStatus.sampleData!!.getFilterConfigByRatio(ratio)
                 updateFilterNow(config, filterView!!)
             }
         } else { // 如果是自动亮度
@@ -224,7 +224,7 @@ class FilterAccessibilityService : AccessibilityService() {
             updateFilter(GlobalStatus.currentLux, filterView!!)
         }
 
-        filterBrightness = 100
+        filterBrightness = FilterViewConfig.FILTER_BRIGHTNESS_MAX
 
         // 监控屏幕亮度
         getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS), true, systemBrightnessObserver)
@@ -317,7 +317,7 @@ class FilterAccessibilityService : AccessibilityService() {
             val calendar = Calendar.getInstance()
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
             if (hour >= 22 || hour < 6) {
-                val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0.toDouble())
+                val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0f)
                 updateFilterNow(filterViewConfig, filterView)
                 return
             }
@@ -345,13 +345,13 @@ class FilterAccessibilityService : AccessibilityService() {
             val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
             filterView.setFilterColor(sample.filterAlpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
         }
-        if (sample.systemBrightness != filterBrightness) {
+        if (sample.filterBrightness != filterBrightness) {
             val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
             if (layoutParams != null) {
-                layoutParams.screenBrightness = (sample.systemBrightness / 100.0).toFloat()
+                layoutParams.screenBrightness = (sample.filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX)
                 mWindowManager.updateViewLayout(popupView, layoutParams)
             }
-            filterBrightness = sample.systemBrightness
+            filterBrightness = sample.filterBrightness
         }
 
         GlobalStatus.currentFilterAlpah = sample.filterAlpha
