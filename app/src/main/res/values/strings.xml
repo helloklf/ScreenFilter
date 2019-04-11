@@ -13,8 +13,8 @@
     <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，可设为屏幕开启DC调光的亮度级别，对于全程PWM调光的屏幕，则应设为最高值。\n\n小米9、MIX3 建议设为30%，三星S8 建议设为95%，其它机型自测哦！</string>
     <string name="auto_adjustment">自动调整亮度</string>
     <string name="auto_adjustment_desc">此选项跟随系统“自动亮度”开关。关闭自动亮度后，滤镜浓度将直接跟随系统亮度</string>
-    <string name="filter_level_offset">滤镜微调</string>
-    <string name="filter_level_offset_desc">滤镜浓度全局微调，数值越高屏幕显示效果越暗。如果你不想编辑样本，可以尝试调整它！</string>
+    <string name="light_lux_offset">环境光灵敏度</string>
+    <string name="light_lux_offset_desc">修正不同手机在相同环境下，光线传感器报告的数值差异，自动模式下生效</string>
     <string name="filter_dynamic_color">环境色温</string>
     <string name="filter_dynamic_color_desc">当环境光逐渐变暗，开始缓慢的根据环境光调整屏幕色温，相当于平滑的夜间模式，此值将调整其色温变化浓度</string>
     <string name="pixel_filter">像素滤镜 *敬请期待</string>

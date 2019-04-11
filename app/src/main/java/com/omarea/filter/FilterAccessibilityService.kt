@@ -93,7 +93,6 @@ class FilterAccessibilityService : AccessibilityService() {
             }
         } else { // 如果是自动亮度
             // Toast.makeText(this, "自动模式下，检测到屏幕亮度改变...", Toast.LENGTH_SHORT).show()
-            // config.edit().putInt(SpfConfig.FILTER_LEVEL_OFFSET, ((1 - ratio) * 100 - 50).toInt()).apply() // 有时候自动亮度模式也会出现屏幕亮度变化...所以，不能跟随调整
             updateFilterSmooth(filterView!!)
         }
     }
@@ -199,10 +198,12 @@ class FilterAccessibilityService : AccessibilityService() {
             // FIXME:已知部分手机，即使环境亮度没改变也可能会疯狂报告亮度 - 比如说三星S8，这可咋整呢？
             override fun onSensorChanged(event: SensorEvent?) {
                 if (event != null && event.values.size > 0) {
+                    val offset = config.getInt(SpfConfig.LIGHT_LUX_OFFSET, SpfConfig.LIGHT_LUX_OFFSET_DEFAULT) / 100.0
+
                     // 获取光线强度
                     val lux = event.values[0].toInt()
                     Log.d("环境光亮度", event.values[0].toString())
-                    GlobalStatus.currentLux = lux
+                    GlobalStatus.currentLux = if (offset > 0) ((1 + offset) * lux).toInt() else lux
                     val history = LightHistory()
                     history.time = System.currentTimeMillis()
                     history.lux = lux
@@ -210,6 +211,7 @@ class FilterAccessibilityService : AccessibilityService() {
                     if (lightHistory.size > 100) {
                         lightHistory.pop()
                     }
+
                     lightHistory.push(history)
 
                     // 自动亮度模式下才根据环境光自动调整滤镜强度
@@ -276,12 +278,12 @@ class FilterAccessibilityService : AccessibilityService() {
                 }
                 val avg = total / historys.size
                 handler.post {
-                    // if (avg > 0 && avg < 1) {
-                        // 小数精确度问题，如果0.5也当做1，=0才理解为全黑环境
-                    //    updateFilterNow(1, filterView)
-                    //} else {
+                    if (avg > 0 && avg < 1) {
+                        // 小数精确度问题，如果是0.x也当做1，=0才理解为全黑环境
+                        updateFilterNow(5, filterView)
+                    } else {
                         updateFilterNow(avg.toInt(), filterView)
-                    //}
+                    }
                 }
             }
         } catch (ex: Exception) {
@@ -323,13 +325,12 @@ class FilterAccessibilityService : AccessibilityService() {
             }
         }
         val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(lux)
-        val offset = config.getInt(SpfConfig.FILTER_LEVEL_OFFSET, SpfConfig.FILTER_LEVEL_OFFSET_DEFAULT) / 100.0
-        var alpha = filterViewConfig.filterAlpha + ((filterViewConfig.filterAlpha * offset).toInt())
+        var alpha = filterViewConfig.filterAlpha
         if (isLandscapf) {
             alpha -= 25
         }
-        if (alpha > 250) {
-            alpha = 250
+        if (alpha > FilterViewConfig.FILTER_MAX_ALPHA) {
+            alpha = FilterViewConfig.FILTER_MAX_ALPHA
         } else if (alpha < 0) {
             alpha = 0
         }
