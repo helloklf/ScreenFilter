@@ -201,9 +201,8 @@ class FilterAccessibilityService : AccessibilityService() {
                     val offset = config.getInt(SpfConfig.LIGHT_LUX_OFFSET, SpfConfig.LIGHT_LUX_OFFSET_DEFAULT) / 100.0
 
                     // 获取光线强度
-                    val lux = event.values[0].toInt()
-                    Log.d("环境光亮度", event.values[0].toString())
-                    GlobalStatus.currentLux = if (offset > 0) ((1 + offset) * lux).toInt() else lux
+                    val lux = if (offset != 0.toDouble()) ((1 + offset) * event.values[0]).toInt() else event.values[0].toInt()
+                    GlobalStatus.currentLux = lux
                     val history = LightHistory()
                     history.time = System.currentTimeMillis()
                     history.lux = lux
