@@ -111,10 +111,10 @@ class SampleData {
     /**
      * 根据样本计算滤镜浓度和屏幕亮度
      */
-    public fun getFilterConfig(lux: Int): FilterViewConfig {
+    public fun getFilterConfig(lux: Int, offset: Double): FilterViewConfig {
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
-            return FilterViewConfig.getConfigByBrightness(sampleValue, screentMinLight)
+            return FilterViewConfig.getConfigByBrightness((sampleValue  * (1 + offset)).toInt(), screentMinLight)
         }
         return FilterViewConfig.getDefault()
     }

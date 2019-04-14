@@ -30,13 +30,14 @@ class FilterViewConfig {
          * 根据所需的亮度值获取滤镜配置
          */
         fun getConfigByBrightness(brightness: Int, screentMinLight: Int = FILTER_BRIGHTNESS_MAX): FilterViewConfig {
+            val brightnessValue = if (FILTER_BRIGHTNESS_MIN < 1) FILTER_BRIGHTNESS_MIN else if (brightness > FILTER_BRIGHTNESS_MAX) FILTER_BRIGHTNESS_MAX else brightness
             if (screentMinLight == FILTER_BRIGHTNESS_MAX) {
-                val config = FilterViewConfig.getDefault()
+                val config = getDefault()
                 config.filterBrightness = FILTER_BRIGHTNESS_MAX
-                config.filterAlpha = FILTER_MAX_ALPHA - (brightness * FILTER_MAX_ALPHA / 1000).toInt()
+                config.filterAlpha = FILTER_MAX_ALPHA - (brightnessValue * FILTER_MAX_ALPHA / 1000)
                 return config
             } else {
-                return getConfigByRatio(getBrightnessRatio(brightness), screentMinLight)
+                return getConfigByRatio(getBrightnessRatio(brightnessValue), screentMinLight)
             }
         }
 
@@ -53,7 +54,7 @@ class FilterViewConfig {
         }
 
         fun getConfigByRatio(ratio: Float, screentMinLight: Int): FilterViewConfig {
-            val config = FilterViewConfig.getDefault()
+            val config = getDefault()
             if (ratio > 1 || ratio < 0) {
                 //
                 return config

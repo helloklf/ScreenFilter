@@ -157,23 +157,23 @@
 
                     <TextView
                         style="@style/option_title"
-                        android:text="@string/light_lux_offset" />
+                        android:text="@string/brightness_offset" />
 
                     <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <SeekBar
-                            android:id="@+id/light_lux_offset"
+                            android:id="@+id/brightness_offset"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:elevation="1dp"
-                            android:max="400"
+                            android:max="200"
                             android:min="0"
                             android:progress="50" />
                         <TextView
-                            android:id="@+id/light_lux_offset_text"
+                            android:id="@+id/brightness_offset_text"
                             android:textAlignment="textEnd"
                             android:layout_width="30dp"
                             android:layout_height="wrap_content" />
@@ -187,7 +187,7 @@
                         style="@style/option_desc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/light_lux_offset_desc" />
+                        android:text="@string/brightness_offset_desc" />
 
                     <TextView
                         style="@style/option_title"

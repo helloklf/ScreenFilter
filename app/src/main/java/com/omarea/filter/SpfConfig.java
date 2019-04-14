@@ -7,9 +7,9 @@ public class SpfConfig {
     public static String FILTER_DYNAMIC_COLOR = "FILTER_DYNAMIC_COLOR";
     public static int FILTER_DYNAMIC_COLOR_DEFAULT = 0;
 
-    // 光线传感器偏移量（1表示1%,100表示100%）
-    public static String LIGHT_LUX_OFFSET = "LIGHT_LUX_OFFSET";
-    public static int LIGHT_LUX_OFFSET_DEFAULT = 0;
+    // 亮度偏移量（1表示1%,100表示100%）
+    public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET";
+    public static int BRIGTHNESS_OFFSET_DEFAULT = 0;
 
     // 平滑亮度
     public static String SMOOTH_ADJUSTMENT = "SMOOTH_ADJUSTMENT";

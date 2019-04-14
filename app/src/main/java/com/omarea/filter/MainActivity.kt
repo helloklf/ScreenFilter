@@ -74,33 +74,33 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 屏幕滤镜强度偏移量
-        light_lux_offset.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        brightness_offset.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val lightLuxOffset = progress - (light_lux_offset.max / 4)
-                config.edit().putInt(SpfConfig.LIGHT_LUX_OFFSET, lightLuxOffset).apply()
+                val lightLuxOffset = progress - (brightness_offset.max / 4)
+                config.edit().putInt(SpfConfig.BRIGTHNESS_OFFSET, lightLuxOffset).apply()
                 if (lightLuxOffset > 0) {
-                    light_lux_offset_text.text = "+" + lightLuxOffset
+                    brightness_offset_text.text = "+" + lightLuxOffset
                 } else if (lightLuxOffset < 0) {
-                    light_lux_offset_text.text = lightLuxOffset.toString()
+                    brightness_offset_text.text = lightLuxOffset.toString()
                 } else {
-                    light_lux_offset_text.text = "100"
+                    brightness_offset_text.text = "100"
                 }
                 filterRefresh()
             }
         })
-        val lightLuxOffset = config.getInt(SpfConfig.LIGHT_LUX_OFFSET, SpfConfig.LIGHT_LUX_OFFSET_DEFAULT)
-        val lightLuxOffsetProgress = lightLuxOffset + (light_lux_offset.max / 4)
+        val lightLuxOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT)
+        val lightLuxOffsetProgress = lightLuxOffset + (brightness_offset.max / 4)
         if (lightLuxOffsetProgress > 0) {
-            light_lux_offset_text.text = "+" + lightLuxOffset
+            brightness_offset_text.text = "+" + lightLuxOffset
         } else if (lightLuxOffsetProgress < 0) {
-            light_lux_offset_text.text = lightLuxOffset.toString()
+            brightness_offset_text.text = lightLuxOffset.toString()
         } else {
-            light_lux_offset_text.text = "100"
+            brightness_offset_text.text = "100"
         }
-        light_lux_offset.progress = lightLuxOffsetProgress
+        brightness_offset.progress = lightLuxOffsetProgress
 
         // 动态颜色
         filter_dynamic_color.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

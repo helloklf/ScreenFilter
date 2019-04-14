@@ -14,7 +14,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.provider.Settings
-import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
@@ -146,11 +145,40 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun filterOpen() {
-        if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
-            Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
-            return
+    /**
+     * dp转换成px
+     */
+    private fun dp2px(context: Context, dpValue: Float): Int {
+        val scale = context.resources.displayMetrics.density
+        return (dpValue * scale + 0.5f).toInt()
+    }
+
+    /**
+     * 获取导航栏高度
+     * @param context
+     * @return
+     */
+    fun getNavBarHeight(): Int {
+        val height = resources.getDimensionPixelSize(resources.getIdentifier("navigation_bar_height", "dimen", "android"))
+        if (height < 1) {
+            return dp2px(this, 55f)
         }
+        return height
+    }
+
+    /**
+     * 获取状态栏高度
+     */
+    fun getStatusHeight(): Int {
+        var result = 0;
+        val resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result
+    }
+
+    private fun filterOpen() {
         if (popupView != null) {
             filterClose()
         }
@@ -160,13 +188,13 @@ class FilterAccessibilityService : AccessibilityService() {
 
         val params = WindowManager.LayoutParams()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             params.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
         } else {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
         }
 
-        params.gravity = Gravity.LEFT or Gravity.TOP
+        params.gravity = Gravity.NO_GRAVITY
         params.format = PixelFormat.TRANSLUCENT
         params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
@@ -181,8 +209,8 @@ class FilterAccessibilityService : AccessibilityService() {
         if (p.x > maxSize) {
             maxSize = p.x
         }
-        params.width = maxSize // p.x // 直接按屏幕最大宽度x最大宽度显示，避免屏幕旋转后盖不住全屏
-        params.height = maxSize
+        params.width = maxSize +  getNavBarHeight() // p.x // 直接按屏幕最大宽度x最大宽度显示，避免屏幕旋转后盖不住全屏
+        params.height = maxSize +  getNavBarHeight()
 
         // 不知道是不是真的有效
         params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
@@ -198,16 +226,15 @@ class FilterAccessibilityService : AccessibilityService() {
             // FIXME:已知部分手机，即使环境亮度没改变也可能会疯狂报告亮度 - 比如说三星S8，这可咋整呢？
             override fun onSensorChanged(event: SensorEvent?) {
                 if (event != null && event.values.size > 0) {
-                    val offset = config.getInt(SpfConfig.LIGHT_LUX_OFFSET, SpfConfig.LIGHT_LUX_OFFSET_DEFAULT) / 100.0
 
                     // 获取光线强度
-                    val lux = if (offset != 0.toDouble()) ((1 + offset) * event.values[0]).toInt() else event.values[0].toInt()
+                    val lux = event.values[0].toInt()
                     GlobalStatus.currentLux = lux
                     val history = LightHistory()
                     history.time = System.currentTimeMillis()
                     history.lux = lux
 
-                    if (lightHistory.size > 100) {
+                    if (lightHistory.size > 50) {
                         lightHistory.pop()
                     }
 
@@ -215,14 +242,20 @@ class FilterAccessibilityService : AccessibilityService() {
 
                     // 自动亮度模式下才根据环境光自动调整滤镜强度
                     if (systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                        updateFilter(lux, filterView!!)
+                        if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
+                            startSmoothLightTimer(filterView!!)
+                        } else {
+                            stopSmoothLightTimer()
+                            updateFilterNow(lux, filterView!!)
+                        }
+                        GlobalStatus.currentFilterBrightness = filterBrightness
                     }
                 }
             }
         })
 
         GlobalStatus.filterRefresh = Runnable {
-            updateFilter(GlobalStatus.currentLux, filterView!!)
+            updateFilterNow(GlobalStatus.currentLux, filterView!!)
         }
 
         filterBrightness = FilterViewConfig.FILTER_BRIGHTNESS_MAX
@@ -279,7 +312,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 handler.post {
                     if (avg > 0 && avg < 1) {
                         // 小数精确度问题，如果是0.x也当做1，=0才理解为全黑环境
-                        updateFilterNow(5, filterView)
+                        updateFilterNow(1, filterView)
                     } else {
                         updateFilterNow(avg.toInt(), filterView)
                     }
@@ -299,31 +332,22 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
-    /**
-     * 更新滤镜
-     */
-    private fun updateFilter(lux: Int, filterView: FilterView) {
-        if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
-            startSmoothLightTimer(filterView)
-        } else {
-            stopSmoothLightTimer()
-            updateFilterNow(lux, filterView)
-        }
-        GlobalStatus.currentFilterBrightness = filterBrightness
-    }
-
     private fun updateFilterNow(lux: Int, filterView: FilterView) {
         // 深夜极暗光 22:00~06:00
         if (lux == 0 && config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)) {
             val calendar = Calendar.getInstance()
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            // 如果是深夜时段
             if (hour >= 22 || hour < 6) {
-                val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0.05f)
+                val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0.01f)
                 updateFilterNow(filterViewConfig, filterView)
                 return
             }
         }
-        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(lux)
+
+        val offset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
+
+        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(lux, offset)
         var alpha = filterViewConfig.filterAlpha
         if (isLandscapf) {
             alpha -= 25
