@@ -80,7 +80,12 @@ class FilterAccessibilityService : AccessibilityService() {
         // 获取当前系统亮度
         systemBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS)
         // 系统最大亮度值
-        val maxLight = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT)
+        var maxLight = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT)
+        // 部分设备最大亮度不符合谷歌规定的1-255，会出现2047 4096等超大数值，因此要自适应一下
+        if (systemBrightness > maxLight) {
+            config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, systemBrightness).apply()
+            maxLight = systemBrightness
+        }
         // 当前亮度比率
         val ratio = (systemBrightness.toFloat() / maxLight)
 

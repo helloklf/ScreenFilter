@@ -14,7 +14,7 @@ class FilterViewConfig {
      * 获取亮度的比率（0.00 ~ 1.00）
      */
     internal fun getFilterBrightnessRatio (): Float {
-        return (filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX)
+        return (filterBrightness.toFloat() / FILTER_BRIGHTNESS_MAX)
     }
 
     companion object {
@@ -30,7 +30,7 @@ class FilterViewConfig {
          * 根据所需的亮度值获取滤镜配置
          */
         fun getConfigByBrightness(brightness: Int, screentMinLight: Int = FILTER_BRIGHTNESS_MAX): FilterViewConfig {
-            val brightnessValue = if (FILTER_BRIGHTNESS_MIN < 1) FILTER_BRIGHTNESS_MIN else if (brightness > FILTER_BRIGHTNESS_MAX) FILTER_BRIGHTNESS_MAX else brightness
+            val brightnessValue = if (brightness < FILTER_BRIGHTNESS_MIN) FILTER_BRIGHTNESS_MIN else if (brightness > FILTER_BRIGHTNESS_MAX) FILTER_BRIGHTNESS_MAX else brightness
             if (screentMinLight == FILTER_BRIGHTNESS_MAX) {
                 val config = getDefault()
                 config.filterBrightness = FILTER_BRIGHTNESS_MAX
@@ -65,9 +65,9 @@ class FilterViewConfig {
                 config.filterBrightness = FILTER_BRIGHTNESS_MAX
             } else {
                 // 如果亮度还没低于屏幕最低亮度限制
-                if (ratio >= screentMinLight) {
+                if (ratio >= screentMinLight.toFloat() / FILTER_BRIGHTNESS_MAX) {
                     config.filterAlpha = 0
-                    config.filterBrightness = (ratio * 1000).toInt()
+                    config.filterBrightness = (ratio * FILTER_BRIGHTNESS_MAX).toInt()
                 } else {
                     // 如果已经低于最低屏幕亮度限制，进行换算
                     val filterAlpha = FILTER_MAX_ALPHA - (ratio * FILTER_BRIGHTNESS_MAX / screentMinLight * FILTER_MAX_ALPHA).toInt()
