@@ -17,8 +17,8 @@
     <string name="brightness_offset_desc">自动亮度微调</string>
     <string name="filter_dynamic_color">环境色温</string>
     <string name="filter_dynamic_color_desc">滤镜使屏幕变黄的程度</string>
-    <string name="pixel_filter">像素滤镜 *敬请期待</string>
-    <string name="pixel_filter_desc">使用关闭相邻像素 + 全局叠加层，双重方案来调整屏幕亮度。略微提升低亮度下的色彩表现，但会出现明显的锯齿感！</string>
+    <string name="pixel_filter">像素滤镜</string>
+    <string name="pixel_filter_desc">允许屏蔽相邻像素来调整亮度，增加锯齿感，色彩表现比纯滤镜略好</string>
     <string name="smooth_adjustment">平滑亮度</string>
     <string name="smooth_adjustment_desc">避免复杂光照环境下屏幕亮度闪烁</string>
     <string name="landscape_optimize">横屏优化</string>

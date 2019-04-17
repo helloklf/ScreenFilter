@@ -17,6 +17,9 @@ class SampleData {
     // 屏幕亮度低于此值时才开启滤镜功能
     private var screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
 
+    // 是否允许使用像素滤镜
+    private var allowPixelFilter = true;
+
     private var filterConfig = "Samples.json"
 
     constructor (context: Context) {
@@ -51,6 +54,9 @@ class SampleData {
             } else {
                 this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
             }
+            if (jsonObject.has("allowPixelFilter")) {
+                allowPixelFilter = jsonObject.getBoolean("allowPixelFilter")
+            }
         } catch (ex: Exception) {
             samples.put(0, FilterViewConfig.FILTER_BRIGHTNESS_MIN)
             samples.put(10000, FilterViewConfig.FILTER_BRIGHTNESS_MAX)
@@ -65,6 +71,7 @@ class SampleData {
         val config = JSONObject()
         config.putOpt("samples", sampleConfig)
         config.put("screentMinLight", this.screentMinLight)
+        config.put("allowPixelFilter", allowPixelFilter)
         val jsonStr = config.toString(2)
 
         if (!FileWrite.writePrivateFile(jsonStr.toByteArray(Charset.defaultCharset()), filterConfig, context)) {
@@ -114,7 +121,7 @@ class SampleData {
     public fun getFilterConfig(lux: Int, offset: Double = 0.toDouble()): FilterViewConfig {
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
-            return FilterViewConfig.getConfigByBrightness((sampleValue  * (1 + offset)).toInt(), screentMinLight)
+            return FilterViewConfig.getConfigByBrightness((sampleValue  * (1 + offset)).toInt(), screentMinLight, allowPixelFilter)
         }
         return FilterViewConfig.getDefault()
     }
@@ -123,14 +130,14 @@ class SampleData {
      * 根据意图亮度百分比，获取滤镜配置
      */
     public fun getFilterConfigByRatio(ratio: Float): FilterViewConfig {
-        return FilterViewConfig.getConfigByRatio(ratio, screentMinLight)
+        return FilterViewConfig.getConfigByRatio(ratio, screentMinLight, allowPixelFilter)
     }
 
     /**
      * 根据意向屏幕亮度获取配置
      */
     public fun getConfigByBrightness(brightness: Int): FilterViewConfig {
-        return FilterViewConfig.getConfigByBrightness(brightness, screentMinLight)
+        return FilterViewConfig.getConfigByBrightness(brightness, screentMinLight, allowPixelFilter)
     }
 
     /**
@@ -195,5 +202,13 @@ class SampleData {
         } else {
             this.screentMinLight = value
         }
+    }
+
+    public fun getAllowPixelFilter(): Boolean {
+        return allowPixelFilter
+    }
+
+    public fun setAllowPixelFilter(allowPixelFilter: Boolean) {
+        this.allowPixelFilter = allowPixelFilter
     }
 }
