@@ -42,35 +42,37 @@ class FilterViewConfig {
         }
 
         /**
-         * 根据亮度值获取亮度比率（0.05~1）
+         * 根据亮度值获取亮度比率（0.01~1）
          */
         fun getBrightnessRatio(brightness: Int): Float {
             if (brightness > 1000) {
                 return 1f
-            } else if (brightness < 5) {
-                return 0.05f
+            } else if (brightness < 1) {
+                return 0.01f
             }
             return (brightness / 1000.0).toFloat()
         }
 
         fun getConfigByRatio(ratio: Float, screentMinLight: Int): FilterViewConfig {
             val config = getDefault()
-            if (ratio > 1 || ratio < 0) {
-                //
-                return config
+            var avalibRatio = ratio
+            if (ratio > 1) {
+                avalibRatio = 1f
+            } else if (ratio < 0f) {
+                avalibRatio = 0.01f
             }
 
             if (screentMinLight == FILTER_BRIGHTNESS_MAX) {
-                config.filterAlpha = FILTER_MAX_ALPHA - (ratio * FILTER_MAX_ALPHA).toInt()
+                config.filterAlpha = FILTER_MAX_ALPHA - (avalibRatio * FILTER_MAX_ALPHA).toInt()
                 config.filterBrightness = FILTER_BRIGHTNESS_MAX
             } else {
                 // 如果亮度还没低于屏幕最低亮度限制
-                if (ratio >= screentMinLight.toFloat() / FILTER_BRIGHTNESS_MAX) {
+                if (avalibRatio >= screentMinLight.toFloat() / FILTER_BRIGHTNESS_MAX) {
                     config.filterAlpha = 0
-                    config.filterBrightness = (ratio * FILTER_BRIGHTNESS_MAX).toInt()
+                    config.filterBrightness = (avalibRatio * FILTER_BRIGHTNESS_MAX).toInt()
                 } else {
                     // 如果已经低于最低屏幕亮度限制，进行换算
-                    val filterAlpha = FILTER_MAX_ALPHA - (ratio * FILTER_BRIGHTNESS_MAX / screentMinLight * FILTER_MAX_ALPHA).toInt()
+                    val filterAlpha = FILTER_MAX_ALPHA - (avalibRatio * FILTER_BRIGHTNESS_MAX / screentMinLight * FILTER_MAX_ALPHA).toInt()
                     config.filterAlpha = filterAlpha
                     config.filterBrightness = screentMinLight
                 }
