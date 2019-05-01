@@ -31,7 +31,7 @@
                         android:layout_height="wrap_content">
                         <FrameLayout
                             android:layout_width="4000dp"
-                            android:layout_height="300dp">
+                            android:layout_height="400dp">
                             <com.omarea.filter.SampleDataView
                                 android:id="@+id/sample_chart"
                                 android:layout_width="4000dp"
@@ -101,15 +101,6 @@
                 <TextView
                     style="@style/option_desc"
                     android:text="@string/screen_min_light_desc" />
-
-                <Switch
-                    android:id="@+id/pixel_filter"
-                    style="@style/option_title"
-                    android:text="@string/pixel_filter" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/pixel_filter_desc" />
             </LinearLayout>
 
             <LinearLayout

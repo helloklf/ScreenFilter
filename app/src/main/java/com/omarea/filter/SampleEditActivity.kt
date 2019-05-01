@@ -121,7 +121,6 @@ class SampleEditActivity : AppCompatActivity() {
     private fun updateChart() {
         screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight() / 10
         screen_light_min_ratio.text = (screen_light_min.progress).toString()
-        pixel_filter.isChecked = GlobalStatus.sampleData!!.getAllowPixelFilter()
 
         sample_chart.invalidate()
     }
@@ -167,10 +166,6 @@ class SampleEditActivity : AppCompatActivity() {
             }
         })
 
-        // 像素滤镜
-        pixel_filter.setOnClickListener {
-            GlobalStatus.sampleData!!.setAllowPixelFilter((it as Switch).isChecked)
-        }
         /*
         getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS), true, object:ContentObserver(Handler()) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {

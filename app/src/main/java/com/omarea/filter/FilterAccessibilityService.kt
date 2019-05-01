@@ -369,10 +369,10 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private fun updateFilterNow(filterViewConfig: FilterViewConfig, filterView: FilterView) {
         if (isLandscapf && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
-            filterView.setFilterColor(filterViewConfig.filterAlpha, 0, 0, 0, true, filterViewConfig.pixelFilter)
+            filterView.setFilterColor(filterViewConfig.filterAlpha, 0, 0, 0, true)
         } else {
             val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
-            filterView.setFilterColor(filterViewConfig.filterAlpha, filterDynamicColor, filterDynamicColor / 2, 0, true, filterViewConfig.pixelFilter)
+            filterView.setFilterColor(filterViewConfig.filterAlpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
         }
         if (filterViewConfig.filterBrightness != filterBrightness) {
             val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
