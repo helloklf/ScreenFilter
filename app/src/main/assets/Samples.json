@@ -1,5 +1,5 @@
 {
-  "desc": "配置格式为[lux]:[brightness]，亮度值(brightness)范围是5~1000，环境光(lux)值范围是0~40000；screentMinLight表示仅当屏幕亮度低于此值才使用滤镜，allowPixelFilter表示是否使用像素滤镜；像素滤镜会在迫不得已(屏幕亮度极低)时使用",
+  "desc": "配置格式为[lux]:[brightness]，亮度值(brightness)范围是5~1000，环境光(lux)值范围是0~40000",
   "samples": {
     "0": "85",
     "1": "125",
@@ -10,6 +10,5 @@
     "3000": "800",
     "10000": "1000"
   },
-  "screentMinLight": "1000",
-  "allowPixelFilter": "false"
+  "screentMinLight": "1000"
 }
