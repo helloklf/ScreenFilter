@@ -33,13 +33,23 @@ class FilterView : View {
     private var valueAnimator: ValueAnimator? = null
 
     constructor(context: Context) : super(context) {
+        init(null, 0)
     }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        init(attrs, 0)
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
+        init(attrs, defStyle)
     }
+
+    private fun init(attrs: AttributeSet?, defStyle: Int) {
+        // Load attributes
+        // val a = context.obtainStyledAttributes(attrs, R.styleable.MyView, defStyle, 0)
+        // a.recycle()
+    }
+
     fun cgangePer(per: Int) {
         val perOld = this.alpha
         if (valueAnimator != null && valueAnimator!!.isRunning) {
@@ -82,7 +92,7 @@ class FilterView : View {
     private var cacheTime:Long = 0L
 
     private fun drawBuffer(): Canvas {
-        if (cachedPixelAlternate == pixelAlternate && (System.currentTimeMillis() - cacheTime < 120000)) {
+        if (cachedPixelAlternate == pixelAlternate && (System.currentTimeMillis() - cacheTime < 60000)) {
             return bufferCanvas!!
         } else {
             pixelAlternate = !pixelAlternate
