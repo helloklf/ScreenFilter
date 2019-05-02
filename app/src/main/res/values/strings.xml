@@ -36,7 +36,7 @@
 
     <string name="sample_chart">当前样本数据</string>
     <string name="sample_desc_title">样本说明</string>
-    <string name="sample_desc">样本数据用于计算不同环境光下的屏幕亮度，上图中x轴表示环境光强度(lux)，y轴表示屏幕亮度。样本的“导入”和“导出”功能会在后续的版本中提供！</string>
+    <string name="sample_desc">样本数据用于计算不同环境光下的屏幕亮度，上图中x轴表示环境光强度(lux)，y轴表示屏幕亮度。</string>
 
     <string name="accessibility_service_required">需要先启动辅助服务，才能使用本功能！</string>
     <string name="overlays_required">还未授予“显示悬浮窗/在应用上层显示”权限</string>
