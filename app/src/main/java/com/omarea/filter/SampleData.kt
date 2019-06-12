@@ -76,6 +76,14 @@ class SampleData {
      * 添加样本数据
      */
     public fun addSample(lux: Int, sample: Int) {
+        // 查找现存样本中与新增样本冲突的旧样本
+        val invalidSamples = samples.filter {
+            (it.key >= lux && it.value <= sample) || (it.key <= lux && it.value >= sample)
+        }
+        invalidSamples.forEach {
+            samples.remove(it.key)
+        }
+
         if (!samples.containsKey(lux)) {
             samples.put(lux, sample)
         }

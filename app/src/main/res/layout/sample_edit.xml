@@ -18,11 +18,12 @@
 
         <SeekBar
             android:id="@+id/sample_lux"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:max="2000"
-            android:min="0" />
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:max="2000" />
 
         <TextView
             android:layout_width="50dp"
@@ -41,15 +42,13 @@
         <TextView
             style="@style/option_desc"
             android:layout_width="wrap_content"
-            android:paddingRight="0dp"
             android:text="@string/sample_edit_currentlux" />
 
         <TextView
             android:id="@+id/sample_edit_currentlux"
             style="@style/option_desc"
-            android:layout_width="30dp"
-            android:gravity="start"
-            android:paddingLeft="0dp" />
+            android:layout_width="40dp"
+            android:gravity="start" />
 
         <TextView
             android:id="@+id/sample_edit_applay"
@@ -57,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:paddingRight="0dp"
+            android:textAlignment="center"
             android:text="@string/sample_edit_applay"
             android:textColor="@color/colorPrimary" />
 
@@ -71,9 +70,8 @@
             style="@style/option_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:background="@android:color/transparent"
-            android:paddingRight="0dp"
             android:text="－"
             android:textColor="@color/colorPrimary" />
 
@@ -82,9 +80,8 @@
             style="@style/option_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:background="@android:color/transparent"
-            android:paddingRight="0dp"
             android:text="＋"
             android:textColor="@color/colorPrimary" />
     </LinearLayout>
@@ -102,13 +99,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:max="1000"
-            android:min="0" />
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:max="1000" />
 
         <TextView
             android:id="@+id/sample_brightness_text"
             android:layout_width="50dp"
-            android:text="0"
             android:gravity="center_horizontal"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical" />
@@ -133,9 +130,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:background="@android:color/transparent"
-            android:paddingRight="0dp"
             android:text="－"
             android:textColor="@color/colorPrimary" />
 
@@ -145,9 +141,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:background="@android:color/transparent"
-            android:paddingRight="0dp"
             android:text="＋"
             android:textColor="@color/colorPrimary" />
     </LinearLayout>
