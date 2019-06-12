@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">屏幕滤镜</string>
+    <string name="screenshot_tile">正常截图</string>
+    <string name="screenshot_tile_fail">屏幕滤镜调用截图失败</string>
+    <string name="screenshot_tile_output">保存路径：</string>
     <string name="sample_edit">样本数据修改</string>
 
     <string name="ambient_light">环境光:</string>
@@ -33,6 +36,9 @@
     <string name="statement">声明</string>
     <string name="statement_content">大多数Amoled屏幕都采用调光，通过不断的“暗~亮”切换，达到调整单位时间内平均亮度的效果。暗光环境下的低频闪烁，更容易造成眼睛疲劳。\n\n将屏幕固定最大亮度，再通过改变屏幕叠加层（滤镜）的浓度，来实现亮度调整，是民间一种“另辟蹊径”的手法，并非本应用首创！！！\n\n启用滤镜后，屏幕会根据亮度不同出现不同程度的色彩失真，并且会导致屏幕截图变暗！</string>
     <string name="author">—— 嘟嘟斯基\n http://vtools.omarea.com</string>
+
+    <string name="quick_tile_on">已开启屏幕滤镜</string>
+    <string name="quick_tile_off">已开关闭幕滤镜</string>
 
     <string name="sample_chart">当前样本数据</string>
     <string name="sample_desc_title">样本说明</string>
