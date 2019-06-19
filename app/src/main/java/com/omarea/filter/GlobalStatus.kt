@@ -11,4 +11,5 @@ object GlobalStatus {
     var filterOpen: Runnable? = null
     var filterClose: Runnable? = null
     var filterRefresh: Runnable? = null
+    var screenCap: Runnable? = null
 }

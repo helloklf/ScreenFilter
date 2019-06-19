@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
-import android.view.KeyEvent
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 

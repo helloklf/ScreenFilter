@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
-import android.view.WindowManager
 
 /**
  * TODO: document your custom view class.

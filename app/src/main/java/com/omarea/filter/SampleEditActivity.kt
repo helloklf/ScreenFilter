@@ -14,7 +14,10 @@ import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.*
+import android.widget.Button
+import android.widget.SeekBar
+import android.widget.TextView
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_sample_edit.*
 
 class SampleEditActivity : AppCompatActivity() {

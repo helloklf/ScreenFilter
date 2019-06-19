@@ -75,14 +75,14 @@
             </intent-filter>
         </service>
 
-        <!--<service android:name=".ScreenShotService"
+        <service android:name=".ScreenShotService"
             android:label="@string/screenshot_tile"
             android:icon="@drawable/glass"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
-        </service>-->
+        </service>
     </application>
 
 </manifest>

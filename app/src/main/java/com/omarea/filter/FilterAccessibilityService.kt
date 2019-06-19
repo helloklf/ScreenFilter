@@ -263,6 +263,10 @@ class FilterAccessibilityService : AccessibilityService() {
             updateFilterNow(GlobalStatus.currentLux, filterView!!)
         }
 
+        GlobalStatus.screenCap = Runnable {
+            this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
+        }
+
         filterBrightness = FilterViewConfig.FILTER_BRIGHTNESS_MAX
 
         // 监控屏幕亮度
