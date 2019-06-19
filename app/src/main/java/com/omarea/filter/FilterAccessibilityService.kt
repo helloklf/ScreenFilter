@@ -12,12 +12,16 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.provider.Settings
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import java.util.*
+import android.os.Environment.getExternalStorageDirectory
+import java.io.File
+
 
 class FilterAccessibilityService : AccessibilityService() {
     private lateinit var config: SharedPreferences
@@ -30,6 +34,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private lateinit var mWindowManager: WindowManager
     private lateinit var display: Display
+    private var isFristScreenCap = true;
 
     // 悬浮窗
     private var popupView: View? = null
@@ -264,7 +269,24 @@ class FilterAccessibilityService : AccessibilityService() {
         }
 
         GlobalStatus.screenCap = Runnable {
-            this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
+            } else {
+                if (isFristScreenCap) {
+                    Toast.makeText(this, "抱歉，对于Android 9.0以前的系统，需要ROOT权限才能调用截屏~", Toast.LENGTH_LONG).show()
+                    isFristScreenCap = false
+                }
+                val output = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Pictures/" + System.currentTimeMillis() + ".png"
+                if (KeepShellPublic.doCmdSync("screencap -p \"$output\"") != "error") {
+                    if (File(output).exists()) {
+                        Toast.makeText(this, "截图保存至 \n" + output, Toast.LENGTH_LONG).show();
+                    }  else {
+                        Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
+                }
+            }
         }
 
         filterBrightness = FilterViewConfig.FILTER_BRIGHTNESS_MAX

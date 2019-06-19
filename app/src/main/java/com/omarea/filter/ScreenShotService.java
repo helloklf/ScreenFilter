@@ -1,5 +1,6 @@
 package com.omarea.filter;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.service.quicksettings.TileService;
@@ -22,9 +23,12 @@ public class ScreenShotService extends TileService {
                 if (close != null) {
                     close.run();
                 }
-                handler.postDelayed(screenCap, 150);
+                try {
+                    startActivityAndCollapse(new Intent(this, ScreenCapActivity.class));
+                } catch (Exception ignored) {}
+                handler.postDelayed(screenCap, 500);
                 if (open != null) {
-                    handler.postDelayed(open, 3000);
+                    handler.postDelayed(open, 5000);
                 }
             } else {
                 screenCap.run();

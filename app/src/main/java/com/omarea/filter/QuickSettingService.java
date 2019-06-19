@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class QuickSettingService extends TileService {
-    private final String LOG_TAG = "QuickSettingService";
 
     //当用户从Edit栏添加到快速设定中调用
     @Override
@@ -28,7 +27,6 @@ public class QuickSettingService extends TileService {
     // 点击的时候
     @Override
     public void onClick() {
-        Log.d(LOG_TAG, "onClick state = " + getQsTile().getState());
         SharedPreferences config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE);
 
         int toggleState = getQsTile().getState();
@@ -76,13 +74,11 @@ public class QuickSettingService extends TileService {
     public void onStartListening() {
         getQsTile().setState(GlobalStatus.INSTANCE.getFilterEnabled() ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
         getQsTile().updateTile(); //更新Tile
-        Log.d(LOG_TAG, "onStartListening");
     }
 
     // 关闭下拉菜单的时候调用,当快速设置按钮并没有在编辑栏拖到设置栏中不会调用
     // 在onTileRemoved移除之前也会调用移除
     @Override
     public void onStopListening() {
-        Log.d(LOG_TAG, "onStopListening");
     }
 }
