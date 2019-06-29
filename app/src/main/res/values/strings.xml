@@ -7,7 +7,7 @@
 
     <string name="ambient_light">环境光:</string>
     <string name="scrient_light">屏幕亮度:</string>
-    <string name="filter_light">滤镜亮度:</string>
+    <string name="filter_light">物理亮度:</string>
     <string name="filter_alpha">滤镜浓度:</string>
 
     <string name="filter_enable">启用滤镜</string>

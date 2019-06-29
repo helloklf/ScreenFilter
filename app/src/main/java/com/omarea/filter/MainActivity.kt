@@ -26,6 +26,19 @@ class MainActivity : AppCompatActivity() {
     private var timer: Timer? = null
     private var myHandler = Handler()
     private lateinit var systemBrightnessModeObserver: ContentObserver
+    private val OVERLAY_PERMISSION_REQ_CODE = 0
+
+    public fun askForPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                Toast.makeText(this, getString(R.string.permission_required), Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()))
+                startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+                return
+            }
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         setExcludeFromRecents()
+        askForPermission()
 
         // 启用滤镜
         filter_switch.setOnClickListener { v ->
@@ -161,7 +175,7 @@ class MainActivity : AppCompatActivity() {
                 filter_light.text = "×"
                 screen_light.text = Utils.getSystemBrightness(applicationContext).toString()
             }
-            filter_alpha.text = GlobalStatus.currentFilterAlpah.toString()
+            filter_alpha.text = ((GlobalStatus.currentFilterAlpah * 1000 / FilterViewConfig.FILTER_MAX_ALPHA).toInt() / 10.0).toString() + "%"
         }
     }
 
@@ -208,6 +222,13 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 1 && GlobalStatus.filterOpen != null) {
             GlobalStatus.filterOpen!!.run()
+        } else if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(this)) {
+                    Toast.makeText(this, getString(R.string.get_permission_fail), Toast.LENGTH_LONG).show()
+                    finishAndRemoveTask()
+                }
+            }
         }
         super.onActivityResult(requestCode, resultCode, data)
     }

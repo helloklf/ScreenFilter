@@ -122,8 +122,8 @@ class SampleEditActivity : AppCompatActivity() {
      * 更新图表
      */
     private fun updateChart() {
-        screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight() / 10
-        screen_light_min_ratio.text = (screen_light_min.progress).toString()
+        screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
+        screen_light_min_ratio.text = (screen_light_min.progress / 10.0).toString()
 
         sample_chart.invalidate()
     }
@@ -161,11 +161,15 @@ class SampleEditActivity : AppCompatActivity() {
             }
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (GlobalStatus.sampleData!!.getScreentMinLight() != (progress * 10)) {
-                    GlobalStatus.sampleData!!.setScreentMinLight(progress * 10)
+                var value = progress
+                if (progress < 1) {
+                    value = 1
+                }
+                if (GlobalStatus.sampleData!!.getScreentMinLight() != value) {
+                    GlobalStatus.sampleData!!.setScreentMinLight(value)
                     hasChange = true
                 }
-                screen_light_min_ratio.text = progress.toString()
+                screen_light_min_ratio.text = (value / 10.0).toString()
             }
         })
 
@@ -232,7 +236,7 @@ class SampleEditActivity : AppCompatActivity() {
             updateChart()
             alertDialog = null
         }
-        val currentLuxView = dialogView.findViewById<TextView>(R.id.sample_edit_currentlux)
+        val currentLuxView = dialogView.findViewById<TextView>(R.id.sample_edit_brightness)
 
         lightSensorManager.start(this, object : SensorEventListener {
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -244,12 +248,19 @@ class SampleEditActivity : AppCompatActivity() {
                     val lux = event.values[0].toInt()
                     currentLuxView.text = lux.toString()
                     if (currentLux == -1) {
-                        var limitLux = lux
-                        if (limitLux > sampleLuxView.max) {
-                            limitLux = sampleLuxView.max
+                        var limitedValue = lux
+                        if (limitedValue > sampleLuxView.max) {
+                            limitedValue = sampleLuxView.max
                         }
-                        sampleLuxValueView.text = limitLux.toString()
-                        sampleLuxView.progress = limitLux
+                        sampleLuxValueView.text = limitedValue.toString()
+                        sampleLuxView.progress = limitedValue
+
+                        val sample = GlobalStatus.sampleData!!.getVitualSample(limitedValue)
+                        if (sample != null) {
+                            sampleBrightness.progress = sample
+                            sampleBrightnessText.text = (sample / 10.0).toString()
+                            filterUpdate(sample)
+                        }
                     }
                     currentLux = lux
                 }
@@ -268,7 +279,7 @@ class SampleEditActivity : AppCompatActivity() {
                 val sample = GlobalStatus.sampleData!!.getVitualSample(progress)
                 if (sample != null) {
                     sampleBrightness.progress = sample
-                    sampleBrightnessText.text = sample.toString()
+                    sampleBrightnessText.text = (sample / 10.0).toString()
                 }
             }
         })
@@ -285,16 +296,12 @@ class SampleEditActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 filterUpdate(progress)
 
-                sampleBrightnessText.text = progress.toString()
+                sampleBrightnessText.text = (progress/ 10.0).toString()
             }
         })
         dialogView.findViewById<TextView>(R.id.sample_edit_applay).setOnClickListener {
-            var lux = currentLux
-            if (lux > 1000) {
-                lux = 1000
-            }
-            sampleLuxValueView.text = lux.toString()
-            sampleLuxView.progress = lux
+            sampleLuxValueView.text = currentLux.toString()
+            sampleLuxView.progress = currentLux
         }
         dialogView.findViewById<TextView>(R.id.sample_edit_minus).setOnClickListener {
             if (sampleLuxView.progress > 0) {

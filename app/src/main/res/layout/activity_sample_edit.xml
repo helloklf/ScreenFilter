@@ -79,8 +79,8 @@
                         android:layout_weight="1"
                         android:elevation="1dp"
                         android:enabled="false"
-                        android:max="100"
-                        android:min="1"
+                        android:max="1000"
+                        android:min="0"
                         android:progress="1000" />
 
                     <TextView

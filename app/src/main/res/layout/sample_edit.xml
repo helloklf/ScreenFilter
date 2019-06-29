@@ -23,7 +23,8 @@
             android:layout_weight="1"
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
-            android:max="2000" />
+            android:min="0"
+            android:max="4000" />
 
         <TextView
             android:layout_width="50dp"
@@ -45,7 +46,7 @@
             android:text="@string/sample_edit_currentlux" />
 
         <TextView
-            android:id="@+id/sample_edit_currentlux"
+            android:id="@+id/sample_edit_brightness"
             style="@style/option_desc"
             android:layout_width="40dp"
             android:gravity="start" />
@@ -68,8 +69,9 @@
         <TextView
             android:id="@+id/sample_edit_minus"
             style="@style/option_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginStart="10dp"
             android:background="@android:color/transparent"
             android:text="－"
@@ -78,8 +80,9 @@
         <TextView
             android:id="@+id/sample_edit_plus"
             style="@style/option_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginStart="20dp"
             android:background="@android:color/transparent"
             android:text="＋"
@@ -101,6 +104,7 @@
             android:layout_weight="1"
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
+            android:min="0"
             android:max="1000" />
 
         <TextView
@@ -109,6 +113,11 @@
             android:gravity="center_horizontal"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="%" />
     </LinearLayout>
 
     <LinearLayout
@@ -127,8 +136,9 @@
         <TextView
             android:id="@+id/sample_edit_alpha_minus"
             style="@style/option_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
             android:background="@android:color/transparent"
@@ -138,8 +148,9 @@
         <TextView
             android:id="@+id/sample_edit_alpha_plus"
             style="@style/option_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="20dp"
             android:background="@android:color/transparent"

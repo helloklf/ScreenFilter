@@ -2,6 +2,7 @@ package com.omarea.filter
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.database.ContentObserver
@@ -35,6 +36,10 @@ class FilterAccessibilityService : AccessibilityService() {
     private lateinit var mWindowManager: WindowManager
     private lateinit var display: Display
     private var isFristScreenCap = true;
+
+    // 当前手机屏幕是否处于开启状态
+    private var screenOn = false;
+    private var reciverLock:ReciverLock? = null
 
     // 悬浮窗
     private var popupView: View? = null
@@ -110,6 +115,23 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     override fun onServiceConnected() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            screenOn = ScreenState(this).isScreenOn()
+        }
+        if (reciverLock == null){
+            reciverLock = ReciverLock.autoRegister(this, ScreenEventHandler({
+                        screenOn = false
+                    }, {
+                        screenOn = true
+                        if (lightHistory.size > 0) {
+                            val last = lightHistory.last()
+                            lightHistory.clear()
+                            lightHistory.push(last)
+                            updateFilterByBrightness()
+                        }
+                    }))
+        }
+
         if (GlobalStatus.sampleData == null) {
             GlobalStatus.sampleData = SampleData(applicationContext)
         }
@@ -126,6 +148,14 @@ class FilterAccessibilityService : AccessibilityService() {
             filterOpen()
         }
         super.onServiceConnected()
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        if (reciverLock != null){
+            ReciverLock.unRegister(this)
+            reciverLock = null
+        }
+        return super.onUnbind(intent)
     }
 
     override fun onInterrupt() {
