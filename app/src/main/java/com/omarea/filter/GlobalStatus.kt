@@ -3,7 +3,7 @@ package com.omarea.filter
 object GlobalStatus {
     var filterEnabled = false
 
-    var currentLux: Int = 0
+    var currentLux: Float = 0F
     var currentFilterBrightness: Int = 0
     var currentFilterAlpah: Int = 0
     var sampleData: SampleData? = null

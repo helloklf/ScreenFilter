@@ -19,9 +19,8 @@ import android.provider.Settings
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
-import java.util.*
-import android.os.Environment.getExternalStorageDirectory
 import java.io.File
+import java.util.*
 
 
 class FilterAccessibilityService : AccessibilityService() {
@@ -39,7 +38,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
     // 当前手机屏幕是否处于开启状态
     private var screenOn = false;
-    private var reciverLock:ReciverLock? = null
+    private var reciverLock: ReciverLock? = null
 
     // 悬浮窗
     private var popupView: View? = null
@@ -118,18 +117,18 @@ class FilterAccessibilityService : AccessibilityService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             screenOn = ScreenState(this).isScreenOn()
         }
-        if (reciverLock == null){
+        if (reciverLock == null) {
             reciverLock = ReciverLock.autoRegister(this, ScreenEventHandler({
-                        screenOn = false
-                    }, {
-                        screenOn = true
-                        if (lightHistory.size > 0) {
-                            val last = lightHistory.last()
-                            lightHistory.clear()
-                            lightHistory.push(last)
-                            updateFilterByBrightness()
-                        }
-                    }))
+                screenOn = false
+            }, {
+                screenOn = true
+                if (lightHistory.size > 0) {
+                    val last = lightHistory.last()
+                    lightHistory.clear()
+                    lightHistory.push(last)
+                    updateFilterByBrightness()
+                }
+            }))
         }
 
         if (GlobalStatus.sampleData == null) {
@@ -151,7 +150,7 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        if (reciverLock != null){
+        if (reciverLock != null) {
             ReciverLock.unRegister(this)
             reciverLock = null
         }
@@ -249,8 +248,8 @@ class FilterAccessibilityService : AccessibilityService() {
         if (p.x > maxSize) {
             maxSize = p.x
         }
-        params.width = maxSize +  getNavBarHeight() // p.x // 直接按屏幕最大宽度x最大宽度显示，避免屏幕旋转后盖不住全屏
-        params.height = maxSize +  getNavBarHeight()
+        params.width = maxSize + getNavBarHeight() // p.x // 直接按屏幕最大宽度x最大宽度显示，避免屏幕旋转后盖不住全屏
+        params.height = maxSize + getNavBarHeight()
 
         // 不知道是不是真的有效
         params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
@@ -268,7 +267,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 if (event != null && event.values.size > 0) {
 
                     // 获取光线强度
-                    val lux = event.values[0].toInt()
+                    val lux = event.values[0]
                     GlobalStatus.currentLux = lux
                     val history = LightHistory()
                     history.time = System.currentTimeMillis()
@@ -310,7 +309,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 if (KeepShellPublic.doCmdSync("screencap -p \"$output\"") != "error") {
                     if (File(output).exists()) {
                         Toast.makeText(this, "截图保存至 \n" + output, Toast.LENGTH_LONG).show();
-                    }  else {
+                    } else {
                         Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
                     }
                 } else {
@@ -365,18 +364,13 @@ class FilterAccessibilityService : AccessibilityService() {
                 (currentTime - it.time) < 10001
             }
             if (historys.size > 0 && this.filterView != null) {
-                var total: Long = 0
+                var total: Double = 0.toDouble()
                 for (history in historys) {
                     total += history.lux
                 }
-                val avg = total / historys.size
+                val avg = (total / historys.size).toFloat()
                 handler.post {
-                    if (avg > 0 && avg < 1) {
-                        // 小数精确度问题，如果是0.x也当做1，=0才理解为全黑环境
-                        updateFilterNow(1, filterView)
-                    } else {
-                        updateFilterNow(avg.toInt(), filterView)
-                    }
+                    updateFilterNow(avg, filterView)
                 }
             }
         } catch (ex: Exception) {
@@ -393,9 +387,9 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun updateFilterNow(lux: Int, filterView: FilterView) {
+    private fun updateFilterNow(lux: Float, filterView: FilterView) {
         // 深夜极暗光 22:00~06:00
-        if (lux == 0 && config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)) {
+        if (lux == 0F && config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)) {
             val calendar = Calendar.getInstance()
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
             // 如果是深夜时段
@@ -408,11 +402,13 @@ class FilterAccessibilityService : AccessibilityService() {
 
         val offset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
 
-        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(lux, offset)
+        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(
+                lux,
+                offset,
+                if (isLandscapf) (FilterViewConfig.FILTER_BRIGHTNESS_MAX / 10) else 0
+        )
         var alpha = filterViewConfig.filterAlpha
-        if (isLandscapf) {
-            alpha -= 25
-        }
+
         if (alpha > FilterViewConfig.FILTER_MAX_ALPHA) {
             alpha = FilterViewConfig.FILTER_MAX_ALPHA
         } else if (alpha < 0) {

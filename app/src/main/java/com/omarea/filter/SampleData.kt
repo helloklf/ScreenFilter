@@ -119,10 +119,10 @@ class SampleData {
     /**
      * 根据样本计算滤镜浓度和屏幕亮度
      */
-    public fun getFilterConfig(lux: Int, offset: Double = 0.toDouble()): FilterViewConfig {
+    public fun getFilterConfig(lux: Float, offset: Double = 0.toDouble(), toneUp: Int = 0): FilterViewConfig {
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
-            return FilterViewConfig.getConfigByBrightness((sampleValue  * (1 + offset)).toInt(), screentMinLight)
+            return FilterViewConfig.getConfigByBrightness((sampleValue  * (1 + offset)).toInt() + toneUp, screentMinLight)
         }
         return FilterViewConfig.getDefault()
     }
@@ -141,14 +141,19 @@ class SampleData {
         return FilterViewConfig.getConfigByBrightness(brightness, screentMinLight)
     }
 
+    public fun getVitualSample(lux: Int): Int? {
+        return getVitualSample(lux.toFloat())
+    }
+
     /**
      * 获取虚拟样本，根据已有样本计算数值
      */
-    public fun getVitualSample(lux: Int): Int? {
+    public fun getVitualSample(lux: Float): Int? {
         if (samples.size > 1) {
             var sampleValue = 0
-            if (samples.containsKey(lux)) {
-                sampleValue = samples.get(lux) as Int
+            val intValue = lux.toInt()
+            if (intValue.toFloat() == lux && samples.containsKey(intValue)) {
+                sampleValue = samples.get(intValue) as Int
             } else {
                 val keys = samples.keys.sorted()
                 var min = keys[0]
