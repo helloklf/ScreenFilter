@@ -94,6 +94,8 @@ class SampleEditActivity : AppCompatActivity() {
         params.height = p.y + getNavBarHeight() * 2
 
         filterPopup = LayoutInflater.from(this).inflate(R.layout.filter, null)
+        filterPopup!!.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        params.flags.and(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
         mWindowManager.addView(filterPopup, params)
     }
 

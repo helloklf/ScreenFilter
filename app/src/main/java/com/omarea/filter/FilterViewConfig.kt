@@ -2,10 +2,9 @@ package com.omarea.filter
 
 class FilterViewConfig {
     constructor() {
-
     }
 
-    // 0 - 255 // 255表示全黑，0 表示不使用滤镜
+    // 0 - 1000 // 1000表示全黑，0 表示不使用滤镜
     internal var filterAlpha = 0
     // 0  - 1000，1000 表示最大亮度
     internal var filterBrightness = FILTER_BRIGHTNESS_MAX
@@ -20,7 +19,7 @@ class FilterViewConfig {
     companion object {
         var FILTER_BRIGHTNESS_MAX = 1000
         var FILTER_BRIGHTNESS_MIN = 1
-        var FILTER_MAX_ALPHA = 240
+        var FILTER_MAX_ALPHA = 950
 
         fun getDefault(): FilterViewConfig {
             return FilterViewConfig()

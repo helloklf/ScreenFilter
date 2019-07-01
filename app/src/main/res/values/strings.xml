@@ -23,11 +23,13 @@
     <string name="pixel_filter">像素滤镜 *敬请期待</string>
     <string name="pixel_filter_desc">使用关闭相邻像素 + 全局叠加层，双重方案来调整屏幕亮度。略微提升低亮度下的色彩表现，但会出现明显的锯齿感！</string>
     <string name="smooth_adjustment">平滑亮度</string>
-    <string name="smooth_adjustment_desc">避免复杂光照环境下屏幕亮度闪烁</string>
+    <string name="smooth_adjustment_desc">避免亮度变化过快，也能降低性能消耗</string>
     <string name="landscape_optimize">横屏优化</string>
     <string name="landscape_optimize_desc">横屏时关闭滤镜的环境色温，并提高亮度</string>
     <string name="night_mode">深夜极暗光</string>
     <string name="night_mode_desc">22:00~06:00期间(自动亮度+无光环境)，允许屏幕亮度降到更低</string>
+    <string name="screen_off_mode">息屏省电</string>
+    <string name="screen_off_mode_desc">息屏时暂停刷新滤镜以节省电量</string>
 
     <string name="hide_in_recent">从最近任务隐藏</string>
     <string name="hide_in_recent_desc">不要在最近任务列表显示本应用</string>

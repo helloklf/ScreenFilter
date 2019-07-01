@@ -16,6 +16,7 @@ import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.provider.Settings
+import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
@@ -350,7 +351,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 override fun run() {
                     updateFilterSmooth(filterView)
                 }
-            }, 1000, 5000)
+            }, 200, 5000)
         }
     }
 
@@ -361,7 +362,7 @@ class FilterAccessibilityService : AccessibilityService() {
         try {
             val currentTime = System.currentTimeMillis()
             val historys = lightHistory.filter {
-                (currentTime - it.time) < 10001
+                (currentTime - it.time) < 10000
             }
             if (historys.size > 0 && this.filterView != null) {
                 var total: Double = 0.toDouble()
@@ -375,7 +376,7 @@ class FilterAccessibilityService : AccessibilityService() {
             }
         } catch (ex: Exception) {
             handler.post {
-                Toast.makeText(this, "更新滤镜异常：" + ex.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "更新滤镜出现异常", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -405,7 +406,7 @@ class FilterAccessibilityService : AccessibilityService() {
         val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(
                 lux,
                 offset,
-                if (isLandscapf) (FilterViewConfig.FILTER_BRIGHTNESS_MAX / 10) else 0
+                if (isLandscapf && systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) (FilterViewConfig.FILTER_BRIGHTNESS_MAX / 10) else 0
         )
         var alpha = filterViewConfig.filterAlpha
 
@@ -420,12 +421,15 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun updateFilterNow(filterViewConfig: FilterViewConfig, filterView: FilterView) {
-        if (isLandscapf && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
-            filterView.setFilterColor(filterViewConfig.filterAlpha, 0, 0, 0, true)
-        } else {
-            val filterDynamicColor = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
-            filterView.setFilterColor(filterViewConfig.filterAlpha, filterDynamicColor, filterDynamicColor / 2, 0, true)
+        if (!screenOn) {
+            // 如果开启了息屏暂停滤镜更新功能
+            if (config.getBoolean(SpfConfig.SCREEN_OFF_PAUSE, SpfConfig.SCREEN_OFF_PAUSE_DEFAULT)) {
+                return
+            } else {
+                Log.e("updateFilterNow", "屏幕关闭时未暂停更新滤镜")
+            }
         }
+        filterView.setFilterColor(filterViewConfig.filterAlpha, 0, 0, 0, true)
         if (filterViewConfig.filterBrightness != filterBrightness) {
             val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
             if (layoutParams != null) {

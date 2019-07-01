@@ -116,17 +116,12 @@ class MainActivity : AppCompatActivity() {
         }
         brightness_offset.progress = lightLuxOffsetProgress
 
-        // 动态颜色
-        filter_dynamic_color.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                config.edit().putInt(SpfConfig.FILTER_DYNAMIC_COLOR, progress).apply()
-                filterRefresh()
-            }
-        })
-        filter_dynamic_color.progress = config.getInt(SpfConfig.FILTER_DYNAMIC_COLOR, SpfConfig.FILTER_DYNAMIC_COLOR_DEFAULT)
+        // 息屏暂停
+        screen_off_mode.isChecked = config.getBoolean(SpfConfig.SCREEN_OFF_PAUSE, SpfConfig.SCREEN_OFF_PAUSE_DEFAULT)
+        screen_off_mode.setOnClickListener {
+            config.edit().putBoolean(SpfConfig.SCREEN_OFF_PAUSE, (it as Switch).isChecked).apply()
+        }
 
         // 平滑亮度
         smooth_adjustment.isChecked = config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)

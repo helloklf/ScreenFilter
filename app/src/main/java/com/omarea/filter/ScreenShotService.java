@@ -25,7 +25,9 @@ public class ScreenShotService extends TileService {
                 }
                 try {
                     startActivityAndCollapse(new Intent(this, ScreenCapActivity.class));
-                } catch (Exception ignored) {}
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
                 handler.postDelayed(screenCap, 500);
                 if (open != null) {
                     handler.postDelayed(open, 5000);

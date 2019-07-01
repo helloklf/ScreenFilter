@@ -3,10 +3,6 @@ package com.omarea.filter;
 public class SpfConfig {
     public static String FILTER_SPF = "FILTER_SPF";
 
-    // 环境光动态色温
-    public static String FILTER_DYNAMIC_COLOR = "FILTER_DYNAMIC_COLOR";
-    public static int FILTER_DYNAMIC_COLOR_DEFAULT = 0;
-
     // 亮度偏移量（1表示1%,100表示100%）
     public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET";
     public static int BRIGTHNESS_OFFSET_DEFAULT = 0;
@@ -14,6 +10,10 @@ public class SpfConfig {
     // 平滑亮度
     public static String SMOOTH_ADJUSTMENT = "SMOOTH_ADJUSTMENT";
     public static boolean SMOOTH_ADJUSTMENT_DEFAULT = true;
+
+    // 深夜极暗光
+    public static String SCREEN_OFF_PAUSE = "SCREEN_OFF_PAUSE";
+    public static boolean SCREEN_OFF_PAUSE_DEFAULT = true;
 
     // 横屏优化
     public static String LANDSCAPE_OPTIMIZE = "LANDSCAPE_OPTIMIZE";
