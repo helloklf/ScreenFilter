@@ -27,6 +27,7 @@ import java.util.*
 class FilterAccessibilityService : AccessibilityService() {
     private lateinit var config: SharedPreferences
     private var lightSensorManager: LightSensorManager = LightSensorManager.getInstance()
+    private var dynamicOptimize:DynamicOptimize? = null
     private var handler = Handler()
     private var isLandscapf = false
     private val lightHistory = Stack<LightHistory>()
@@ -171,7 +172,10 @@ class FilterAccessibilityService : AccessibilityService() {
                 val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
                 mWindowManager.removeView(popupView)
                 popupView = null
-                lightSensorManager.stop()
+            }
+            lightSensorManager.stop()
+            if (dynamicOptimize != null) {
+                dynamicOptimize!!.unregisterListener()
             }
 
             GlobalStatus.filterRefresh = null
@@ -293,6 +297,11 @@ class FilterAccessibilityService : AccessibilityService() {
                 }
             }
         })
+
+        if (dynamicOptimize == null) {
+            dynamicOptimize = DynamicOptimize(this)
+        }
+        dynamicOptimize!!.registerListener()
 
         GlobalStatus.filterRefresh = Runnable {
             updateFilterNow(GlobalStatus.currentLux, filterView!!)

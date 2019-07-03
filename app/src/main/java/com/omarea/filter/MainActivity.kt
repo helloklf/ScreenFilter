@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(if (GlobalStatus.filterEnabled) R.style.AppTheme_Default else R.style.AppTheme_OFF)
+
         if (GlobalStatus.sampleData == null) {
             GlobalStatus.sampleData = SampleData(applicationContext)
         }
@@ -78,12 +80,14 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     config.edit().putBoolean(SpfConfig.FILTER_AUTO_START, true).apply()
                     GlobalStatus.filterOpen!!.run()
+                    recreate()
                 }
             } else {
                 if (GlobalStatus.filterClose != null) {
                     GlobalStatus.filterClose!!.run()
                 }
                 config.edit().putBoolean(SpfConfig.FILTER_AUTO_START, false).apply()
+                recreate()
             }
         }
 

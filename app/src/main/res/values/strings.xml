@@ -20,14 +20,14 @@
     <string name="brightness_offset_desc">自动亮度微调</string>
     <string name="filter_dynamic_color">环境色温</string>
     <string name="filter_dynamic_color_desc">滤镜使屏幕变黄的程度</string>
-    <string name="pixel_filter">像素滤镜 *敬请期待</string>
-    <string name="pixel_filter_desc">使用关闭相邻像素 + 全局叠加层，双重方案来调整屏幕亮度。略微提升低亮度下的色彩表现，但会出现明显的锯齿感！</string>
     <string name="smooth_adjustment">平滑亮度</string>
     <string name="smooth_adjustment_desc">避免亮度变化过快，也能降低性能消耗</string>
     <string name="landscape_optimize">横屏优化</string>
     <string name="landscape_optimize_desc">横屏时关闭滤镜的环境色温，并提高亮度</string>
     <string name="night_mode">深夜极暗光</string>
     <string name="night_mode_desc">22:00~06:00期间(自动亮度+无光环境)，允许屏幕亮度降到更低</string>
+    <string name="dynamic_optimize">环境模拟</string>
+    <string name="dynamic_optimize_desc">由于光线传感器灵敏度有限，难以区分弱光和无光环境，导致深夜模式难以在合适的时间激活。\n开启本选项后，将通过“时间”和“握持角度”来优化亮度调节，使自动亮度调节更加智能。</string>
     <string name="screen_off_mode">息屏省电</string>
     <string name="screen_off_mode_desc">息屏时暂停刷新滤镜以节省电量</string>
 
@@ -36,7 +36,7 @@
 
     <string name="accessibility_description">通过辅助服务，提高滤镜显示层级，以便能够覆盖状态栏、导航栏、锁屏界面。</string>
     <string name="statement">声明</string>
-    <string name="statement_content">大多数Amoled屏幕，在较低亮度时会使用低频PWM调光，容易造成眼睛疲劳。\n\n本软件会将屏幕固定最大亮度，再通过调整屏幕叠加层（滤镜）的不透明度，来实现视觉亮度调整，是民间一种“另辟蹊径”的手法，并非本应用首创！！！\n\n启用滤镜后，屏幕会根据亮度不同出现不同程度的色彩失真，并且会导致屏幕截图变暗！</string>
+    <string name="statement_content">大多数Amoled屏幕，在低亮度时会使用低频PWM调光，容易造成眼睛疲劳。\n\n本软件会限制屏幕最低亮度，再通过调整屏幕叠加层（滤镜）的不透明度，来实现视觉亮度调整，是民间一种“另辟蹊径”的手法，并非本应用首创！！！\n\n启用滤镜后，屏幕会根据亮度不同出现不同程度的色彩失真，并且会导致屏幕截图变暗！</string>
     <string name="author">—— 嘟嘟斯基\n http://vtools.omarea.com</string>
 
     <string name="quick_tile_on">已开启屏幕滤镜</string>
