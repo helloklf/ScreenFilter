@@ -1,15 +1,11 @@
 package com.omarea.filter
 
-import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
-import android.view.animation.BaseInterpolator
 import kotlin.math.abs
 
 
@@ -66,19 +62,12 @@ class FilterView : View {
 
     private fun invalidateTextPaintAndMeasurements() {}
 
-    fun setFilterColor(alpha: Int, red: Int = 0, green: Int = 0, blue: Int = 0, soomth: Boolean = false) {
+    fun setFilterColor(alpha: Int) {
         var effectiveValue = alpha
         if (effectiveValue < 0) {
             effectiveValue = 0
         } else if (effectiveValue > FilterViewConfig.FILTER_MAX_ALPHA) {
             effectiveValue = FilterViewConfig.FILTER_MAX_ALPHA
-        }
-        if (this.red != red || this.blue != blue || this.green != green) {
-            this.red = red;
-            this.green = green;
-            this.blue = blue;
-            this.setBackgroundColor(Color.rgb(red, green, blue))
-            invalidate()
         }
 
         if (this.toAlpha != effectiveValue / 1000f) {
@@ -101,6 +90,9 @@ class FilterView : View {
             }
         } else {
             this.alpha = this.toAlpha
+        }
+        if (this.alpha != this.toAlpha) {
+            invalidate()
         }
     }
 }

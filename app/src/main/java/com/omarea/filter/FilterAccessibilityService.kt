@@ -299,23 +299,17 @@ class FilterAccessibilityService : AccessibilityService() {
         }
 
         GlobalStatus.screenCap = Runnable {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
-            } else {
-                if (isFristScreenCap) {
-                    Toast.makeText(this, "抱歉，对于Android 9.0以前的系统，需要ROOT权限才能调用截屏~", Toast.LENGTH_LONG).show()
-                    isFristScreenCap = false
-                }
-                val output = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Pictures/" + System.currentTimeMillis() + ".png"
-                if (KeepShellPublic.doCmdSync("screencap -p \"$output\"") != "error") {
-                    if (File(output).exists()) {
-                        Toast.makeText(this, "截图保存至 \n" + output, Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
-                }
+            val isEnabled = GlobalStatus.filterEnabled
+            if (isEnabled) {
+                filterClose()
+            }
+            handler.postDelayed({
+                triggerSsceenCap()
+            }, 700)
+            if (isEnabled) {
+                handler.postDelayed({
+                    filterOpen()
+                }, 3200)
             }
         }
 
@@ -328,6 +322,27 @@ class FilterAccessibilityService : AccessibilityService() {
         switchAutoBrightness()
 
         GlobalStatus.filterEnabled = true
+    }
+
+    private fun triggerSsceenCap() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
+        } else {
+            if (isFristScreenCap) {
+                Toast.makeText(this, "抱歉，对于Android 9.0以前的系统，需要ROOT权限才能调用截屏~", Toast.LENGTH_LONG).show()
+                isFristScreenCap = false
+            }
+            val output = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Pictures/" + System.currentTimeMillis() + ".png"
+            if (KeepShellPublic.doCmdSync("screencap -p \"$output\"") != "error") {
+                if (File(output).exists()) {
+                    Toast.makeText(this, "截图保存至 \n" + output, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -429,7 +444,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 Log.e("updateFilterNow", "屏幕关闭时未暂停更新滤镜")
             }
         }
-        filterView.setFilterColor(filterViewConfig.filterAlpha, 0, 0, 0, true)
+        filterView.setFilterColor(filterViewConfig.filterAlpha)
         if (filterViewConfig.filterBrightness != filterBrightness) {
             val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
             if (layoutParams != null) {

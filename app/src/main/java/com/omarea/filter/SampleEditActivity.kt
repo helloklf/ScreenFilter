@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -107,8 +108,8 @@ class SampleEditActivity : AppCompatActivity() {
 
         val layoutParams = filterPopup!!.layoutParams as WindowManager.LayoutParams?
         if (layoutParams != null) {
-            val filterBrightness = filterViewConfig.getFilterBrightnessRatio()
-            layoutParams.screenBrightness = filterBrightness
+            val ratio = filterViewConfig.getFilterBrightnessRatio()
+            layoutParams.screenBrightness = ratio
             mWindowManager.updateViewLayout(filterPopup, layoutParams)
         }
 

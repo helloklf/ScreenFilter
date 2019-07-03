@@ -1,14 +1,21 @@
 package com.omarea.filter
 
+import android.app.Activity
 import android.os.Bundle
-import android.os.Handler
-import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 
-class ScreenCapActivity : AppCompatActivity() {
+class ScreenCapActivity : Activity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Handler().postDelayed({
-            finish()
-        }, 1000)
+
+        val screenCap = GlobalStatus.screenCap
+        if (screenCap != null) {
+            screenCap.run()
+        } else {
+            Toast.makeText(this, "滤镜服务未启动", Toast.LENGTH_LONG).show()
+        }
+
+        finish()
     }
 }
