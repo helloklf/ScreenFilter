@@ -88,7 +88,7 @@ class SampleDataView : View {
         for (point in 0..10) {
             paint.color = Color.parseColor("#000000")
             canvas.drawText(
-                    (point * 100).toString(),
+                    (point * 10).toString() + "%",
                     10f,
                     innerPadding + ((1000 - point * 100) * ratioY).toInt() + 8,
                     paint

@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -175,6 +174,20 @@ class SampleEditActivity : AppCompatActivity() {
                 screen_light_min_ratio.text = (value / 10.0).toString()
             }
         })
+
+        screen_light_minus.setOnClickListener {
+            if (screen_light_min.progress > 1) {
+                screen_light_min.progress -= 1
+            }
+        }
+
+        screen_light_plus.setOnClickListener {
+            if (screen_light_min.progress < screen_light_min.max - 1) {
+                screen_light_min.progress += 1
+            } else if (screen_light_min.progress < screen_light_min.max) {
+                screen_light_min.progress = screen_light_min.max
+            }
+        }
 
         /*
         getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS), true, object:ContentObserver(Handler()) {

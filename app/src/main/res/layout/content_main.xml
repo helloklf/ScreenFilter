@@ -134,15 +134,19 @@
                 android:text="@string/filter_enable"
                 android:textColor="@color/colorAccent" />
 
-            <!--微调栏-->
+            <!--自动亮度-->
+            <TextView
+                style="@style/option_desc"
+                android:layout_marginBottom="0dp"
+                android:text="@string/automatic_brightness_config" />
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:orientation="vertical"
                     android:padding="10dp">
 
@@ -195,40 +199,6 @@
                         android:text="@string/brightness_offset_desc" />
 
                     <Switch
-                        android:id="@+id/screen_off_mode"
-                        style="@style/option_title"
-                        android:text="@string/screen_off_mode" />
-
-                    <TextView
-                        style="@style/option_desc"
-                        android:layout_marginBottom="0dp"
-                        android:text="@string/screen_off_mode_desc" />
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-            <!--特殊选项-->
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-
-                    android:orientation="vertical"
-                    android:padding="10dp">
-
-                    <Switch
-                        android:id="@+id/smooth_adjustment"
-                        style="@style/option_title"
-                        android:text="@string/smooth_adjustment" />
-
-                    <TextView
-                        style="@style/option_desc"
-                        android:text="@string/smooth_adjustment_desc" />
-
-                    <Switch
                         android:id="@+id/landscape_optimize"
                         style="@style/option_title"
                         android:text="@string/landscape_optimize" />
@@ -236,31 +206,6 @@
                     <TextView
                         style="@style/option_desc"
                         android:text="@string/landscape_optimize_desc" />
-
-                    <Switch
-                        android:id="@+id/night_mode"
-                        style="@style/option_title"
-                        android:text="@string/night_mode" />
-
-                    <TextView
-                        style="@style/option_desc"
-                        android:layout_marginBottom="0dp"
-                        android:text="@string/night_mode_desc" />
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-
-                    android:orientation="vertical"
-                    android:padding="10dp">
-
 
                     <Switch
                         android:id="@+id/dynamic_optimize"
@@ -274,6 +219,11 @@
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
+            <TextView
+                style="@style/option_desc"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="0dp"
+                android:text="@string/other_config" />
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -282,9 +232,17 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:orientation="vertical"
                     android:padding="10dp">
+
+                    <Switch
+                        android:id="@+id/hardware_acceleration"
+                        style="@style/option_title"
+                        android:text="@string/hardware_acceleration" />
+
+                    <TextView
+                        style="@style/option_desc"
+                        android:text="@string/hardware_acceleration_desc" />
 
                     <Switch
                         android:id="@+id/hide_in_recent"
@@ -298,6 +256,33 @@
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
+            <TextView
+                style="@style/option_desc"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="0dp"
+                android:text="@string/help_infos" />
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        style="@style/option_title"
+                        android:text="@string/brightness_control" />
+
+                    <TextView
+                        style="@style/option_desc"
+                        android:layout_marginBottom="0dp"
+                        android:text="@string/brightness_control_content" />
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
             <!--声明-->
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"

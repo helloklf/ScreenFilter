@@ -27,7 +27,7 @@ import java.util.*
 class FilterAccessibilityService : AccessibilityService() {
     private lateinit var config: SharedPreferences
     private var lightSensorManager: LightSensorManager = LightSensorManager.getInstance()
-    private var dynamicOptimize:DynamicOptimize? = null
+    private var dynamicOptimize: DynamicOptimize? = null
     private var handler = Handler()
     private var isLandscapf = false
     private val lightHistory = Stack<LightHistory>()
@@ -247,6 +247,10 @@ class FilterAccessibilityService : AccessibilityService() {
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 
+        if (config.getBoolean(SpfConfig.HARDWARE_ACCELERATED, SpfConfig.HARDWARE_ACCELERATED_DEFAULT)) {
+            params.flags = params.flags.or(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+        }
+
         val p = Point()
         display.getRealSize(p)
         var maxSize = p.y
@@ -256,7 +260,6 @@ class FilterAccessibilityService : AccessibilityService() {
         params.width = maxSize + getNavBarHeight() // p.x // 直接按屏幕最大宽度x最大宽度显示，避免屏幕旋转后盖不住全屏
         params.height = maxSize + getNavBarHeight()
 
-        // 不知道是不是真的有效
         params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
 
         popupView = LayoutInflater.from(this).inflate(R.layout.filter, null)
@@ -298,10 +301,12 @@ class FilterAccessibilityService : AccessibilityService() {
             }
         })
 
-        if (dynamicOptimize == null) {
-            dynamicOptimize = DynamicOptimize(this)
+        if (config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
+            if (dynamicOptimize == null) {
+                dynamicOptimize = DynamicOptimize(this)
+            }
+            dynamicOptimize!!.registerListener()
         }
-        dynamicOptimize!!.registerListener()
 
         GlobalStatus.filterRefresh = Runnable {
             updateFilterNow(GlobalStatus.currentLux, filterView!!)
@@ -333,6 +338,9 @@ class FilterAccessibilityService : AccessibilityService() {
         GlobalStatus.filterEnabled = true
     }
 
+    /**
+     * 触发屏幕截图
+     */
     private fun triggerSsceenCap() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
@@ -354,6 +362,9 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
+    /**
+     * 屏幕配置改变（旋转、分辨率更改、DPI更改等）
+     */
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         if (newConfig != null) {
@@ -414,6 +425,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private fun updateFilterNow(lux: Float, filterView: FilterView) {
         // 深夜极暗光 22:00~06:00
+        /*
         if (lux == 0F && config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)) {
             val calendar = Calendar.getInstance()
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -424,8 +436,14 @@ class FilterAccessibilityService : AccessibilityService() {
                 return
             }
         }
+        */
 
-        val offset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
+        // 亮度微调
+        var offset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
+
+        if (lux == 0F && dynamicOptimize != null && config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
+            offset = dynamicOptimize!!.brightnessOptimization(config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT))
+        }
 
         val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(
                 lux,

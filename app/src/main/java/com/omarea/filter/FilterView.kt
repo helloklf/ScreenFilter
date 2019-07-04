@@ -41,7 +41,7 @@ class FilterView : View {
         ValueAnimator.setFrameDelay(100); // 10帧
         valueAnimator = ValueAnimator.ofFloat(perOld, per)
         valueAnimator!!.run {
-            duration = 600
+            duration = 1200
             // interpolator = LinearInterpolator()
             addUpdateListener { animation ->
                 alpha = animation.animatedValue as Float
@@ -74,25 +74,31 @@ class FilterView : View {
             this.toAlpha = effectiveValue / 1000f
             // val distance = abs(this.toAlpha - this.alpha)
             // stepByStep = distance / 10
-            invalidate()
+            if (isHardwareAccelerated) {
+                cgangePer(this.toAlpha)
+            } else {
+                invalidate()
+            }
         }
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawRGB(red, green, blue)
-        val distance = this.toAlpha - this.alpha
-        if (abs(distance) >= stepByStep) {
-            if (this.toAlpha > this.alpha) {
-                this.alpha += stepByStep
+        if (!isHardwareAccelerated) {
+            val distance = this.toAlpha - this.alpha
+            if (abs(distance) >= stepByStep) {
+                if (this.toAlpha > this.alpha) {
+                    this.alpha += stepByStep
+                } else {
+                    this.alpha -= stepByStep
+                }
             } else {
-                this.alpha -= stepByStep
+                this.alpha = this.toAlpha
             }
-        } else {
-            this.alpha = this.toAlpha
-        }
-        if (this.alpha != this.toAlpha) {
-            invalidate()
+            if (this.alpha != this.toAlpha) {
+                invalidate()
+            }
         }
     }
 }

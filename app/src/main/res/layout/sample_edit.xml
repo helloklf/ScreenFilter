@@ -36,6 +36,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:paddingTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -123,6 +124,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
@@ -130,30 +134,33 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginBottom="0dp"
             android:layout_weight="1"
             android:text="@string/sample_brightness_desc" />
 
         <TextView
             android:id="@+id/sample_edit_alpha_minus"
             style="@style/option_desc"
-            android:gravity="center"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
+            android:layout_marginBottom="0dp"
             android:background="@android:color/transparent"
+            android:gravity="center"
             android:text="－"
             android:textColor="@color/colorPrimary" />
 
         <TextView
             android:id="@+id/sample_edit_alpha_plus"
             style="@style/option_desc"
-            android:gravity="center"
             android:layout_width="25dp"
             android:layout_height="25dp"
+            android:layout_marginBottom="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="20dp"
             android:background="@android:color/transparent"
+            android:gravity="center"
             android:text="＋"
             android:textColor="@color/colorPrimary" />
     </LinearLayout>

@@ -11,7 +11,7 @@ public class SpfConfig {
     public static String SMOOTH_ADJUSTMENT = "SMOOTH_ADJUSTMENT";
     public static boolean SMOOTH_ADJUSTMENT_DEFAULT = true;
 
-    // 深夜极暗光
+    // 息屏暂停
     public static String SCREEN_OFF_PAUSE = "SCREEN_OFF_PAUSE";
     public static boolean SCREEN_OFF_PAUSE_DEFAULT = true;
 
@@ -35,7 +35,15 @@ public class SpfConfig {
     public static String HIDE_IN_RECENT = "HIDE_IN_RECENT";
     public static boolean HIDE_IN_RECENT_DEFAULT = false;
 
-    // 深夜极暗光
-    public static String NIGHT_MODE = "NIGHT_MODE";
-    public static boolean NIGHT_MODE_DEFAULT = true;
+    // 动态优化（虚拟环境）
+    public static String DYNAMIC_OPTIMIZE = "DYNAMIC_OPTIMIZE";
+    public static boolean DYNAMIC_OPTIMIZE_DEFAULT = false;
+
+    // 动态优化（虚拟环境） 灵敏度
+    public static String DYNAMIC_OPTIMIZE_SENSITIVITY = "DYNAMIC_OPTIMIZE_SENSITIVITY";
+    public static float DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT = 0.5F;
+
+    // 硬件加速
+    public static String HARDWARE_ACCELERATED = "HARDWARE_ACCELERATED";
+    public static boolean HARDWARE_ACCELERATED_DEFAULT = true;
 }

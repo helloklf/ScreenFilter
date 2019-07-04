@@ -120,37 +120,33 @@ class MainActivity : AppCompatActivity() {
         }
         brightness_offset.progress = lightLuxOffsetProgress
 
-
-        // 息屏暂停
-        screen_off_mode.isChecked = config.getBoolean(SpfConfig.SCREEN_OFF_PAUSE, SpfConfig.SCREEN_OFF_PAUSE_DEFAULT)
-        screen_off_mode.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.SCREEN_OFF_PAUSE, (it as Switch).isChecked).apply()
-        }
-
-        // 平滑亮度
-        smooth_adjustment.isChecked = config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)
-        smooth_adjustment.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.SMOOTH_ADJUSTMENT, (it as Switch).isChecked).apply()
-            filterRefresh()
-        }
-
         // 横屏优化
         landscape_optimize.isChecked = config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)
         landscape_optimize.setOnClickListener {
             config.edit().putBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, (it as Switch).isChecked).apply()
         }
 
-        // 深夜极暗光模式
-        night_mode.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.NIGHT_MODE, (it as Switch).isChecked).apply()
+        // 动态优化（虚拟环境）
+        dynamic_optimize.isChecked = config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)
+        dynamic_optimize.setOnClickListener {
+            config.edit().putBoolean(SpfConfig.DYNAMIC_OPTIMIZE, (it as Switch).isChecked).apply()
         }
-        night_mode.isChecked = config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)
 
         // 从最近任务隐藏
         hide_in_recent.isChecked = config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT)
         hide_in_recent.setOnClickListener {
             config.edit().putBoolean(SpfConfig.HIDE_IN_RECENT, (it as Switch).isChecked).apply()
             setExcludeFromRecents()
+        }
+
+        // 硬件加速
+        hardware_acceleration.isChecked = config.getBoolean(SpfConfig.HARDWARE_ACCELERATED, SpfConfig.HARDWARE_ACCELERATED_DEFAULT)
+        hardware_acceleration.setOnClickListener {
+            config.edit().putBoolean(SpfConfig.HARDWARE_ACCELERATED, (it as Switch).isChecked).apply()
+            if (GlobalStatus.filterEnabled) {
+                GlobalStatus.filterClose?.run()
+                GlobalStatus.filterOpen?.run()
+            }
         }
 
         // 自动亮度

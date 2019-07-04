@@ -72,16 +72,38 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <SeekBar
-                        android:id="@+id/screen_light_min"
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:elevation="1dp"
-                        android:enabled="false"
-                        android:max="1000"
-                        android:min="0"
-                        android:progress="1000" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/screen_light_minus"
+                            android:gravity="center"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:background="@android:color/transparent"
+                            android:text="－"
+                            android:textColor="@color/colorPrimary" />
+                        <SeekBar
+                            android:id="@+id/screen_light_min"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:max="1000"
+                            android:min="0"
+                            android:progress="1000" />
+
+                        <TextView
+                            android:id="@+id/screen_light_plus"
+                            android:gravity="center"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:background="@android:color/transparent"
+                            android:text="＋"
+                            android:textColor="@color/colorPrimary" />
+                    </LinearLayout>
 
                     <TextView
                         android:text="100"
@@ -99,6 +121,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:layout_marginTop="10dp"
                     style="@style/option_desc"
                     android:text="@string/screen_min_light_desc" />
             </LinearLayout>
