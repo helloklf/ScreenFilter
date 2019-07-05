@@ -38,14 +38,16 @@ class FilterView : View {
         if (valueAnimator != null && valueAnimator!!.isRunning) {
             valueAnimator!!.cancel()
         }
-        ValueAnimator.setFrameDelay(100); // 10帧
-        valueAnimator = ValueAnimator.ofFloat(perOld, per)
+        ValueAnimator.setFrameDelay(100); // 10帧（这个设置好像是无效的）
+        val frames = 60
+        stepByStep = (per - perOld) / frames;
+        valueAnimator = ValueAnimator.ofInt(0, frames)
         valueAnimator!!.run {
-            duration = 1200
+            duration = 2500
             // interpolator = LinearInterpolator()
             addUpdateListener { animation ->
-                alpha = animation.animatedValue as Float
-                invalidate()
+                alpha = perOld + (animation.animatedValue as Int) * stepByStep
+                // invalidate()
             }
             start()
         }

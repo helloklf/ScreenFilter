@@ -13,6 +13,7 @@ import android.os.Handler
 import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SeekBar
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
             if (Build.PRODUCT == "perseus") { // Xiaomi MIX3 屏幕最大亮度2047
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
                 // GlobalStatus.sampleData!!.setScreentMinLight(30)
+                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
             }
         }
 
@@ -97,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val lightLuxOffset = progress - (brightness_offset.max / 4)
+                val lightLuxOffset = progress - (brightness_offset.max / 2)
                 config.edit().putInt(SpfConfig.BRIGTHNESS_OFFSET, lightLuxOffset).apply()
                 if (lightLuxOffset > 0) {
                     brightness_offset_text.text = "+" + lightLuxOffset
@@ -109,16 +111,7 @@ class MainActivity : AppCompatActivity() {
                 filterRefresh()
             }
         })
-        val lightLuxOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT)
-        val lightLuxOffsetProgress = lightLuxOffset + (brightness_offset.max / 4)
-        if (lightLuxOffsetProgress > 0) {
-            brightness_offset_text.text = "+" + lightLuxOffset
-        } else if (lightLuxOffsetProgress < 0) {
-            brightness_offset_text.text = lightLuxOffset.toString()
-        } else {
-            brightness_offset_text.text = "100"
-        }
-        brightness_offset.progress = lightLuxOffsetProgress
+        brightness_offset.progress = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) + (brightness_offset.max / 2)
 
         // 横屏优化
         landscape_optimize.isChecked = config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)
@@ -130,6 +123,10 @@ class MainActivity : AppCompatActivity() {
         dynamic_optimize.isChecked = config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)
         dynamic_optimize.setOnClickListener {
             config.edit().putBoolean(SpfConfig.DYNAMIC_OPTIMIZE, (it as Switch).isChecked).apply()
+            if (GlobalStatus.filterEnabled) {
+                GlobalStatus.filterClose?.run()
+                GlobalStatus.filterOpen?.run()
+            }
         }
 
         // 从最近任务隐藏

@@ -4,7 +4,7 @@ public class SpfConfig {
     public static String FILTER_SPF = "FILTER_SPF";
 
     // 亮度偏移量（1表示1%,100表示100%）
-    public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET";
+    public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET_V2";
     public static int BRIGTHNESS_OFFSET_DEFAULT = 0;
 
     // 平滑亮度
@@ -41,7 +41,7 @@ public class SpfConfig {
 
     // 动态优化（虚拟环境） 灵敏度
     public static String DYNAMIC_OPTIMIZE_SENSITIVITY = "DYNAMIC_OPTIMIZE_SENSITIVITY";
-    public static float DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT = 0.5F;
+    public static float DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT = 1F;
 
     // 硬件加速
     public static String HARDWARE_ACCELERATED = "HARDWARE_ACCELERATED";

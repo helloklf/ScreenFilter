@@ -24,13 +24,13 @@
     <string name="brightness_offset_desc">自动亮度微调</string>
     <string name="landscape_optimize">横屏优化</string>
     <string name="landscape_optimize_desc">横屏时增加10%亮度，适合游戏玩家</string>
-    <string name="dynamic_optimize">弱光优化 *试验</string>
-    <string name="dynamic_optimize_desc">分析[角度\\时间]调节无光环境下屏幕亮度</string>
+    <string name="dynamic_optimize">环境估测</string>
+    <string name="dynamic_optimize_desc">*（试验性）根据[握持角度\\时间]微调屏幕亮度</string>
 
     <string name="hide_in_recent">从最近任务隐藏</string>
     <string name="hide_in_recent_desc">不要在最近任务列表显示本应用</string>
     <string name="hardware_acceleration">硬件加速</string>
-    <string name="hardware_acceleration_desc">启用可降低CPU占用，关闭可节省内存</string>
+    <string name="hardware_acceleration_desc">启用提高亮度变化平滑度，关闭可节省内存</string>
 
     <string name="accessibility_description">通过辅助服务，提高滤镜显示层级，以便能够覆盖状态栏、导航栏、锁屏界面。</string>
     <string name="brightness_control">亮度控制</string>

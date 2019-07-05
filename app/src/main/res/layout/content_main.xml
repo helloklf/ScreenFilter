@@ -174,7 +174,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:max="200"
+                            android:max="100"
                             android:min="0"
                             android:paddingStart="6dp"
                             android:paddingEnd="6dp"
@@ -183,6 +183,7 @@
                         <TextView
                             android:id="@+id/brightness_offset_text"
                             android:layout_width="40dp"
+                            android:text="100"
                             android:layout_height="wrap_content"
                             android:textAlignment="textEnd" />
 

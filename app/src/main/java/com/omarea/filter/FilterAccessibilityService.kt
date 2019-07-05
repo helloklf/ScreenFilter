@@ -122,6 +122,9 @@ class FilterAccessibilityService : AccessibilityService() {
         if (reciverLock == null) {
             reciverLock = ReciverLock.autoRegister(this, ScreenEventHandler({
                 screenOn = false
+                if (dynamicOptimize != null) {
+                    dynamicOptimize!!.registerListener()
+                }
             }, {
                 screenOn = true
                 if (lightHistory.size > 0) {
@@ -129,6 +132,14 @@ class FilterAccessibilityService : AccessibilityService() {
                     lightHistory.clear()
                     lightHistory.push(last)
                     updateFilterByBrightness()
+                }
+                if (GlobalStatus.filterEnabled) {
+                    if (config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
+                        if (dynamicOptimize != null) {
+                            dynamicOptimize = DynamicOptimize(this)
+                        }
+                        dynamicOptimize!!.registerListener()
+                    }
                 }
             }))
         }
@@ -424,32 +435,20 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun updateFilterNow(lux: Float, filterView: FilterView) {
-        // 深夜极暗光 22:00~06:00
-        /*
-        if (lux == 0F && config.getBoolean(SpfConfig.NIGHT_MODE, SpfConfig.NIGHT_MODE_DEFAULT)) {
-            val calendar = Calendar.getInstance()
-            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            // 如果是深夜时段
-            if (hour >= 22 || hour < 6) {
-                val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfigByRatio(0.01f)
-                updateFilterNow(filterViewConfig, filterView)
-                return
-            }
-        }
-        */
-
         // 亮度微调
         var offset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
 
-        if (lux == 0F && dynamicOptimize != null && config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
-            offset = dynamicOptimize!!.brightnessOptimization(config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT))
+        // 场景优化
+        if (dynamicOptimize != null && config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
+            offset += dynamicOptimize!!.brightnessOptimization(config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT))
         }
 
-        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(
-                lux,
-                offset,
-                if (isLandscapf && systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) (FilterViewConfig.FILTER_BRIGHTNESS_MAX / 10) else 0
-        )
+        // 横屏
+        if (isLandscapf && systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+            offset += 0.1
+        }
+
+        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(lux, offset)
         var alpha = filterViewConfig.filterAlpha
 
         if (alpha > FilterViewConfig.FILTER_MAX_ALPHA) {

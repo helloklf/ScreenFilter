@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
 import java.util.*
+import kotlin.math.abs
 
 class DynamicOptimize(private var context: Context) {
     private var sensorEventListener: SensorEventListener? = null
@@ -47,14 +48,14 @@ class DynamicOptimize(private var context: Context) {
     /**
      * @param sensitivity 角度亮度纠正的灵敏度
      */
-    fun brightnessOptimization(sensitivity:Float = 0.5F, offset: Double = 0.toDouble()): Double {
+    fun brightnessOptimization(sensitivity:Float = 1.0F, offset: Double = 0.toDouble()): Double {
+        var offsetValue: Double = 0.toDouble();
         if (sensorEventListener != null) {
-            var offsetValue: Double = offset;
             // 手机处于屏幕朝下时，根据角度降低亮度
             if (z < 0) {
-                offsetValue = offset + ((z * 10).toInt() / 100.0 * sensitivity);
-            } else if (z > 5) {
-                offsetValue = offset + (((z - 5) * 10).toInt() / 200.0 * sensitivity);
+                offsetValue += ((z * 100).toInt() / 1000.0 * sensitivity);
+            } else if (z >= 5 && z <= 8) {
+                offsetValue += (((8 - z) * 100).toInt() / 1000.0 * sensitivity);
             }
 
             val calendar = Calendar.getInstance()
@@ -71,12 +72,14 @@ class DynamicOptimize(private var context: Context) {
 
             if (offsetValue < -0.999) {
                 offsetValue = -0.999
+            } else if(offsetValue > 1) {
+                offsetValue = 1.0
             }
 
-            Log.d("brightnessOptimization", ">>> " + offsetValue)
+            Log.d("brightnessOptimization", ">>> $z; " + offsetValue)
             return offsetValue;
         } else {
-            return offset
+            return offsetValue
         }
     }
 }
