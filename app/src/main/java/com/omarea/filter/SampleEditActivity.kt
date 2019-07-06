@@ -18,6 +18,7 @@ import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import com.omarea.filter.light.LightSensorManager
 import kotlinx.android.synthetic.main.activity_sample_edit.*
 
 class SampleEditActivity : AppCompatActivity() {
@@ -234,6 +235,7 @@ class SampleEditActivity : AppCompatActivity() {
                 .setCancelable(false)
                 .create()
         alertDialog!!.show()
+        alertDialog!!.getWindow()!!.setDimAmount(0f);
         filterOpen()
 
         dialogView.findViewById<Button>(R.id.sample_edit_cancel).setOnClickListener {

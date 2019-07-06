@@ -5,7 +5,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 import java.util.*
 
 class DynamicOptimize(private var context: Context) {
@@ -15,7 +14,7 @@ class DynamicOptimize(private var context: Context) {
     private var z = 0f
 
     fun registerListener() {
-        if(sensorEventListener == null) {
+        if (sensorEventListener == null) {
             val sm = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
             sensorEventListener = object : SensorEventListener {
                 override fun onSensorChanged(event: SensorEvent) {
@@ -49,18 +48,10 @@ class DynamicOptimize(private var context: Context) {
      */
     fun brightnessOptimization(sensitivity: Float = 0.5F, lux: Float): Double {
         var offsetValue: Double = 0.toDouble();
-        if (sensorEventListener != null) {
-            // 手机处于屏幕朝下时，根据角度降低亮度
-            if (z < 0) {
-                offsetValue += ((z * 100).toInt() / 1000.0 * sensitivity);
-            } else if(lux > 0 && z >= 5 && z <= 8) {
-                offsetValue += (((8 - z) * 100 * 2).toInt() / 1000.0 * sensitivity);
-            }
-        }
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        if (lux <= 0f) {
-            if (hour >= 21 || hour < 7) {
+        if (hour >= 21 || hour < 7) {
+            if (lux <= 0f) {
                 if (hour > 20) {
                     offsetValue -= ((hour - 20) / 10.0)
                 } else if (hour > 5) {
@@ -68,6 +59,14 @@ class DynamicOptimize(private var context: Context) {
                 } else {
                     offsetValue -= 0.3
                 }
+            }
+        } else if (sensorEventListener != null) {
+            // 手机处于屏幕朝下时，根据角度降低亮度
+            if (z < 0) {
+                // 可能导致微信支付界面亮度变暗无法正常付款
+                // offsetValue += ((z * 100).toInt() / 1000.0 * sensitivity);
+            } else if (lux > 0 && z >= 5 && z <= 8) {
+                offsetValue += (((8 - z) * 100 * 2).toInt() / 1000.0 * sensitivity);
             }
         }
 

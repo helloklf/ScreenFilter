@@ -124,7 +124,8 @@ class SampleData {
     public fun getFilterConfig(lux: Float, staticOffset: Double = 0.toDouble(), offsetpractical: Double = 0.toDouble()): FilterViewConfig {
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
-            return FilterViewConfig.getConfigByBrightness(((sampleValue + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * staticOffset)) * (1 + offsetpractical)).toInt(), screentMinLight)
+            val brightness = ((sampleValue + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * staticOffset)) * (1 + offsetpractical)).toInt()
+            return FilterViewConfig.getConfigByBrightness(brightness, screentMinLight)
         }
         return FilterViewConfig.getDefault()
     }

@@ -1,4 +1,4 @@
-package com.omarea.filter
+package com.omarea.filter.light
 
 class LightHistory {
     internal var time: Long = 0
