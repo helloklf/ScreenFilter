@@ -84,6 +84,19 @@ class FilterView : View {
         }
     }
 
+    fun setFilterColorNow(alpha: Int) {
+        var effectiveValue = alpha
+        if (effectiveValue < 0) {
+            effectiveValue = 0
+        } else if (effectiveValue > FilterViewConfig.FILTER_MAX_ALPHA) {
+            effectiveValue = FilterViewConfig.FILTER_MAX_ALPHA
+        }
+
+        if (this.alpha != effectiveValue / 1000f) {
+            this.alpha = effectiveValue / 1000f
+        }
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawRGB(red, green, blue)

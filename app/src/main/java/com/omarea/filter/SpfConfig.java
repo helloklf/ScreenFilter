@@ -41,7 +41,7 @@ public class SpfConfig {
 
     // 动态优化（虚拟环境） 灵敏度
     public static String DYNAMIC_OPTIMIZE_SENSITIVITY = "DYNAMIC_OPTIMIZE_SENSITIVITY";
-    public static float DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT = 1F;
+    public static float DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT = 0.5F;
 
     // 硬件加速
     public static String HARDWARE_ACCELERATED = "HARDWARE_ACCELERATED";

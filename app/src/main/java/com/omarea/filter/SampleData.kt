@@ -118,11 +118,13 @@ class SampleData {
 
     /**
      * 根据样本计算滤镜浓度和屏幕亮度
+     * @param staticOffset 固定亮度增益 按总亮度的比例增加亮度
+     * @param offsetpractical 按实际亮度的比例增加亮度
      */
-    public fun getFilterConfig(lux: Float, offset: Double = 0.toDouble()): FilterViewConfig {
+    public fun getFilterConfig(lux: Float, staticOffset: Double = 0.toDouble(), offsetpractical: Double = 0.toDouble()): FilterViewConfig {
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
-            return FilterViewConfig.getConfigByBrightness((sampleValue + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * offset)).toInt(), screentMinLight)
+            return FilterViewConfig.getConfigByBrightness(((sampleValue + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * staticOffset)) * (1 + offsetpractical)).toInt(), screentMinLight)
         }
         return FilterViewConfig.getDefault()
     }
@@ -152,30 +154,34 @@ class SampleData {
         if (samples.size > 1) {
             var sampleValue = 0
             val intValue = lux.toInt()
+            // 如果有现成的样本 直接获取样本值
             if (intValue.toFloat() == lux && samples.containsKey(intValue)) {
                 sampleValue = samples.get(intValue) as Int
             } else {
+                // 计算生成虚拟样本
                 val keys = samples.keys.sorted()
-                var min = keys[0]
-                var max = keys[keys.size - 1]
-                for (item in keys) {
-                    if (item < lux) {
-                        min = item
-                    } else {
-                        max = item
-                        break
-                    }
-                }
+                var rangeLeftLux = keys.first()
+                var rangeRightLux = keys.last()
 
-                val minSample = if (min > lux) FilterViewConfig.FILTER_BRIGHTNESS_MAX else (samples[min] as Int)
-                val maxSample = samples[max] as Int
-
-                val ratio = (lux - min) * 1.0 / (max - min)
-
-                if (minSample != maxSample) {
-                    sampleValue = minSample + ((maxSample - minSample) * ratio).toInt()
+                if (lux < rangeLeftLux) {
+                    return samples[rangeLeftLux]
+                } else if (lux > rangeRightLux) {
+                    return samples[rangeRightLux]
                 } else {
-                    sampleValue = minSample
+                    for (sampleLux in keys) {
+                        if (lux > sampleLux) {
+                            rangeLeftLux = sampleLux
+                        } else {
+                            rangeRightLux = sampleLux
+                            break
+                        }
+                    }
+                    val rangeLeftBrightness = samples.get(rangeLeftLux)!!
+                    val rangeRightBrightness = samples.get(rangeRightLux)!!
+                    if (rangeLeftBrightness == rangeRightBrightness || rangeLeftLux == rangeRightLux) {
+                        return rangeLeftBrightness
+                    }
+                    return rangeLeftBrightness + ((rangeRightBrightness - rangeLeftBrightness) * (lux - rangeLeftLux) / (rangeRightLux - rangeLeftLux)).toInt()
                 }
             }
             return sampleValue

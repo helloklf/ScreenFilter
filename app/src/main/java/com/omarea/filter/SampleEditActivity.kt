@@ -112,7 +112,7 @@ class SampleEditActivity : AppCompatActivity() {
             mWindowManager.updateViewLayout(filterPopup, layoutParams)
         }
 
-        filterView.setFilterColor(filterViewConfig.filterAlpha)
+        filterView.setFilterColorNow(filterViewConfig.filterAlpha)
 
         // 亮度锁定
         // val lp = getWindow().getAttributes()

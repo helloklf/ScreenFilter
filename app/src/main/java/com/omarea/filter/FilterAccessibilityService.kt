@@ -338,8 +338,6 @@ class FilterAccessibilityService : AccessibilityService() {
             }
         }
 
-        filterBrightness = FilterViewConfig.FILTER_BRIGHTNESS_MAX
-
         // 监控屏幕亮度
         getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS), true, systemBrightnessObserver)
         getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
@@ -435,20 +433,24 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun updateFilterNow(lux: Float, filterView: FilterView) {
-        // 亮度微调
-        var offset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
+        var optimizedLux = lux
 
-        // 场景优化
-        if (dynamicOptimize != null && config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
-            offset += dynamicOptimize!!.brightnessOptimization(config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT))
-        }
+        // 亮度微调
+        var staticOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
 
         // 横屏
         if (isLandscapf && systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-            offset += 0.1
+            staticOffset += 0.1
         }
 
-        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(lux, offset)
+        var offsetpractical = 0.toDouble()
+        // 场景优化
+        if (dynamicOptimize != null && config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
+            optimizedLux += dynamicOptimize!!.luxOptimization(lux)
+            offsetpractical += dynamicOptimize!!.brightnessOptimization(config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT), lux)
+        }
+
+        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(optimizedLux, staticOffset, offsetpractical)
         var alpha = filterViewConfig.filterAlpha
 
         if (alpha > FilterViewConfig.FILTER_MAX_ALPHA) {

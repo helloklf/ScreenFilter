@@ -25,7 +25,7 @@
     <string name="landscape_optimize">横屏优化</string>
     <string name="landscape_optimize_desc">横屏时增加10%亮度，适合游戏玩家</string>
     <string name="dynamic_optimize">环境估测</string>
-    <string name="dynamic_optimize_desc">*（试验性）根据[握持角度\\时间]微调屏幕亮度</string>
+    <string name="dynamic_optimize_desc">*(试验性)根据 [握持角度\\时间] 微调屏幕亮度</string>
 
     <string name="hide_in_recent">从最近任务隐藏</string>
     <string name="hide_in_recent_desc">不要在最近任务列表显示本应用</string>
@@ -34,7 +34,7 @@
 
     <string name="accessibility_description">通过辅助服务，提高滤镜显示层级，以便能够覆盖状态栏、导航栏、锁屏界面。</string>
     <string name="brightness_control">亮度控制</string>
-    <string name="brightness_control_content">滤镜的自动亮度开关、手动亮度调节都是跟随系统的。\n但本应用具有独立的自动亮度控制逻辑，由于并未对每个设备单独配置，由于硬件差异可能出现过亮或过暗的情况。\n你可以从右上角进入样本编辑，自行添加样本数据来修复此问题！</string>
+    <string name="brightness_control_content">滤镜的自动亮度开关、手动亮度调节都是跟随系统的。\n但本应用有独立的自动亮度控制逻辑，由于实际硬件差异，使用过程可能出现屏幕过亮或过暗的情况。\n你可以从右上角进入样本编辑，自行添加样本数据来修复此问题！</string>
     <string name="statement">工作原理</string>
     <string name="statement_content">大多数Amoled屏幕，在低亮度时会使用低频PWM调光，容易造成眼睛疲劳。\n\n本软件会限制屏幕最低亮度，再通过调整屏幕叠加层（滤镜）的不透明度，来实现视觉亮度调整，是民间一种“另辟蹊径”的手法，并非本应用首创！！！\n\n启用滤镜后，屏幕会根据亮度不同出现不同程度的色彩失真，并且会导致屏幕截图变暗！</string>
     <string name="author">—— 嘟嘟斯基\n http://vtools.omarea.com</string>
