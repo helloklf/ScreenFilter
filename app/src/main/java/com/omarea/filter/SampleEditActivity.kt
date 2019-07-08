@@ -314,7 +314,7 @@ class SampleEditActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 filterUpdate(progress)
 
-                sampleBrightnessText.text = (progress/ 10.0).toString()
+                sampleBrightnessText.text = (progress / 10.0).toString()
             }
         })
         dialogView.findViewById<TextView>(R.id.sample_edit_applay).setOnClickListener {

@@ -6,13 +6,14 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import java.lang.Math.abs
 
 class FilterView : View {
     private var red = 0
     private var green = 0
     private var blue = 0
-    private var currentAlpha:Int = 0
-    private var toAlpha:Int = 0
+    private var currentAlpha: Int = 0
+    private var toAlpha: Int = 0
     private var valueAnimator: ValueAnimator? = null
 
     constructor(context: Context) : super(context) {
@@ -57,8 +58,6 @@ class FilterView : View {
         toAlpha = currentAlpha
     }
 
-    private fun invalidateTextPaintAndMeasurements() {}
-
     fun setFilterColor(alpha: Int) {
         var effectiveValue = alpha
         if (effectiveValue < 0) {
@@ -74,8 +73,8 @@ class FilterView : View {
             if (isHardwareAccelerated) {
                 cgangePer(this.toAlpha)
             } else {
-                this.currentAlpha = this.toAlpha
-                invalidate()
+                // this.currentAlpha = this.toAlpha
+                basicRefresh()
             }
         }
     }
@@ -95,8 +94,24 @@ class FilterView : View {
         }
     }
 
+    private fun basicRefresh() {
+        if (abs(toAlpha - currentAlpha) > 5) {
+            if (currentAlpha > toAlpha) {
+                currentAlpha -= 5
+            } else {
+                currentAlpha += 5
+            }
+        } else {
+            currentAlpha = toAlpha
+        }
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawARGB(currentAlpha, red, green, blue)
+        if (!isHardwareAccelerated && currentAlpha != toAlpha) {
+            basicRefresh()
+        }
     }
 }

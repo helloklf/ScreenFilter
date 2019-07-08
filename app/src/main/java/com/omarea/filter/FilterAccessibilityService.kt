@@ -100,14 +100,16 @@ class FilterAccessibilityService : AccessibilityService() {
             ReciverLock.unRegister(this)
             reciverLock = null
         }
-        return super.onUnbind(intent)
-    }
 
-    override fun onInterrupt() {
         GlobalStatus.filterOpen = null
         GlobalStatus.filterClose = null
         GlobalStatus.filterRefresh = null
         filterClose()
+
+        return super.onUnbind(intent)
+    }
+
+    override fun onInterrupt() {
     }
 
     private fun filterClose() {
@@ -163,6 +165,10 @@ class FilterAccessibilityService : AccessibilityService() {
         }
         return result
     }
+
+    /**
+     * 系统亮度改变时触发
+     */
     private fun brightnessChangeHandle(brightness: Int) {
         // 系统最大亮度值
         var maxLight = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT)
@@ -174,10 +180,34 @@ class FilterAccessibilityService : AccessibilityService() {
         // 当前亮度比率
         val ratio = (brightness.toFloat() / maxLight)
 
-        // 如果不是自动亮度模式（直接调整滤镜）
         if (filterView != null) {
             val config = GlobalStatus.sampleData!!.getFilterConfigByRatio(ratio)
+            config.smoothChange = false
             updateFilterNow(config)
+        }
+    }
+
+    /**
+     * 周围光线发生变化时触发
+     */
+    private fun luxChangeHandle(currentLux: Float) {
+        if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
+            val history = LightHistory()
+            history.run {
+                time = System.currentTimeMillis()
+                lux = currentLux
+            }
+
+            if (lightHistory.size > 100) {
+                lightHistory.pop()
+            }
+
+            lightHistory.push(history)
+
+            startSmoothLightTimer()
+        } else {
+            stopSmoothLightTimer()
+            updateFilterNow(currentLux)
         }
     }
 
@@ -227,38 +257,16 @@ class FilterAccessibilityService : AccessibilityService() {
 
         if (lightSensorWatcher == null) {
             lightSensorWatcher = LightSensorWatcher(this, object : LightHandler {
-                // 当亮度模式改变
                 override fun onModeChange(auto: Boolean) {
                     if (!auto) {
                         stopSmoothLightTimer()
                     }
                 }
-
-                // 当系统亮度改变
                 override fun onBrightnessChange(brightness: Int) {
                     brightnessChangeHandle(brightness)
                 }
-
-                // 当环境光改变
                 override fun onLuxChange(currentLux: Float) {
-                    if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
-                        val history = LightHistory()
-                        history.run {
-                            time = System.currentTimeMillis()
-                            lux = currentLux
-                        }
-
-                        if (lightHistory.size > 100) {
-                            lightHistory.pop()
-                        }
-
-                        lightHistory.push(history)
-
-                        startSmoothLightTimer()
-                    } else {
-                        stopSmoothLightTimer()
-                        updateFilterNow(currentLux)
-                    }
+                    luxChangeHandle(currentLux)
                 }
             })
         }
@@ -388,7 +396,7 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun updateFilterNow(lux: Float) {
-        if  (filterView != null) {
+        if (filterView != null) {
             var optimizedLux = lux
 
             // 亮度微调
@@ -399,14 +407,14 @@ class FilterAccessibilityService : AccessibilityService() {
                 staticOffset += 0.1
             }
 
-            var offsetpractical = 0.toDouble()
+            var offsetPractical = 0.toDouble()
             // 场景优化
             if (dynamicOptimize != null && config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
                 optimizedLux += dynamicOptimize!!.luxOptimization(lux)
-                offsetpractical += dynamicOptimize!!.brightnessOptimization(config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT), lux)
+                offsetPractical += dynamicOptimize!!.brightnessOptimization(config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT), lux)
             }
 
-            val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(optimizedLux, staticOffset, offsetpractical)
+            val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(optimizedLux, staticOffset, offsetPractical)
             var alpha = filterViewConfig.filterAlpha
 
             if (alpha > FilterViewConfig.FILTER_MAX_ALPHA) {
@@ -421,7 +429,7 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun updateFilterNow(filterViewConfig: FilterViewConfig) {
-        if  (filterView != null) {
+        if (filterView != null) {
             if (!screenOn) {
                 // 如果开启了息屏暂停滤镜更新功能
                 if (config.getBoolean(SpfConfig.SCREEN_OFF_PAUSE, SpfConfig.SCREEN_OFF_PAUSE_DEFAULT)) {
@@ -430,7 +438,11 @@ class FilterAccessibilityService : AccessibilityService() {
                     Log.e("updateFilterNow", "屏幕关闭时未暂停更新滤镜")
                 }
             }
-            filterView!!.setFilterColor(filterViewConfig.filterAlpha)
+            if (filterViewConfig.smoothChange) {
+                filterView!!.setFilterColor(filterViewConfig.filterAlpha)
+            } else {
+                filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
+            }
             if (filterViewConfig.filterBrightness != filterBrightness) {
                 val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
                 if (layoutParams != null) {

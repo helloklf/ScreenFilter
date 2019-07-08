@@ -79,11 +79,11 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
 
     public fun startSystemConfigWatcher() {
         getSystemConfig()
-        lightHandler.onBrightnessChange(systemBrightness)
 
         if (systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
             start()
         } else {
+            lightHandler.onBrightnessChange(systemBrightness)
             stop()
         }
         val contentResolver = context.contentResolver

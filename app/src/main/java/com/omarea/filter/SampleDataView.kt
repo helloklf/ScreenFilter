@@ -81,7 +81,7 @@ class SampleDataView : View {
                 paint.color = Color.parseColor("#dddddd")
                 canvas.drawLine(
                         (point * 100 * ratioX).toInt() + innerPadding, innerPadding,
-                        (point * 100 * ratioX).toInt() + innerPadding ,this.height - innerPadding, paint)
+                        (point * 100 * ratioX).toInt() + innerPadding, this.height - innerPadding, paint)
             }
         }
 
@@ -103,7 +103,7 @@ class SampleDataView : View {
                 paint.color = Color.parseColor("#dddddd")
                 canvas.drawLine(
                         innerPadding, innerPadding + ((1000 - point * 100) * ratioY).toInt(),
-                        (this.width - innerPadding) ,innerPadding + ((1000 - point * 100) * ratioY).toInt(), paint)
+                        (this.width - innerPadding), innerPadding + ((1000 - point * 100) * ratioY).toInt(), paint)
             }
         }
 

@@ -56,7 +56,7 @@ class ReciverLock(private var callbacks: Handler) : BroadcastReceiver() {
             return reciver
         }
 
-         fun unRegister(context: Context) {
+        fun unRegister(context: Context) {
             if (reciver == null) {
                 return
             }

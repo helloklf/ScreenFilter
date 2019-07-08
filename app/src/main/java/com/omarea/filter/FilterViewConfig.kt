@@ -1,7 +1,5 @@
 package com.omarea.filter
 
-import android.util.Log
-
 class FilterViewConfig {
     constructor() {
     }
@@ -11,10 +9,13 @@ class FilterViewConfig {
     // 0  - 1000，1000 表示最大亮度
     internal var filterBrightness = FILTER_BRIGHTNESS_MAX
 
+    // 是否平滑变更
+    internal var smoothChange = true
+
     /**
      * 获取亮度的比率（0.00 ~ 1.00）
      */
-    internal fun getFilterBrightnessRatio (): Float {
+    internal fun getFilterBrightnessRatio(): Float {
         return (filterBrightness.toFloat() / FILTER_BRIGHTNESS_MAX)
     }
 

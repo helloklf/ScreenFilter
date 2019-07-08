@@ -4,6 +4,8 @@
     <string name="screenshot_tile_fail">屏幕滤镜调用截图失败</string>
     <string name="screenshot_tile_output">保存路径：</string>
     <string name="sample_edit">样本数据修改</string>
+    <string name="shortcut_on">启用滤镜</string>
+    <string name="shortcut_off">关闭滤镜</string>
 
     <string name="ambient_light">环境光:</string>
     <string name="scrient_light">屏幕亮度:</string>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/on"
+        android:shortcutDisabledMessage="@string/shortcut_on"
+        android:shortcutId="on"
+        android:shortcutLongLabel="@string/shortcut_on"
+        android:shortcutShortLabel="@string/shortcut_on">
+        <intent
+            android:action="open"
+            android:targetClass="com.omarea.filter.MainActivity"
+            android:targetPackage="com.omarea.filter" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/off"
+        android:shortcutDisabledMessage="@string/shortcut_on"
+        android:shortcutId="off"
+        android:shortcutLongLabel="@string/shortcut_off"
+        android:shortcutShortLabel="@string/shortcut_off">
+        <intent
+            android:action="close"
+            android:targetClass="com.omarea.filter.MainActivity"
+            android:targetPackage="com.omarea.filter" />
+    </shortcut>
+</shortcuts>

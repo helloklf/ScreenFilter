@@ -8,7 +8,6 @@ import android.provider.Settings;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 import android.widget.Toast;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
@@ -42,7 +41,7 @@ public class QuickSettingService extends TileService {
             getQsTile().setState(Tile.STATE_INACTIVE);
         }
         // 如果磁贴为未激活状态 被点击 则动作为开启滤镜
-        else if(toggleState == Tile.STATE_INACTIVE) {
+        else if (toggleState == Tile.STATE_INACTIVE) {
             // 如果服务没启动
             if (GlobalStatus.INSTANCE.getFilterOpen() == null) {
                 Toast.makeText(this, R.string.accessibility_service_required, Toast.LENGTH_SHORT).show();

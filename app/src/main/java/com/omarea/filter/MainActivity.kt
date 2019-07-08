@@ -13,7 +13,6 @@ import android.os.Handler
 import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SeekBar
@@ -43,6 +42,27 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val intent = this.intent
+        if (intent != null && intent.action != null) {
+            val action = intent.action
+            if (action == "open") {
+                if (!GlobalStatus.filterEnabled && GlobalStatus.filterOpen != null) {
+                    GlobalStatus.filterOpen?.run()
+                }
+                Toast.makeText(this, "滤镜已开启", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            } else if (action == "close") {
+                if (GlobalStatus.filterEnabled && GlobalStatus.filterClose != null) {
+                    GlobalStatus.filterClose?.run()
+                }
+                Toast.makeText(this, "滤镜已关闭", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
+        }
+
         setTheme(if (GlobalStatus.filterEnabled) R.style.AppTheme_Default else R.style.AppTheme_OFF)
 
         if (GlobalStatus.sampleData == null) {
