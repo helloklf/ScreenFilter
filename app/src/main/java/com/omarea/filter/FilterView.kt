@@ -31,6 +31,7 @@ class FilterView : View {
     fun cgangePer(per: Int) {
         if (valueAnimator != null && valueAnimator!!.isRunning) {
             valueAnimator!!.cancel()
+            valueAnimator = null
         }
         val perOld = this.currentAlpha
         ValueAnimator.setFrameDelay(100); // 10帧（这个设置好像是无效的）
@@ -80,6 +81,11 @@ class FilterView : View {
     }
 
     fun setFilterColorNow(alpha: Int) {
+        if (valueAnimator != null && valueAnimator!!.isRunning) {
+            valueAnimator!!.cancel()
+            valueAnimator = null
+        }
+
         var effectiveValue = alpha
         if (effectiveValue < 0) {
             effectiveValue = 0

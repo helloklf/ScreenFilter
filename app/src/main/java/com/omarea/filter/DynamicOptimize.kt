@@ -46,7 +46,7 @@ class DynamicOptimize(private var context: Context) {
     /**
      * @param sensitivity 角度亮度纠正的灵敏度
      */
-    fun brightnessOptimization(sensitivity: Float = 0.5F, lux: Float): Double {
+    fun brightnessOptimization(sensitivity: Float = 0.5F, lux: Float, screentMinLight:Int): Double {
         var offsetValue: Double = 0.toDouble();
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -54,10 +54,14 @@ class DynamicOptimize(private var context: Context) {
             if (lux <= 0f) {
                 if (hour > 20) {
                     offsetValue -= ((hour - 20) / 10.0)
+                    if (hour > 20) {
+                        offsetValue -= (FilterViewConfig.FILTER_BRIGHTNESS_MAX - screentMinLight) / 15.0F / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                    }
                 } else if (hour > 5) {
                     offsetValue += ((hour - 7) / 10.0)
                 } else {
                     offsetValue -= 0.3
+                    offsetValue -= (FilterViewConfig.FILTER_BRIGHTNESS_MAX - screentMinLight) / 15.0F / FilterViewConfig.FILTER_BRIGHTNESS_MAX
                 }
             }
         } else if (sensorEventListener != null) {

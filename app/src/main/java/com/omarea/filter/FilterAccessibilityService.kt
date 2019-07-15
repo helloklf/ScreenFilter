@@ -129,7 +129,7 @@ class FilterAccessibilityService : AccessibilityService() {
             stopSmoothLightTimer()
             filterBrightness = -1
         } catch (ex: Exception) {
-            Toast.makeText(this, "关闭滤镜服务时出现异常\n" + ex.message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "关闭滤镜时出现异常\n" + ex.message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -411,7 +411,10 @@ class FilterAccessibilityService : AccessibilityService() {
             // 场景优化
             if (dynamicOptimize != null && config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
                 optimizedLux += dynamicOptimize!!.luxOptimization(lux)
-                offsetPractical += dynamicOptimize!!.brightnessOptimization(config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT), lux)
+                offsetPractical += dynamicOptimize!!.brightnessOptimization(
+                        config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY, SpfConfig.DYNAMIC_OPTIMIZE_SENSITIVITY_DEFAULT),
+                        lux,
+                        GlobalStatus.sampleData!!.getScreentMinLight())
             }
 
             val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(optimizedLux, staticOffset, offsetPractical)
@@ -438,17 +441,26 @@ class FilterAccessibilityService : AccessibilityService() {
                     Log.e("updateFilterNow", "屏幕关闭时未暂停更新滤镜")
                 }
             }
+
             if (filterViewConfig.smoothChange) {
                 filterView!!.setFilterColor(filterViewConfig.filterAlpha)
             } else {
                 filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
             }
+
             if (filterViewConfig.filterBrightness != filterBrightness) {
-                val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams?
-                if (layoutParams != null) {
+                val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
+                if (layoutParams.screenBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
+                    layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
+                    filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
+                    popupView!!.postDelayed({
+                        mWindowManager.updateViewLayout(popupView, layoutParams)
+                    }, 50)
+                } else {
                     layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
                     mWindowManager.updateViewLayout(popupView, layoutParams)
                 }
+
                 filterBrightness = filterViewConfig.filterBrightness
             }
 
