@@ -55,13 +55,13 @@ class DynamicOptimize(private var context: Context) {
                 if (hour > 20) {
                     offsetValue -= ((hour - 20) / 10.0)
                     if (hour > 20) {
-                        offsetValue -= (FilterViewConfig.FILTER_BRIGHTNESS_MAX - screentMinLight) / 15.0F / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                        offsetValue -= (FilterViewConfig.FILTER_BRIGHTNESS_MAX - screentMinLight) / 6.0F / FilterViewConfig.FILTER_BRIGHTNESS_MAX
                     }
                 } else if (hour > 5) {
                     offsetValue += ((hour - 7) / 10.0)
                 } else {
                     offsetValue -= 0.3
-                    offsetValue -= (FilterViewConfig.FILTER_BRIGHTNESS_MAX - screentMinLight) / 15.0F / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                    offsetValue -= (FilterViewConfig.FILTER_BRIGHTNESS_MAX - screentMinLight) / 6.0F / FilterViewConfig.FILTER_BRIGHTNESS_MAX
                 }
             }
         } else if (sensorEventListener != null) {

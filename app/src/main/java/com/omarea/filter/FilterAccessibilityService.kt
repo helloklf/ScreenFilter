@@ -1,6 +1,7 @@
 package com.omarea.filter
 
 import android.accessibilityservice.AccessibilityService
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -18,6 +19,7 @@ import com.omarea.filter.light.LightHandler
 import com.omarea.filter.light.LightHistory
 import com.omarea.filter.light.LightSensorWatcher
 import java.io.File
+import java.lang.Math.abs
 import java.util.*
 
 
@@ -114,6 +116,12 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private fun filterClose() {
         try {
+            if (valueAnimator != null && valueAnimator!!.isRunning) {
+                valueAnimator!!.cancel()
+                valueAnimator = null
+            }
+            currentAlpha = 0
+
             if (popupView != null) {
                 val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
                 mWindowManager.removeView(popupView)
@@ -262,9 +270,11 @@ class FilterAccessibilityService : AccessibilityService() {
                         stopSmoothLightTimer()
                     }
                 }
+
                 override fun onBrightnessChange(brightness: Int) {
                     brightnessChangeHandle(brightness)
                 }
+
                 override fun onLuxChange(currentLux: Float) {
                     luxChangeHandle(currentLux)
                 }
@@ -370,15 +380,17 @@ class FilterAccessibilityService : AccessibilityService() {
             if (filterView != null) {
                 val currentTime = System.currentTimeMillis()
                 val historys = lightHistory.filter {
-                    (currentTime - it.time) < 10000
+                    (currentTime - it.time) < 11000
                 }
-                if (historys.size > 0 && this.filterView != null) {
+                if (historys.size > 0) {
                     var total: Double = 0.toDouble()
                     for (history in historys) {
                         total += history.lux
                     }
                     val avg = (total / historys.size).toFloat()
                     updateFilterNow(avg)
+                } else if (lightHistory.size > 0) {
+                    updateFilterNow(lightHistory.last().lux)
                 }
             }
         } catch (ex: Exception) {
@@ -443,29 +455,90 @@ class FilterAccessibilityService : AccessibilityService() {
             }
 
             if (filterViewConfig.smoothChange) {
-                filterView!!.setFilterColor(filterViewConfig.filterAlpha)
+                smoothUpdateFilter(filterViewConfig.filterAlpha, filterViewConfig)
             } else {
                 filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
-            }
 
-            if (filterViewConfig.filterBrightness != filterBrightness) {
-                val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
-                if (layoutParams.screenBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
-                    layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
-                    filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
-                    popupView!!.postDelayed({
+                if (filterViewConfig.filterBrightness != filterBrightness) {
+                    val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
+                    if (layoutParams.screenBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
+                        layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
+                        filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
+                        popupView!!.postDelayed({
+                            mWindowManager.updateViewLayout(popupView, layoutParams)
+                        }, 50)
+                    } else {
+                        layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
                         mWindowManager.updateViewLayout(popupView, layoutParams)
-                    }, 50)
-                } else {
-                    layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
-                    mWindowManager.updateViewLayout(popupView, layoutParams)
-                }
+                    }
 
-                filterBrightness = filterViewConfig.filterBrightness
+                    filterBrightness = filterViewConfig.filterBrightness
+                }
             }
 
             GlobalStatus.currentFilterAlpah = filterViewConfig.filterAlpha
             GlobalStatus.currentFilterBrightness = filterBrightness
+        }
+    }
+
+    private var currentAlpha: Int = 0
+    private var valueAnimator: ValueAnimator? = null
+    // TODO: 注意异常处理
+    fun smoothUpdateFilter(per: Int, filterViewConfig: FilterViewConfig) {
+        if (valueAnimator != null && valueAnimator!!.isRunning) {
+            valueAnimator!!.cancel()
+            valueAnimator = null
+        }
+        val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
+
+        // 首次刷新滤镜 - 立即调整亮度，而不是延迟执行
+        if (layoutParams.screenBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
+            layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
+
+            filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
+            popupView!!.postDelayed({
+                mWindowManager.updateViewLayout(popupView, layoutParams)
+                filterBrightness = filterViewConfig.filterBrightness
+            }, 50)
+        } else {
+            val perOld = this.currentAlpha
+            val distance = (per - perOld)
+            var frames = abs(distance)
+            var time = 2500L
+            if (!filterView!!.isHardwareAccelerated && frames > 20) {
+                if (frames > 3) {
+                    frames = frames / 3
+                }
+                if (frames > 20) {
+                    frames = 20
+                }
+                time = 1000
+            }
+            var frame = 0
+            val stepByStep = (per - perOld) / frames.toFloat()
+
+            val bPerOld = layoutParams.screenBrightness
+            val stepByStep2 = (filterViewConfig.getFilterBrightnessRatio() - bPerOld) / frames
+
+            valueAnimator = ValueAnimator.ofInt(frame, frames)
+            valueAnimator!!.run {
+                duration = time
+                addUpdateListener { animation ->
+                    val value = animation.animatedValue as Int
+                    if (value != frame) {
+                        frame = value
+                        currentAlpha = (perOld + (frame * stepByStep)).toInt()
+                        layoutParams.screenBrightness = bPerOld + (frame * stepByStep2)// filterViewConfig.getFilterBrightnessRatio()
+
+                        filterView?.run {
+                            filterView?.setFilterColorNow(currentAlpha)
+                            mWindowManager.updateViewLayout(popupView, layoutParams)
+                        }
+                        filterBrightness = filterViewConfig.filterBrightness
+                    }
+                }
+                start()
+            }
         }
     }
 }
