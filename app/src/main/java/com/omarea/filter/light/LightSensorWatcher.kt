@@ -8,12 +8,12 @@ import android.hardware.SensorEventListener
 import android.net.Uri
 import android.os.Handler
 import android.provider.Settings
+import android.util.Log
 import com.omarea.filter.GlobalStatus
 import java.util.*
 
 class LightSensorWatcher(private var context: Context, private var lightHandler: LightHandler) {
     private var lightSensorManager: LightSensorManager = LightSensorManager.getInstance()
-    private val lightHistory = Stack<LightHistory>()
 
     private var systemBrightness = 0 // 当前由系统控制的亮度
     private var systemBrightnessMode = Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC // Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
@@ -48,6 +48,7 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
             } else {
                 start()
             }
+            lightHandler.onModeChange(systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
         }
     }
 
@@ -58,6 +59,7 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
 
             // FIXME:已知部分手机，即使环境亮度没改变也可能会疯狂报告亮度 - 比如说三星S8，这可咋整呢？
             override fun onSensorChanged(event: SensorEvent?) {
+                Log.d("onSensorChanged", "")
                 if (event != null && event.values.size > 0) {
 
                     // 获取光线强度
@@ -86,6 +88,9 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
             lightHandler.onBrightnessChange(systemBrightness)
             stop()
         }
+
+        lightHandler.onModeChange(systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
+
         val contentResolver = context.contentResolver
 
         // 监控屏幕亮度

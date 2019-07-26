@@ -41,6 +41,10 @@ class FilterView : View {
         }
     }
 
+    fun getCurrentAlpha(): Float {
+        return currentAlpha * 4F
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawARGB(currentAlpha, red, green, blue)

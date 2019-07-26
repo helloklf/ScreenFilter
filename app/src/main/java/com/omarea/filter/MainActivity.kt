@@ -182,10 +182,8 @@ class MainActivity : AppCompatActivity() {
             light_lux.text = GlobalStatus.currentLux.toString() + "lux"
             if (GlobalStatus.filterEnabled) {
                 filter_light.text = (GlobalStatus.currentFilterBrightness / 10f).toString() + "%"
-                screen_light.text = "×"
             } else {
                 filter_light.text = "×"
-                screen_light.text = Utils.getSystemBrightness(applicationContext).toString()
             }
             filter_alpha.text = ((GlobalStatus.currentFilterAlpah * 1000 / FilterViewConfig.FILTER_MAX_ALPHA).toInt() / 10.0).toString() + "%"
         }

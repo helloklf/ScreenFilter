@@ -7,23 +7,14 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
-
-    <!--
-        android:layout_marginTop="?attr/actionBarSize"
-        android:textColor="?android:attr/colorPrimary"
-    -->
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="10dp">
-
-            <!--状态监测栏-->
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -49,28 +40,6 @@
 
                         <TextView
                             android:id="@+id/light_lux"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="2dp"
-                            android:text="0"
-                            android:textSize="11dp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/scrient_light"
-                            android:textSize="11dp" />
-
-                        <TextView
-                            android:id="@+id/screen_light"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="2dp"
@@ -134,11 +103,11 @@
                 android:text="@string/filter_enable"
                 android:textColor="@color/colorAccent" />
 
-            <!--自动亮度-->
             <TextView
                 style="@style/option_desc"
                 android:layout_marginBottom="0dp"
                 android:text="@string/automatic_brightness_config" />
+
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -183,8 +152,8 @@
                         <TextView
                             android:id="@+id/brightness_offset_text"
                             android:layout_width="40dp"
-                            android:text="100"
                             android:layout_height="wrap_content"
+                            android:text="100"
                             android:textAlignment="textEnd" />
 
                         <TextView
@@ -225,6 +194,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="0dp"
                 android:text="@string/other_config" />
+
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -262,6 +232,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="0dp"
                 android:text="@string/help_infos" />
+
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
