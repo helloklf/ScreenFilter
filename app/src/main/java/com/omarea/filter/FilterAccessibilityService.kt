@@ -394,21 +394,19 @@ class FilterAccessibilityService : AccessibilityService() {
     private fun updateFilterNow(lux: Float) {
         if (filterView != null) {
             var optimizedLux = lux
+            // 场景优化
+            optimizedLux += dynamicOptimize.luxOptimization(lux)
 
             // 亮度微调
             var staticOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
+            var offsetPractical = 0.toDouble()
 
             // 横屏
             if (isLandscapf) {
                 staticOffset += 0.1
+            } else {
+                offsetPractical += dynamicOptimize.brightnessOptimization(lux, GlobalStatus.sampleData!!.getScreentMinLight())
             }
-
-            var offsetPractical = 0.toDouble()
-            // 场景优化
-            optimizedLux += dynamicOptimize.luxOptimization(lux)
-            offsetPractical += dynamicOptimize.brightnessOptimization(
-                    lux,
-                    GlobalStatus.sampleData!!.getScreentMinLight())
 
             val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(optimizedLux, staticOffset, offsetPractical)
             var alpha = filterViewConfig.filterAlpha
