@@ -11,7 +11,6 @@ import android.graphics.Point
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
-import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
@@ -516,8 +515,6 @@ class FilterAccessibilityService : AccessibilityService() {
             }
             var frame = 0
 
-            Log.d("frames", "$frames")
-
             valueAnimator = ValueAnimator.ofInt(frame, frames)
             valueAnimator!!.run {
                 duration = 2000L
@@ -527,8 +524,6 @@ class FilterAccessibilityService : AccessibilityService() {
                         frame = value
                         val alpha = if(alphaFrames.isEmpty()) null else alphaFrames.removeFirst()
                         val brightness = if(brightnessFrames.isEmpty()) null else brightnessFrames.removeFirst()
-
-                        Log.d("frame", "$alpha $brightness")
 
                         if (alpha != null) {
                             currentAlpha = alpha
@@ -547,25 +542,6 @@ class FilterAccessibilityService : AccessibilityService() {
                 start()
             }
         }
-    }
-
-    fun frameLimit(value: Int, isHardwareAccelerated: Boolean): Int {
-        var frames = value
-        if (filterView!!.isHardwareAccelerated) {
-            if (frames > 48) {
-                frames = 48
-            }
-        } else {
-            if (frames > 15) {
-                if (frames > 3) {
-                    frames = frames / 3
-                }
-                if (frames > 15) {
-                    frames = 15
-                }
-            }
-        }
-        return frames
     }
 
     fun fastUpdateFilter(filterViewConfig: FilterViewConfig) {
