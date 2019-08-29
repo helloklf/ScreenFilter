@@ -22,7 +22,6 @@ import com.omarea.filter.light.LightSensorWatcher
 import java.io.File
 import java.lang.Math.abs
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class FilterAccessibilityService : AccessibilityService() {
@@ -293,41 +292,15 @@ class FilterAccessibilityService : AccessibilityService() {
      * 截屏
      */
     private fun screenCap() {
-        val isEnabled = GlobalStatus.filterEnabled
-        if (isEnabled) {
-            stopSmoothLightTimer()
-            if (Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL) {
-                startSmoothLightTimer()
-            }
-
-            val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
-            val backupBrightness = abs(layoutParams.screenBrightness)
-            val backupAlpha = currentAlpha
-
-            var toBrightness = backupBrightness * (1 - (backupAlpha * 4F / FilterViewConfig.FILTER_MAX_ALPHA))
-            if (toBrightness < 0.01F) {
-                toBrightness = 0.01F
-            } else if (toBrightness > 1F) {
-                toBrightness = 1F
-            }
-            layoutParams.screenBrightness = toBrightness
-            mWindowManager.updateViewLayout(popupView, layoutParams)
-
+        if (GlobalStatus.filterEnabled) {
+            filterClose()
             handler.postDelayed({
-                filterView?.setFilterColorNow(0)
-            }, 1000)
-
-            handler.postDelayed({
-                layoutParams.screenBrightness = backupBrightness
-                mWindowManager.updateViewLayout(popupView, layoutParams)
-            }, 3200)
-            handler.postDelayed({
-                filterView?.setFilterColorNow(backupAlpha)
-            }, 3300)
+                filterOpen()
+            }, 3000)
         }
         handler.postDelayed({
             triggerSsceenCap()
-        }, 1500)
+        }, 700)
     }
 
     /**
