@@ -20,6 +20,8 @@
         <meta-data
             android:name="com.google.android.actions"
             android:resource="@xml/filter_accessibility" />
+        <meta-data android:name="android.service.quicksettings.ACTIVE_TILE"
+            android:value="true" />
 
         <activity
             android:name=".MainActivity"
@@ -30,6 +32,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data
