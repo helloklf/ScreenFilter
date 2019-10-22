@@ -1,9 +1,6 @@
 package com.omarea.filter
 
 class FilterViewConfig {
-    constructor() {
-    }
-
     // 0 - 1000 // 1000表示全黑，0 表示不使用滤镜
     internal var filterAlpha = 0
     // 0  - 1000，1000 表示最大亮度

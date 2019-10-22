@@ -65,4 +65,6 @@
     <string name="get_permission_fail">获取悬浮窗显示权限失败！</string>
     <string name="pwm_amoled">为PWM调光的AMOLED屏幕而准备</string>
     <string name="permission_required">应用需要显示悬浮窗(叠加层)权限</string>
+    <string name="smooth_brightness">平均环境光</string>
+    <string name="smooth_brightness_desc">使用十秒内环境光平均值计算亮度</string>
 </resources>

@@ -9,7 +9,7 @@ public class SpfConfig {
 
     // 平滑亮度
     public static String SMOOTH_ADJUSTMENT = "SMOOTH_ADJUSTMENT";
-    public static boolean SMOOTH_ADJUSTMENT_DEFAULT = true;
+    public static boolean SMOOTH_ADJUSTMENT_DEFAULT = false;
 
     // 息屏暂停
     public static String SCREEN_OFF_PAUSE = "SCREEN_OFF_PAUSE";

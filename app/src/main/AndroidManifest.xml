@@ -66,7 +66,7 @@
         </activity>
 
         <service
-            android:name=".FilterAccessibilityService"
+            android:name=".service.FilterAccessibilityService"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
@@ -81,7 +81,7 @@
                 android:resource="@xml/filter_accessibility" />
         </service>
 
-        <service android:name=".QuickSettingService"
+        <service android:name=".service.QuickSettingService"
             android:label="@string/app_name"
             android:icon="@drawable/filter"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
@@ -90,7 +90,7 @@
             </intent-filter>
         </service>
 
-        <service android:name=".ScreenShotService"
+        <service android:name=".service.ScreenShotService"
             android:label="@string/screenshot_tile"
             android:icon="@drawable/glass"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">

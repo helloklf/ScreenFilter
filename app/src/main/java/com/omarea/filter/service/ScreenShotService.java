@@ -1,10 +1,12 @@
-package com.omarea.filter;
+package com.omarea.filter.service;
 
 import android.content.Intent;
 import android.os.Build;
 import android.service.quicksettings.TileService;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+
+import com.omarea.filter.ScreenCapActivity;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class ScreenShotService extends TileService {

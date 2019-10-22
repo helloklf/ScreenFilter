@@ -1,4 +1,4 @@
-package com.omarea.filter
+package com.omarea.filter.common
 
 /**
  * Created by Hello on 2018/01/23.

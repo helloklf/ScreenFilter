@@ -1,4 +1,4 @@
-package com.omarea.filter
+package com.omarea.filter.common
 
 import android.util.Log
 import java.io.BufferedReader

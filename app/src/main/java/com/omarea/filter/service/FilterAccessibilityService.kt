@@ -1,4 +1,4 @@
-package com.omarea.filter
+package com.omarea.filter.service
 
 import android.accessibilityservice.AccessibilityService
 import android.animation.ValueAnimator
@@ -15,9 +15,12 @@ import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
+import com.omarea.filter.*
+import com.omarea.filter.ScreenEventHandler
 import com.omarea.filter.light.LightHandler
 import com.omarea.filter.light.LightHistory
 import com.omarea.filter.light.LightSensorWatcher
+import com.omarea.filter.common.KeepShellPublic
 import java.io.File
 import java.lang.Math.abs
 import java.util.*
@@ -61,10 +64,9 @@ class FilterAccessibilityService : AccessibilityService() {
             }, {
                 screenOn = true
                 if (GlobalStatus.filterEnabled) {
-                    if (lightHistory.size > 0) {
-                        val last = lightHistory.last()
+                    lightHistory.lastOrNull()?.run {
                         lightHistory.clear()
-                        updateFilterNow(last.lux)
+                        updateFilterByLux(this.lux)
                     }
                 }
             }))
@@ -181,7 +183,7 @@ class FilterAccessibilityService : AccessibilityService() {
         if (filterView != null) {
             val config = GlobalStatus.sampleData!!.getFilterConfigByRatio(ratio)
             config.smoothChange = false
-            updateFilterNow(config)
+            updateFilterByConfig(config)
         }
     }
 
@@ -205,7 +207,7 @@ class FilterAccessibilityService : AccessibilityService() {
             startSmoothLightTimer()
         } else {
             stopSmoothLightTimer()
-            updateFilterNow(currentLux)
+            updateFilterByLux(currentLux)
         }
     }
 
@@ -215,7 +217,7 @@ class FilterAccessibilityService : AccessibilityService() {
         }
 
         mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        display = mWindowManager.getDefaultDisplay()
+        display = mWindowManager.defaultDisplay
 
         val params = WindowManager.LayoutParams()
 
@@ -277,7 +279,7 @@ class FilterAccessibilityService : AccessibilityService() {
         lightSensorWatcher?.startSystemConfigWatcher()
 
         GlobalStatus.filterRefresh = Runnable {
-            updateFilterNow(GlobalStatus.currentLux)
+            updateFilterByLux(GlobalStatus.currentLux)
         }
 
         GlobalStatus.screenCap = Runnable {
@@ -313,7 +315,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 Toast.makeText(this, "抱歉，对于Android 9.0以前的系统，需要ROOT权限才能调用截屏~", Toast.LENGTH_LONG).show()
                 isFirstScreenCap = false
             }
-            val output = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Pictures/" + System.currentTimeMillis() + ".png"
+            val output = Environment.getExternalStorageDirectory().absolutePath + "/Pictures/" + System.currentTimeMillis() + ".png"
             if (KeepShellPublic.doCmdSync("screencap -p \"$output\"") != "error") {
                 if (File(output).exists()) {
                     Toast.makeText(this, "截图保存至 \n$output", Toast.LENGTH_LONG).show()
@@ -361,21 +363,23 @@ class FilterAccessibilityService : AccessibilityService() {
      */
     private fun smoothLightTimerTick() {
         try {
-            if (filterView != null) {
+            if (filterView != null && lightHistory.size > 0) {
                 val currentTime = System.currentTimeMillis()
-                val historyList = lightHistory.filter {
+                val result = lightHistory.filter {
                     (currentTime - it.time) < 11000
                 }
-                if (historyList.isNotEmpty()) {
+
+                val avgLux: Float
+                if (result.isNotEmpty()) {
                     var total: Double = 0.toDouble()
-                    for (history in historyList) {
+                    for (history in result) {
                         total += history.lux
                     }
-                    val avg = (total / historyList.size).toFloat()
-                    updateFilterNow(avg)
-                } else if (lightHistory.size > 0) {
-                    updateFilterNow(lightHistory.last().lux)
+                    avgLux = (total / result.size).toFloat()
+                } else {
+                    avgLux = lightHistory.last().lux
                 }
+                updateFilterByLux(avgLux)
             }
         } catch (ex: Exception) {
             handler.post {
@@ -391,11 +395,12 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun updateFilterNow(lux: Float) {
+    private fun updateFilterByLux(lux: Float) {
+         val luxValue = if (lux < 0) 0f else lux
         if (filterView != null) {
-            var optimizedLux = lux
+            var optimizedLux = luxValue
             // 场景优化
-            optimizedLux += dynamicOptimize.luxOptimization(lux)
+            optimizedLux += dynamicOptimize.luxOptimization(luxValue)
 
             // 亮度微调
             var staticOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
@@ -405,7 +410,7 @@ class FilterAccessibilityService : AccessibilityService() {
             if (isLandscapf) {
                 staticOffset += 0.1
             } else {
-                offsetPractical += dynamicOptimize.brightnessOptimization(lux, GlobalStatus.sampleData!!.getScreentMinLight())
+                offsetPractical += dynamicOptimize.brightnessOptimization(luxValue, GlobalStatus.sampleData!!.getScreentMinLight())
             }
 
             val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(optimizedLux, staticOffset, offsetPractical)
@@ -418,19 +423,15 @@ class FilterAccessibilityService : AccessibilityService() {
             }
             filterViewConfig.filterAlpha = alpha
 
-            updateFilterNow(filterViewConfig)
+            updateFilterByConfig(filterViewConfig)
         }
     }
 
-    private fun updateFilterNow(filterViewConfig: FilterViewConfig) {
+    private fun updateFilterByConfig(filterViewConfig: FilterViewConfig) {
         if (filterView != null) {
-            if (!screenOn) {
-                // 如果开启了息屏暂停滤镜更新功能
-                if (config.getBoolean(SpfConfig.SCREEN_OFF_PAUSE, SpfConfig.SCREEN_OFF_PAUSE_DEFAULT)) {
-                    return
-                } else {
-                    Log.e("updateFilterNow", "屏幕关闭时未暂停更新滤镜")
-                }
+            // 如果开启了息屏暂停滤镜更新功能
+            if (!screenOn && config.getBoolean(SpfConfig.SCREEN_OFF_PAUSE, SpfConfig.SCREEN_OFF_PAUSE_DEFAULT)) {
+                return
             }
 
             if (filterViewConfig.smoothChange) {
@@ -446,9 +447,10 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private var currentAlpha: Int = 0
     private var valueAnimator: ValueAnimator? = null
+
     // TODO: 注意异常处理
     private fun smoothUpdateFilter(filterViewConfig: FilterViewConfig) {
-        if (valueAnimator != null && valueAnimator!!.isRunning) {
+        if (valueAnimator != null) {
             valueAnimator!!.cancel()
             valueAnimator = null
         }
@@ -465,12 +467,10 @@ class FilterAccessibilityService : AccessibilityService() {
             if (perOld != toAlpha) {
                 val alphaDistance = toAlpha - perOld
                 val absDistance = abs(alphaDistance)
-                if (absDistance < 1) {
-                    alphaFrameCount = 1
-                } else if (absDistance > 60) {
-                    alphaFrameCount = 60
-                } else {
-                    alphaFrameCount = absDistance
+                alphaFrameCount = when {
+                    absDistance < 1 -> 1
+                    absDistance > 60 -> 60
+                    else -> absDistance
                 }
                 if (alphaFrameCount > 20 && !filterView!!.isHardwareAccelerated) {
                     alphaFrameCount = 20

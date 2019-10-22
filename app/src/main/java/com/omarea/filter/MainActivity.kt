@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var systemBrightnessModeObserver: ContentObserver
     private val OVERLAY_PERMISSION_REQ_CODE = 0
 
-    public fun askForPermission() {
+    private fun askForPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
                 Toast.makeText(this, getString(R.string.permission_required), Toast.LENGTH_LONG).show()
@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private var filterEnabled = GlobalStatus.filterEnabled
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        setTheme(if (GlobalStatus.filterEnabled) R.style.AppTheme_Default else R.style.AppTheme_OFF)
+        setTheme(if (filterEnabled) R.style.AppTheme_Default else R.style.AppTheme_OFF)
 
         if (GlobalStatus.sampleData == null) {
             GlobalStatus.sampleData = SampleData(applicationContext)
@@ -121,12 +122,10 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val lightLuxOffset = progress - (brightness_offset.max / 2)
                 config.edit().putInt(SpfConfig.BRIGTHNESS_OFFSET, lightLuxOffset).apply()
-                if (lightLuxOffset > 0) {
-                    brightness_offset_text.text = "+" + lightLuxOffset
-                } else if (lightLuxOffset < 0) {
-                    brightness_offset_text.text = lightLuxOffset.toString()
-                } else {
-                    brightness_offset_text.text = "100"
+                when {
+                    lightLuxOffset > 0 -> brightness_offset_text.text = "+$lightLuxOffset"
+                    lightLuxOffset < 0 -> brightness_offset_text.text = lightLuxOffset.toString()
+                    else -> brightness_offset_text.text = "100"
                 }
                 filterRefresh()
             }
@@ -143,10 +142,13 @@ class MainActivity : AppCompatActivity() {
         dynamic_optimize.isChecked = config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)
         dynamic_optimize.setOnClickListener {
             config.edit().putBoolean(SpfConfig.DYNAMIC_OPTIMIZE, (it as Switch).isChecked).apply()
-            if (GlobalStatus.filterEnabled) {
-                GlobalStatus.filterClose?.run()
-                GlobalStatus.filterOpen?.run()
-            }
+            restartFilter()
+        }
+
+        // 平滑光线传奇数值
+        smooth_brightness.isChecked = config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)
+        smooth_brightness.setOnClickListener {
+            config.edit().putBoolean(SpfConfig.SMOOTH_ADJUSTMENT, (it as Switch).isChecked).apply()
         }
 
         // 从最近任务隐藏
@@ -170,6 +172,13 @@ class MainActivity : AppCompatActivity() {
         auto_adjustment.isChecked = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
     }
 
+    private fun restartFilter() {
+        if (GlobalStatus.filterEnabled) {
+            GlobalStatus.filterClose?.run()
+            GlobalStatus.filterOpen?.run()
+        }
+    }
+
     private fun filterRefresh() {
         if (GlobalStatus.filterEnabled && GlobalStatus.filterRefresh != null) {
             GlobalStatus.filterRefresh!!.run()
@@ -191,6 +200,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        if (GlobalStatus.filterEnabled && !filterEnabled) {
+            filterEnabled = true
+            recreate()
+            return
+        }
 
         filter_switch.isChecked = GlobalStatus.filterEnabled
 

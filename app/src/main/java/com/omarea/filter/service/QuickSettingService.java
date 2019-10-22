@@ -1,4 +1,4 @@
-package com.omarea.filter;
+package com.omarea.filter.service;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,10 @@ import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.support.annotation.RequiresApi;
 import android.widget.Toast;
+
+import com.omarea.filter.GlobalStatus;
+import com.omarea.filter.R;
+import com.omarea.filter.SpfConfig;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class QuickSettingService extends TileService {

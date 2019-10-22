@@ -5,12 +5,12 @@ import android.provider.Settings
 
 object Utils {
     internal fun getSystemBrightness(context: Context): Int {
-        var systemBrightness = 0;
+        var systemBrightness = 0
         try {
-            systemBrightness = Settings.System.getInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+            systemBrightness = Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS)
         } catch (e: Settings.SettingNotFoundException) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
-        return systemBrightness;
+        return systemBrightness
     }
 }
