@@ -35,10 +35,10 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private lateinit var mWindowManager: WindowManager
     private lateinit var display: Display
-    private var isFristScreenCap = true;
+    private var isFirstScreenCap = true
 
     // 当前手机屏幕是否处于开启状态
-    private var screenOn = false;
+    private var screenOn = false
     private var reciverLock: ReciverLock? = null
 
     // 悬浮窗
@@ -156,10 +156,10 @@ class FilterAccessibilityService : AccessibilityService() {
      * 获取状态栏高度
      */
     fun getStatusHeight(): Int {
-        var result = 0;
-        val resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        var result = 0
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
+            result = resources.getDimensionPixelSize(resourceId)
         }
         return result
     }
@@ -309,19 +309,19 @@ class FilterAccessibilityService : AccessibilityService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
         } else {
-            if (isFristScreenCap) {
+            if (isFirstScreenCap) {
                 Toast.makeText(this, "抱歉，对于Android 9.0以前的系统，需要ROOT权限才能调用截屏~", Toast.LENGTH_LONG).show()
-                isFristScreenCap = false
+                isFirstScreenCap = false
             }
             val output = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Pictures/" + System.currentTimeMillis() + ".png"
             if (KeepShellPublic.doCmdSync("screencap -p \"$output\"") != "error") {
                 if (File(output).exists()) {
-                    Toast.makeText(this, "截图保存至 \n" + output, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "截图保存至 \n$output", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show()
                 }
             } else {
-                Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -363,15 +363,15 @@ class FilterAccessibilityService : AccessibilityService() {
         try {
             if (filterView != null) {
                 val currentTime = System.currentTimeMillis()
-                val historys = lightHistory.filter {
+                val historyList = lightHistory.filter {
                     (currentTime - it.time) < 11000
                 }
-                if (historys.size > 0) {
+                if (historyList.isNotEmpty()) {
                     var total: Double = 0.toDouble()
-                    for (history in historys) {
+                    for (history in historyList) {
                         total += history.lux
                     }
-                    val avg = (total / historys.size).toFloat()
+                    val avg = (total / historyList.size).toFloat()
                     updateFilterNow(avg)
                 } else if (lightHistory.size > 0) {
                     updateFilterNow(lightHistory.last().lux)
@@ -447,7 +447,7 @@ class FilterAccessibilityService : AccessibilityService() {
     private var currentAlpha: Int = 0
     private var valueAnimator: ValueAnimator? = null
     // TODO: 注意异常处理
-    fun smoothUpdateFilter(filterViewConfig: FilterViewConfig) {
+    private fun smoothUpdateFilter(filterViewConfig: FilterViewConfig) {
         if (valueAnimator != null && valueAnimator!!.isRunning) {
             valueAnimator!!.cancel()
             valueAnimator = null
@@ -460,7 +460,7 @@ class FilterAccessibilityService : AccessibilityService() {
         } else {
             val perOld = this.currentAlpha
             val toAlpha = filterViewConfig.filterAlpha
-            var alphaFrameCount = 0
+            var alphaFrameCount: Int
             val alphaFrames = LinkedList<Int>()
             if (perOld != toAlpha) {
                 val alphaDistance = toAlpha - perOld
@@ -477,7 +477,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 }
 
                 val stepByStep = alphaDistance / alphaFrameCount.toFloat()
-                for (frame in 1..alphaFrameCount - 1) {
+                for (frame in 1 until alphaFrameCount) {
                     alphaFrames.add(perOld + (frame * stepByStep).toInt())
                 }
                 alphaFrames.add(toAlpha)
@@ -485,23 +485,21 @@ class FilterAccessibilityService : AccessibilityService() {
 
             val currentBrightness = (layoutParams.screenBrightness * 1000).toInt()
             val toBrightness = filterViewConfig.filterBrightness
-            var brightnessFrameCount = 0
+            var brightnessFrameCount:Int
             val brightnessFrames = LinkedList<Int>()
             if (toBrightness != currentBrightness) {
                 val brightnessDistance = toBrightness - currentBrightness
                 val absDistance = abs(brightnessDistance)
-                if (absDistance < 1) {
-                    brightnessFrameCount = 1
-                } else if (absDistance > 60) {
-                    brightnessFrameCount = 60
-                } else {
-                    brightnessFrameCount = absDistance
+                brightnessFrameCount = when {
+                    absDistance < 1 -> 1
+                    absDistance > 60 -> 60
+                    else -> absDistance
                 }
                 if (brightnessFrameCount > 20 && !filterView!!.isHardwareAccelerated) {
                     brightnessFrameCount = 20
                 }
                 val stepByStep2 = brightnessDistance / brightnessFrameCount.toFloat()
-                for (frame in 1..brightnessFrameCount - 1) {
+                for (frame in 1 until brightnessFrameCount) {
                     brightnessFrames.add(currentBrightness + (frame * stepByStep2).toInt())
                 }
                 brightnessFrames.add(toBrightness)
@@ -542,7 +540,7 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
-    fun fastUpdateFilter(filterViewConfig: FilterViewConfig) {
+    private fun fastUpdateFilter(filterViewConfig: FilterViewConfig) {
         filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
         currentAlpha = filterViewConfig.filterAlpha
 
