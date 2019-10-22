@@ -22,7 +22,6 @@
     <string name="auto_adjustment">自动亮度</string>
     <string name="auto_adjustment_desc">此开关跟随系统自带的“自动亮度”开关</string>
     <string name="brightness_offset">亮度微调</string>
-    <string name="brightness_offset_desc">自动亮度微调</string>
     <string name="landscape_optimize">横屏优化</string>
     <string name="landscape_optimize_desc">横屏时增加10%亮度，适合游戏玩家</string>
     <string name="dynamic_optimize">夜间微调</string>

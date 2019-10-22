@@ -133,6 +133,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
                     <SeekBar
@@ -158,12 +159,6 @@
                         android:layout_height="wrap_content"
                         android:text="%" />
                 </LinearLayout>
-
-                <TextView
-                    style="@style/option_desc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/brightness_offset_desc" />
 
                 <Switch
                     android:id="@+id/landscape_optimize"
