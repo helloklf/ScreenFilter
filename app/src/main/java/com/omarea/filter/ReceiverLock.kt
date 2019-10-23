@@ -12,7 +12,7 @@ import android.os.Handler
  * Created by Hello on 2018/01/23.
  */
 
-class ReciverLock(private var callbacks: Handler) : BroadcastReceiver() {
+class ReceiverLock(private var callbacks: Handler) : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
         if (p1 == null) {
             return
@@ -38,30 +38,30 @@ class ReciverLock(private var callbacks: Handler) : BroadcastReceiver() {
     }
 
     companion object {
-        private var reciver: ReciverLock? = null
-        public fun autoRegister(context: Context, callbacks: Handler): ReciverLock? {
-            if (reciver != null) {
+        private var receiver: ReceiverLock? = null
+        public fun autoRegister(context: Context, callbacks: Handler): ReceiverLock? {
+            if (receiver != null) {
                 unRegister(context)
             }
 
-            reciver = ReciverLock(callbacks)
+            receiver = ReceiverLock(callbacks)
 
-            context.applicationContext.registerReceiver(reciver, IntentFilter(Intent.ACTION_SCREEN_OFF))
+            context.applicationContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                context.applicationContext.registerReceiver(reciver, IntentFilter(Intent.ACTION_USER_UNLOCKED))
+                context.applicationContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_USER_UNLOCKED))
             }
-            context.applicationContext.registerReceiver(reciver, IntentFilter(Intent.ACTION_SCREEN_ON))
-            context.applicationContext.registerReceiver(reciver, IntentFilter(Intent.ACTION_USER_PRESENT))
+            context.applicationContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_SCREEN_ON))
+            context.applicationContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_USER_PRESENT))
 
-            return reciver
+            return receiver
         }
 
         fun unRegister(context: Context) {
-            if (reciver == null) {
+            if (receiver == null) {
                 return
             }
-            context.applicationContext.unregisterReceiver(reciver)
-            reciver = null
+            context.applicationContext.unregisterReceiver(receiver)
+            receiver = null
         }
     }
 }

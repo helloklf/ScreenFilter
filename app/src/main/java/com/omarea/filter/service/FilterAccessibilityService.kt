@@ -11,7 +11,6 @@ import android.graphics.Point
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
-import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
@@ -42,7 +41,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
     // 当前手机屏幕是否处于开启状态
     private var screenOn = false
-    private var reciverLock: ReciverLock? = null
+    private var receiverLock: ReceiverLock? = null
 
     // 悬浮窗
     private var popupView: View? = null
@@ -58,8 +57,8 @@ class FilterAccessibilityService : AccessibilityService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             screenOn = ScreenState(this).isScreenOn()
         }
-        if (reciverLock == null) {
-            reciverLock = ReciverLock.autoRegister(this, ScreenEventHandler({
+        if (receiverLock == null) {
+            receiverLock = ReceiverLock.autoRegister(this, ScreenEventHandler({
                 screenOn = false
             }, {
                 screenOn = true
@@ -91,9 +90,9 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        if (reciverLock != null) {
-            ReciverLock.unRegister(this)
-            reciverLock = null
+        if (receiverLock != null) {
+            ReceiverLock.unRegister(this)
+            receiverLock = null
         }
 
         GlobalStatus.filterOpen = null
@@ -456,87 +455,86 @@ class FilterAccessibilityService : AccessibilityService() {
         }
         val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
 
-        // 首次刷新滤镜 - 立即调整亮度，而不是延迟执行
-        if (layoutParams.screenBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
-            fastUpdateFilter(filterViewConfig)
-        } else {
-            val perOld = this.currentAlpha
-            val toAlpha = filterViewConfig.filterAlpha
-            var alphaFrameCount: Int
-            val alphaFrames = LinkedList<Int>()
-            if (perOld != toAlpha) {
-                val alphaDistance = toAlpha - perOld
-                val absDistance = abs(alphaDistance)
-                alphaFrameCount = when {
-                    absDistance < 1 -> 1
-                    absDistance > 60 -> 60
-                    else -> absDistance
-                }
-                if (alphaFrameCount > 20 && !filterView!!.isHardwareAccelerated) {
-                    alphaFrameCount = 20
-                }
-
-                val stepByStep = alphaDistance / alphaFrameCount.toFloat()
-                for (frame in 1 until alphaFrameCount) {
-                    alphaFrames.add(perOld + (frame * stepByStep).toInt())
-                }
-                alphaFrames.add(toAlpha)
+        val perOld = this.currentAlpha
+        val toAlpha = filterViewConfig.filterAlpha
+        var alphaFrameCount: Int
+        val alphaFrames = LinkedList<Int>()
+        if (perOld != toAlpha) {
+            val alphaDistance = toAlpha - perOld
+            val absDistance = abs(alphaDistance)
+            alphaFrameCount = when {
+                absDistance < 1 -> 1
+                absDistance > 60 -> 60
+                else -> absDistance
+            }
+            if (alphaFrameCount > 20 && !filterView!!.isHardwareAccelerated) {
+                alphaFrameCount = 20
             }
 
-            val currentBrightness = (layoutParams.screenBrightness * 1000).toInt()
-            val toBrightness = filterViewConfig.filterBrightness
-            var brightnessFrameCount:Int
-            val brightnessFrames = LinkedList<Int>()
-            if (toBrightness != currentBrightness) {
-                val brightnessDistance = toBrightness - currentBrightness
-                val absDistance = abs(brightnessDistance)
-                brightnessFrameCount = when {
-                    absDistance < 1 -> 1
-                    absDistance > 60 -> 60
-                    else -> absDistance
-                }
-                if (brightnessFrameCount > 20 && !filterView!!.isHardwareAccelerated) {
-                    brightnessFrameCount = 20
-                }
-                val stepByStep2 = brightnessDistance / brightnessFrameCount.toFloat()
-                for (frame in 1 until brightnessFrameCount) {
-                    brightnessFrames.add(currentBrightness + (frame * stepByStep2).toInt())
-                }
-                brightnessFrames.add(toBrightness)
+            val stepByStep = alphaDistance / alphaFrameCount.toFloat()
+            for (frame in 1 until alphaFrameCount) {
+                alphaFrames.add(perOld + (frame * stepByStep).toInt())
             }
+            alphaFrames.add(toAlpha)
+        }
 
-            val frames = if (alphaFrames.size > brightnessFrames.size) alphaFrames.size else brightnessFrames.size
-            if (frames == 0) {
-                return
+        val currentBrightness = (abs(layoutParams.screenBrightness) * 1000).toInt()
+        val toBrightness = filterViewConfig.filterBrightness
+        var brightnessFrameCount:Int
+        val brightnessFrames = LinkedList<Int>()
+        if (toBrightness != currentBrightness) {
+            val brightnessDistance = toBrightness - currentBrightness
+            val absDistance = abs(brightnessDistance)
+            brightnessFrameCount = when {
+                absDistance < 1 -> 1
+                absDistance > 60 -> 60
+                else -> absDistance
             }
-            var frame = 0
+            if (brightnessFrameCount > 20 && !filterView!!.isHardwareAccelerated) {
+                brightnessFrameCount = 20
+            }
+            val stepByStep2 = brightnessDistance / brightnessFrameCount.toFloat()
+            for (frame in 1 until brightnessFrameCount) {
+                brightnessFrames.add(currentBrightness + (frame * stepByStep2).toInt())
+            }
+            brightnessFrames.add(toBrightness)
+        }
 
-            valueAnimator = ValueAnimator.ofInt(frame, frames)
-            valueAnimator!!.run {
-                duration = 2000L
-                addUpdateListener { animation ->
-                    val value = animation.animatedValue as Int
-                    if (value != frame) {
-                        frame = value
-                        val alpha = if(alphaFrames.isEmpty()) null else alphaFrames.removeFirst()
-                        val brightness = if(brightnessFrames.isEmpty()) null else brightnessFrames.removeFirst()
+        val frames = if (alphaFrames.size > brightnessFrames.size) alphaFrames.size else brightnessFrames.size
+        if (frames == 0) {
+            return
+        }
+        var frame = 0
 
-                        if (alpha != null) {
-                            currentAlpha = alpha
-                            filterView?.run {
-                                filterView?.setFilterColorNow(currentAlpha)
-                            }
-                        }
+        valueAnimator = ValueAnimator.ofInt(frame, frames)
+        valueAnimator!!.run {
+            duration = 2000L
+            addUpdateListener { animation ->
+                val value = animation.animatedValue as Int
+                if (value != frame) {
+                    frame = value
+                    val alpha = if(alphaFrames.isEmpty()) null else alphaFrames.removeFirst()
+                    val brightness = if(brightnessFrames.isEmpty()) null else brightnessFrames.removeFirst()
 
-                        if (brightness != null) {
-                            layoutParams.screenBrightness = brightness / 1000F
-                            mWindowManager.updateViewLayout(popupView, layoutParams)
-                            filterBrightness = brightness
+                    if (alpha != null) {
+                        currentAlpha = alpha
+                        filterView?.run {
+                            filterView?.setFilterColorNow(currentAlpha)
                         }
                     }
+
+                    if (brightness != null) {
+                        if (brightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                            layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                        } else {
+                            layoutParams.screenBrightness = brightness / FilterViewConfig.FILTER_BRIGHTNESS_MAX.toFloat()
+                        }
+                        mWindowManager.updateViewLayout(popupView, layoutParams)
+                        filterBrightness = brightness
+                    }
                 }
-                start()
             }
+            start()
         }
     }
 
@@ -546,16 +544,15 @@ class FilterAccessibilityService : AccessibilityService() {
 
         if (filterViewConfig.filterBrightness != filterBrightness) {
             val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
-            if (layoutParams.screenBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
-                layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
-                filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
-                popupView!!.postDelayed({
-                    mWindowManager.updateViewLayout(popupView, layoutParams)
-                }, 100)
+            if (filterViewConfig.filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
             } else {
                 layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
-                mWindowManager.updateViewLayout(popupView, layoutParams)
             }
+            filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
+            popupView!!.postDelayed({
+                mWindowManager.updateViewLayout(popupView, layoutParams)
+            }, 100)
 
             filterBrightness = filterViewConfig.filterBrightness
         }
