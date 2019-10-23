@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
-import com.omarea.filter.FilterViewConfig
 
 class FilterView : View {
     private var red = 0
