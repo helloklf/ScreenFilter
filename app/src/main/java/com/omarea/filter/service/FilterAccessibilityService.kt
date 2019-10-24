@@ -34,6 +34,9 @@ class FilterAccessibilityService : AccessibilityService() {
     private var screenOn = false
     private var receiverLock: ReceiverLock? = null
 
+    // 是否是首次更新屏幕滤镜
+    private var isFirstUpdate = false
+
     // 计算平滑亮度的定时器
     private var smoothLightTimer: Timer? = null
 
@@ -117,7 +120,10 @@ class FilterAccessibilityService : AccessibilityService() {
      * 周围光线发生变化时触发
      */
     private fun onLuxChanged(currentLux: Float) {
-        if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
+        if (isFirstUpdate) {
+            updateFilterByLux(currentLux, false)
+            isFirstUpdate = false
+        } else if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
             val history = LightHistory()
             history.run {
                 time = System.currentTimeMillis()
@@ -139,6 +145,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private fun filterOpen() {
         filterViewManager.open()
+        isFirstUpdate = true
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
             screenOn = ScreenState(this).isScreenOn()
@@ -191,10 +198,14 @@ class FilterAccessibilityService : AccessibilityService() {
      */
     private fun onScreenCap() {
         if (GlobalStatus.filterEnabled) {
-            filterClose()
-            handler.postDelayed({ filterOpen() }, 3000)
+            filterViewManager.pause()
+            handler.postDelayed({
+                filterViewManager.resume()
+            }, 5000)
         }
-        handler.postDelayed({ triggerScreenCap() }, 700)
+        handler.postDelayed({
+            triggerScreenCap()
+        }, 2000)
     }
 
     /**
@@ -286,11 +297,9 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun updateFilterByLux(lux: Float) {
+    private fun updateFilterByLux(lux: Float, smoothChange: Boolean = true) {
         val luxValue = if (lux < 0) 0f else lux
-        var optimizedLux = luxValue
-        // 场景优化
-        optimizedLux += dynamicOptimize.luxOptimization(luxValue)
+        val optimizedLux = dynamicOptimize.luxOptimization(luxValue)
 
         // 亮度微调
         var staticOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
@@ -312,6 +321,7 @@ class FilterAccessibilityService : AccessibilityService() {
             alpha = 0
         }
         filterViewConfig.filterAlpha = alpha
+        filterViewConfig.smoothChange = smoothChange
 
         updateFilterByConfig(filterViewConfig)
     }

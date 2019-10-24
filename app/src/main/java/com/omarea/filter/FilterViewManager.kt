@@ -2,15 +2,14 @@ package com.omarea.filter
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import com.omarea.filter.common.ViewHelper
 import java.util.*
 
@@ -25,6 +24,8 @@ class FilterViewManager(private var context: Context){
     private var filterBrightness = 0 // 当前由滤镜控制的屏幕亮度
     private var currentAlpha: Int = 0
     private var valueAnimator: ValueAnimator? = null
+    private var isPaused = false
+    private var lastFilterViewConfig: FilterViewConfig? = null
 
     fun open() {
         if (popupView != null) {
@@ -66,13 +67,14 @@ class FilterViewManager(private var context: Context){
         popupView = LayoutInflater.from(context).inflate(R.layout.filter, null)
         mWindowManager.addView(popupView, params)
         filterView = popupView!!.findViewById(R.id.filter_view)
-
-
     }
 
     fun close() {
         stopUpdate()
         currentAlpha = 0
+        lastFilterViewConfig = null
+        isPaused = false
+        filterBrightness = -1
 
         if (popupView != null) {
             mWindowManager.removeView(popupView)
@@ -80,17 +82,55 @@ class FilterViewManager(private var context: Context){
         }
     }
 
-    fun updateFilterByConfig(filterViewConfig: FilterViewConfig) {
-        if (filterView != null) {
 
-            if (filterViewConfig.smoothChange) {
-                smoothUpdateFilter(filterViewConfig)
-            } else {
-                fastUpdateFilter(filterViewConfig)
+    fun pause() {
+        stopUpdate()
+        if (currentAlpha != 0) {
+            val layoutParams = this.layoutParams
+            if (layoutParams != null) {
+                val config = FilterViewConfig()
+                val screenBrightness = layoutParams.screenBrightness - ((currentAlpha.toFloat() / FilterViewConfig.FILTER_MAX_ALPHA) * layoutParams.screenBrightness)
+                config.filterBrightness = (screenBrightness * FilterViewConfig.FILTER_BRIGHTNESS_MAX).toInt()
+                config.filterAlpha = 0
+                config.smoothChange = true
+                updateFilterByConfig(config, false)
             }
+        }
+        isPaused = true
+    }
 
-            GlobalStatus.currentFilterAlpah = filterViewConfig.filterAlpha
-            GlobalStatus.currentFilterBrightness = filterBrightness
+    fun resume() {
+        isPaused = false
+        stopUpdate()
+        layoutParams?.run {
+            if (lastFilterViewConfig != null) {
+                lastFilterViewConfig?.smoothChange = true
+                updateFilterByConfig(lastFilterViewConfig!!)
+            }
+        }
+    }
+
+    private val layoutParams: WindowManager.LayoutParams?
+        get() {
+            return popupView?.layoutParams as WindowManager.LayoutParams?
+        }
+
+    fun updateFilterByConfig(filterViewConfig: FilterViewConfig, backup: Boolean = true) {
+        if (filterView != null) {
+           if (!isPaused) {
+               if (filterViewConfig.smoothChange) {
+                   smoothUpdateFilter(filterViewConfig)
+               } else {
+                   fastUpdateFilter(filterViewConfig)
+               }
+
+               GlobalStatus.currentFilterAlpah = filterViewConfig.filterAlpha
+               GlobalStatus.currentFilterBrightness = filterBrightness
+           }
+
+            if (backup) {
+                lastFilterViewConfig = filterViewConfig
+            }
         }
     }
 
@@ -104,7 +144,7 @@ class FilterViewManager(private var context: Context){
     // TODO: 注意异常处理
     private fun smoothUpdateFilter(filterViewConfig: FilterViewConfig) {
         stopUpdate()
-        val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
+        val layoutParams = this.layoutParams!!
 
         val perOld = this.currentAlpha
         val toAlpha = filterViewConfig.filterAlpha
@@ -176,7 +216,7 @@ class FilterViewManager(private var context: Context){
 
                     if (brightness != null) {
                         if (brightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                            layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                            layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
                         } else {
                             layoutParams.screenBrightness = brightness / FilterViewConfig.FILTER_BRIGHTNESS_MAX.toFloat()
                         }
@@ -196,9 +236,9 @@ class FilterViewManager(private var context: Context){
         currentAlpha = filterViewConfig.filterAlpha
 
         if (filterViewConfig.filterBrightness != filterBrightness) {
-            val layoutParams = popupView!!.layoutParams as WindowManager.LayoutParams
+            val layoutParams = this.layoutParams!!
             if (filterViewConfig.filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
             } else {
                 layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
             }

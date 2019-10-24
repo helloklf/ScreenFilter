@@ -29,11 +29,9 @@ class DynamicOptimize {
     fun luxOptimization(lux: Float): Float {
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        if (lux <= 2f) {
-            if (hour < 21 && hour >= 7) {
-                return 1f
-            }
+        if (lux <= 2f && hour < 21 && hour >= 7) {
+            return 0f
         }
-        return 0f
+        return lux
     }
 }
