@@ -69,4 +69,6 @@
     <string name="write_settings_unallowed">本应用没有修改系统设置的权限，请通过系统的“自动亮度开关进行切换”</string>
     <string name="filter_mode_auto">滤镜切换到“自动亮度”</string>
     <string name="filter_mode_manual">滤镜切换到“手动亮度”</string>
+    <string name="lock_off">息屏关闭滤镜</string>
+    <string name="lock_off_desc">为了AOD，息屏/锁屏时关闭滤镜</string>
 </resources>

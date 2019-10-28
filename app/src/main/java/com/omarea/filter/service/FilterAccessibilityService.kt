@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.provider.Settings
-import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import com.omarea.filter.*
@@ -34,11 +33,13 @@ class FilterAccessibilityService : AccessibilityService() {
 
     // 当前手机屏幕是否处于开启状态
     private var screenOn = false
+    // 屏幕解锁事件监听
     private var receiverLock: ReceiverLock? = null
 
     // 是否是首次更新屏幕滤镜
     private var isFirstUpdate = false
 
+    // 是否正在使用自动亮度调节
     private var isAutoBrightness = false
 
     // 计算平滑亮度的定时器
@@ -69,6 +70,21 @@ class FilterAccessibilityService : AccessibilityService() {
             filterOpen()
         }
 
+        receiverLock = ReceiverLock.autoRegister(this, ScreenEventHandler({
+            screenOn = false
+            if (config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
+                filterClose()
+            }
+        }, {
+            screenOn = true
+            if (!GlobalStatus.filterEnabled && config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT) && config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
+                filterOpen()
+            } else {
+                filterRefresh()
+                lightHistory.clear()
+            }
+        }))
+
         super.onServiceConnected()
     }
 
@@ -77,17 +93,58 @@ class FilterAccessibilityService : AccessibilityService() {
         GlobalStatus.filterClose = null
         filterClose()
 
+        if (receiverLock != null) {
+            ReceiverLock.unRegister(this)
+            receiverLock = null
+        }
+
         return super.onUnbind(intent)
     }
 
     override fun onInterrupt() {}
 
+    private fun filterOpen() {
+        filterViewManager.open()
+        isFirstUpdate = true
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+            screenOn = ScreenState(this).isScreenOn()
+        }
+
+        if (lightSensorWatcher == null) {
+            lightSensorWatcher = LightSensorWatcher(this, object : LightHandler {
+                override fun onModeChange(auto: Boolean) {
+                    isAutoBrightness = auto
+                    if (auto) {
+                        startSmoothLightTimer()
+                        Toast.makeText(this@FilterAccessibilityService, getString(R.string.filter_mode_auto), Toast.LENGTH_LONG).show()
+                    } else {
+                        stopSmoothLightTimer()
+                        Toast.makeText(this@FilterAccessibilityService, getString(R.string.filter_mode_manual), Toast.LENGTH_LONG).show()
+                    }
+                }
+
+                override fun onBrightnessChange(brightness: Int) {
+                    onBrightnessChanged(brightness)
+                }
+
+                override fun onLuxChange(currentLux: Float) {
+                    onLuxChanged(currentLux)
+                }
+            })
+        }
+
+        lightSensorWatcher?.startSystemConfigWatcher()
+
+        GlobalStatus.filterRefresh = Runnable { filterRefresh() }
+
+        GlobalStatus.screenCap = Runnable { onScreenCap() }
+
+        GlobalStatus.filterEnabled = true
+    }
+
     private fun filterClose() {
         try {
-            if (receiverLock != null) {
-                ReceiverLock.unRegister(this)
-                receiverLock = null
-            }
             lightSensorWatcher?.stopSystemConfigWatcher()
 
             filterViewManager.close()
@@ -102,12 +159,53 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun filterRefresh() {
-        if (isAutoBrightness) {
-            lightHistory.lastOrNull()?.run {
-                updateFilterByLux(this.lux)
+        if (GlobalStatus.filterEnabled) {
+            if (isAutoBrightness) {
+                lightHistory.lastOrNull()?.run {
+                    updateFilterByLux(this.lux)
+                }
+            } else {
+                onBrightnessChanged(Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS))
             }
+        }
+    }
+
+    /**
+     * 截屏
+     */
+    private fun onScreenCap() {
+        if (GlobalStatus.filterEnabled) {
+            filterViewManager.pause()
+            handler.postDelayed({
+                filterViewManager.resume()
+            }, 4000)
+        }
+        handler.postDelayed({
+            triggerScreenCap()
+        }, 1200)
+    }
+
+    /**
+     * 触发屏幕截图
+     */
+    private fun triggerScreenCap() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
         } else {
-            onBrightnessChanged(Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS))
+            if (isFirstScreenCap) {
+                Toast.makeText(this, "抱歉，Android 9.0以前的系统，需要ROOT权限才能调用截屏~", Toast.LENGTH_LONG).show()
+                isFirstScreenCap = false
+            }
+            val output = Environment.getExternalStorageDirectory().absolutePath + "/Pictures/" + System.currentTimeMillis() + ".png"
+            if (KeepShellPublic.doCmdSync("screencap -p \"$output\"") != "error") {
+                if (File(output).exists()) {
+                    Toast.makeText(this, "截图保存至 \n$output", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -154,96 +252,6 @@ class FilterAccessibilityService : AccessibilityService() {
         } else {
             stopSmoothLightTimer()
             updateFilterByLux(currentLux)
-        }
-    }
-
-    private fun filterOpen() {
-        filterViewManager.open()
-        isFirstUpdate = true
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-            screenOn = ScreenState(this).isScreenOn()
-        }
-        receiverLock = ReceiverLock.autoRegister(this, ScreenEventHandler({
-            screenOn = false
-        }, {
-            screenOn = true
-            if (GlobalStatus.filterEnabled) {
-                filterRefresh()
-                lightHistory.clear()
-            }
-        }))
-
-        if (lightSensorWatcher == null) {
-            lightSensorWatcher = LightSensorWatcher(this, object : LightHandler {
-                override fun onModeChange(auto: Boolean) {
-                    isAutoBrightness = auto
-                    if (auto) {
-                        startSmoothLightTimer()
-                        Toast.makeText(this@FilterAccessibilityService, getString(R.string.filter_mode_auto), Toast.LENGTH_LONG).show()
-                    } else {
-                        stopSmoothLightTimer()
-                        Toast.makeText(this@FilterAccessibilityService, getString(R.string.filter_mode_manual), Toast.LENGTH_LONG).show()
-                    }
-                }
-
-                override fun onBrightnessChange(brightness: Int) {
-                    onBrightnessChanged(brightness)
-                }
-
-                override fun onLuxChange(currentLux: Float) {
-                    onLuxChanged(currentLux)
-                }
-            })
-        }
-
-        lightSensorWatcher?.startSystemConfigWatcher()
-
-        GlobalStatus.filterRefresh = Runnable {
-            filterRefresh()
-        }
-
-        GlobalStatus.screenCap = Runnable { onScreenCap() }
-
-        GlobalStatus.filterEnabled = true
-    }
-
-    /**
-     * 截屏
-     */
-    private fun onScreenCap() {
-        if (GlobalStatus.filterEnabled) {
-            filterViewManager.pause()
-            handler.postDelayed({
-                filterViewManager.resume()
-            }, 4000)
-        }
-        handler.postDelayed({
-            triggerScreenCap()
-        }, 1200)
-    }
-
-    /**
-     * 触发屏幕截图
-     */
-    private fun triggerScreenCap() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            this.performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
-        } else {
-            if (isFirstScreenCap) {
-                Toast.makeText(this, "抱歉，Android 9.0以前的系统，需要ROOT权限才能调用截屏~", Toast.LENGTH_LONG).show()
-                isFirstScreenCap = false
-            }
-            val output = Environment.getExternalStorageDirectory().absolutePath + "/Pictures/" + System.currentTimeMillis() + ".png"
-            if (KeepShellPublic.doCmdSync("screencap -p \"$output\"") != "error") {
-                if (File(output).exists()) {
-                    Toast.makeText(this, "截图保存至 \n$output", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show()
-                }
-            } else {
-                Toast.makeText(this, "未能通过ROOT权限调用截图", Toast.LENGTH_LONG).show()
-            }
         }
     }
 

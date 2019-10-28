@@ -15,6 +15,10 @@ public class SpfConfig {
     public static String SCREEN_OFF_PAUSE = "SCREEN_OFF_PAUSE";
     public static boolean SCREEN_OFF_PAUSE_DEFAULT = true;
 
+    // 息屏关闭滤镜
+    public static String SCREEN_OFF_CLOSE = "SCREEN_OFF_CLOSE";
+    public static boolean SCREEN_OFF_CLOSE_DEFAULT = true;
+
     // 横屏优化
     public static String LANDSCAPE_OPTIMIZE = "LANDSCAPE_OPTIMIZE";
     public static boolean LANDSCAPE_OPTIMIZE_DEFAULT = true;

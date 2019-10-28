@@ -169,6 +169,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // 息屏关闭
+        lock_off.isChecked = config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)
+        lock_off.setOnClickListener {
+            config.edit().putBoolean(SpfConfig.SCREEN_OFF_CLOSE, (it as Switch).isChecked).apply()
+        }
+
+
         // 自动亮度
         val contentResolver = getContentResolver()
         auto_adjustment.isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC

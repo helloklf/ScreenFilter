@@ -51,6 +51,8 @@ class ReceiverLock(private var callbacks: Handler) : BroadcastReceiver() {
             context.applicationContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_SCREEN_ON))
             context.applicationContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_USER_PRESENT))
 
+
+
             return receiver
         }
 

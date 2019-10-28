@@ -205,6 +205,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="10dp">
+                <Switch
+                    android:id="@+id/lock_off"
+                    style="@style/option_title"
+                    android:text="@string/lock_off" />
+
+                <TextView
+                    style="@style/option_desc"
+                    android:text="@string/lock_off_desc" />
 
                 <Switch
                     android:id="@+id/hardware_acceleration"
