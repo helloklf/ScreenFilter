@@ -201,11 +201,11 @@ class FilterAccessibilityService : AccessibilityService() {
             filterViewManager.pause()
             handler.postDelayed({
                 filterViewManager.resume()
-            }, 5000)
+            }, 4000)
         }
         handler.postDelayed({
             triggerScreenCap()
-        }, 2000)
+        }, 1200)
     }
 
     /**

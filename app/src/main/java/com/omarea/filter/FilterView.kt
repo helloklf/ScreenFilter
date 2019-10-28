@@ -28,7 +28,7 @@ class FilterView : View {
         currentAlpha = 0
     }
 
-    fun setFilterColorNow(alpha: Int) {
+    fun setFilterColorNow(alpha: Int, updateView: Boolean = true) {
         var effectiveValue = alpha
         if (effectiveValue < 0) {
             effectiveValue = 0
@@ -38,7 +38,6 @@ class FilterView : View {
 
         if (this.currentAlpha != (effectiveValue / 4.4).toInt()) {
             this.currentAlpha = (effectiveValue / 4.4).toInt()
-            Log.d("currentAlpha", "" + currentAlpha)
             invalidate()
         }
     }

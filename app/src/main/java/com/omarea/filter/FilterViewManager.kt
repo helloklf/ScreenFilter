@@ -12,6 +12,7 @@ import android.view.View
 import android.view.WindowManager
 import com.omarea.filter.common.ViewHelper
 import java.util.*
+import kotlin.math.abs
 
 class FilterViewManager(private var context: Context){
     private val mWindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -86,14 +87,28 @@ class FilterViewManager(private var context: Context){
     fun pause() {
         stopUpdate()
         if (currentAlpha != 0) {
+            /*
+            // updateFilterByConfig 不太适用于这种情况
+
             val layoutParams = this.layoutParams
             if (layoutParams != null) {
                 val config = FilterViewConfig()
-                val screenBrightness = layoutParams.screenBrightness - ((currentAlpha.toFloat() / FilterViewConfig.FILTER_MAX_ALPHA) * layoutParams.screenBrightness)
+                val originBrightness = abs(layoutParams.screenBrightness)
+
+                val screenBrightness = originBrightness - ((currentAlpha.toFloat() / FilterViewConfig.FILTER_MAX_ALPHA) * originBrightness)
                 config.filterBrightness = (screenBrightness * FilterViewConfig.FILTER_BRIGHTNESS_MAX).toInt()
                 config.filterAlpha = 0
                 config.smoothChange = true
                 updateFilterByConfig(config, false)
+            }
+            */
+            val layoutParams = this.layoutParams
+            if (layoutParams != null) {
+                val originBrightness = abs(layoutParams.screenBrightness) * FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                val originAlpha = currentAlpha
+                val targetBrightness = originBrightness - ((originAlpha.toFloat() / FilterViewConfig.FILTER_MAX_ALPHA) * originBrightness)
+
+                brightnessTransAlpha(targetBrightness, originBrightness, targetBrightness)
             }
         }
         isPaused = true
@@ -102,11 +117,30 @@ class FilterViewManager(private var context: Context){
     fun resume() {
         isPaused = false
         stopUpdate()
-        layoutParams?.run {
-            if (lastFilterViewConfig != null) {
-                lastFilterViewConfig?.smoothChange = true
-                updateFilterByConfig(lastFilterViewConfig!!)
+        if (layoutParams != null && lastFilterViewConfig != null) {
+            brightnessTransAlpha(filterBrightness.toFloat(), filterBrightness.toFloat(), lastFilterViewConfig!!.filterBrightness.toFloat())
+        }
+    }
+
+    private fun brightnessTransAlpha(absBrightness:Float, originBrightness:Float, targetBrightness: Float) {
+        val layoutParams = this.layoutParams
+        if (layoutParams != null) {
+            val distanceBrightness = originBrightness - targetBrightness
+
+            val alphaFrames = LinkedList<Int>()
+            val brightnessFrames = LinkedList<Int>()
+
+            val frames = 35
+            val stepBrightness = distanceBrightness / frames
+            for (i in 1 .. frames) {
+                val b = (originBrightness - (stepBrightness * i)).toInt()
+                brightnessFrames.add(b)
+                val alpha = 1 - (absBrightness / b)
+                alphaFrames.add((alpha * FilterViewConfig.FILTER_MAX_ALPHA).toInt())
+                Log.d("alphaTransBrightness", "$b ${alphaFrames.last}")
             }
+
+            playFrames(alphaFrames, brightnessFrames, 1000)
         }
     }
 
@@ -134,6 +168,7 @@ class FilterViewManager(private var context: Context){
         }
     }
 
+    // 停止正在运行的滤镜更新动画
     private fun stopUpdate() {
         if (valueAnimator != null && valueAnimator!!.isRunning) {
             valueAnimator!!.cancel()
@@ -141,7 +176,7 @@ class FilterViewManager(private var context: Context){
         }
     }
 
-    // TODO: 注意异常处理
+    // 使用平滑的动画更新滤镜
     private fun smoothUpdateFilter(filterViewConfig: FilterViewConfig) {
         stopUpdate()
         val layoutParams = this.layoutParams!!
@@ -169,7 +204,7 @@ class FilterViewManager(private var context: Context){
             alphaFrames.add(toAlpha)
         }
 
-        val currentBrightness = (Math.abs(layoutParams.screenBrightness) * 1000).toInt()
+        val currentBrightness = (Math.abs(layoutParams.screenBrightness) * FilterViewConfig.FILTER_BRIGHTNESS_MAX).toInt()
         val toBrightness = filterViewConfig.filterBrightness
         var brightnessFrameCount:Int
         val brightnessFrames = LinkedList<Int>()
@@ -191,15 +226,21 @@ class FilterViewManager(private var context: Context){
             brightnessFrames.add(toBrightness)
         }
 
+        playFrames(alphaFrames, brightnessFrames)
+    }
+
+    private fun playFrames(alphaFrames: LinkedList<Int>,brightnessFrames: LinkedList<Int>, durationMS: Long = 2000L) {
+        stopUpdate()
+
+        val layoutParams = this.layoutParams!!
         val frames = if (alphaFrames.size > brightnessFrames.size) alphaFrames.size else brightnessFrames.size
         if (frames == 0) {
             return
         }
         var frame = 0
-
         valueAnimator = ValueAnimator.ofInt(frame, frames)
         valueAnimator!!.run {
-            duration = 2000L
+            duration = durationMS
             addUpdateListener { animation ->
                 val value = animation.animatedValue as Int
                 if (value != frame) {
@@ -210,7 +251,7 @@ class FilterViewManager(private var context: Context){
                     if (alpha != null) {
                         currentAlpha = alpha
                         filterView?.run {
-                            filterView?.setFilterColorNow(currentAlpha)
+                            filterView?.setFilterColorNow(currentAlpha, brightness == null)
                         }
                     }
 
@@ -229,6 +270,7 @@ class FilterViewManager(private var context: Context){
         }
     }
 
+    // 快速更新滤镜 而不是使用动画
     private fun fastUpdateFilter(filterViewConfig: FilterViewConfig) {
         stopUpdate()
 
