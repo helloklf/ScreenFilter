@@ -8,6 +8,8 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
+import android.provider.Settings
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import com.omarea.filter.*
@@ -36,6 +38,8 @@ class FilterAccessibilityService : AccessibilityService() {
 
     // 是否是首次更新屏幕滤镜
     private var isFirstUpdate = false
+
+    private var isAutoBrightness = false
 
     // 计算平滑亮度的定时器
     private var smoothLightTimer: Timer? = null
@@ -97,6 +101,16 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
+    private fun filterRefresh() {
+        if (isAutoBrightness) {
+            lightHistory.lastOrNull()?.run {
+                updateFilterByLux(this.lux)
+            }
+        } else {
+            onBrightnessChanged(Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS))
+        }
+    }
+
     /**
      * 系统亮度改变时触发
      */
@@ -155,22 +169,21 @@ class FilterAccessibilityService : AccessibilityService() {
         }, {
             screenOn = true
             if (GlobalStatus.filterEnabled) {
-                lightHistory.lastOrNull()?.run {
-                    lightHistory.clear()
-                    updateFilterByLux(this.lux)
-                }
+                filterRefresh()
+                lightHistory.clear()
             }
         }))
 
         if (lightSensorWatcher == null) {
             lightSensorWatcher = LightSensorWatcher(this, object : LightHandler {
                 override fun onModeChange(auto: Boolean) {
+                    isAutoBrightness = auto
                     if (auto) {
                         startSmoothLightTimer()
-                        Toast.makeText(this@FilterAccessibilityService, "滤镜切换到“自动亮度”", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@FilterAccessibilityService, getString(R.string.filter_mode_auto), Toast.LENGTH_LONG).show()
                     } else {
                         stopSmoothLightTimer()
-                        Toast.makeText(this@FilterAccessibilityService, "滤镜切换到“手动亮度”", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@FilterAccessibilityService, getString(R.string.filter_mode_manual), Toast.LENGTH_LONG).show()
                     }
                 }
 
@@ -186,7 +199,9 @@ class FilterAccessibilityService : AccessibilityService() {
 
         lightSensorWatcher?.startSystemConfigWatcher()
 
-        GlobalStatus.filterRefresh = Runnable { updateFilterByLux(GlobalStatus.currentLux) }
+        GlobalStatus.filterRefresh = Runnable {
+            filterRefresh()
+        }
 
         GlobalStatus.screenCap = Runnable { onScreenCap() }
 

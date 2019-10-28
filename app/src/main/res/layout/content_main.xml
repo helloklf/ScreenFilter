@@ -119,7 +119,6 @@
                 <Switch
                     android:id="@+id/auto_adjustment"
                     style="@style/option_title"
-                    android:enabled="false"
                     android:text="@string/auto_adjustment" />
 
                 <TextView

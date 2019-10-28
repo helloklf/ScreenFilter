@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Checkable
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.Toast
@@ -169,7 +170,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 自动亮度
-        auto_adjustment.isChecked = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+        val contentResolver = getContentResolver()
+        auto_adjustment.isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+        auto_adjustment.setOnClickListener {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(this)) {
+                val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE,  Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+                if (current == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                    Settings.System.putInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+                } else {
+                    Settings.System.putInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
+                }
+            } else {
+                it.isEnabled = true
+                Toast.makeText(this, getString(R.string.write_settings_unallowed), Toast.LENGTH_LONG).show()
+                (it as Checkable).isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+            }
+        }
     }
 
     private fun restartFilter() {

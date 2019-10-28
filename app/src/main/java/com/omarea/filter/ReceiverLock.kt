@@ -22,7 +22,6 @@ class ReceiverLock(private var callbacks: Handler) : BroadcastReceiver() {
                 try {
                     callbacks.sendMessage(callbacks.obtainMessage(8))
                 } catch (ex: Exception) {
-                    System.out.print(">>>>>" + ex.message)
                 }
             }
             Intent.ACTION_USER_PRESENT,
@@ -31,7 +30,6 @@ class ReceiverLock(private var callbacks: Handler) : BroadcastReceiver() {
                 try {
                     callbacks.sendMessage(callbacks.obtainMessage(7))
                 } catch (ex: Exception) {
-                    System.out.print(">>>>>" + ex.message)
                 }
             }
         }
