@@ -19,6 +19,7 @@ import android.widget.Checkable
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.Toast
+import com.omarea.filter.common.NotificationHelper
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
 
@@ -180,17 +181,46 @@ class MainActivity : AppCompatActivity() {
         val contentResolver = getContentResolver()
         auto_adjustment.isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
         auto_adjustment.setOnClickListener {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(this)) {
-                val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE,  Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(this)) {
+                val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
                 if (current == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                    Settings.System.putInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
                 } else {
-                    Settings.System.putInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
+                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
                 }
             } else {
                 it.isEnabled = true
                 Toast.makeText(this, getString(R.string.write_settings_unallowed), Toast.LENGTH_LONG).show()
                 (it as Checkable).isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+            }
+        }
+
+        // 亮度控制通知
+        brightness_controller.isChecked = config.getBoolean(SpfConfig.BRIGHTNESS_CONTROLLER, SpfConfig.BRIGHTNESS_CONTROLLER_DEFAULT)
+        brightness_controller.setOnClickListener {
+            val checkable = it as Checkable
+            if (checkable.isChecked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (!Settings.System.canWrite(this)) {
+                        Toast.makeText(this, getString(R.string.write_settings_unallowed), Toast.LENGTH_SHORT).show()
+                        checkable.isChecked = false
+                    }
+                } else {
+                    Toast.makeText(this, getString(R.string.write_settings_unsupported), Toast.LENGTH_SHORT).show()
+                    checkable.isChecked = false
+                }
+            } else {
+                NotificationHelper(this).cancelNotification()
+            }
+            config.edit().putBoolean(SpfConfig.BRIGHTNESS_CONTROLLER, checkable.isChecked).apply()
+
+            try {
+                if (checkable.isChecked
+                        && GlobalStatus.filterEnabled
+                        && Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL) {
+                    NotificationHelper(this).updateNotification()
+                }
+            } catch (ex: java.lang.Exception) {
             }
         }
     }

@@ -83,6 +83,20 @@ class FilterViewManager(private var context: Context){
         }
     }
 
+    fun updateSize() {
+        val params = layoutParams
+        params?.run {
+            val p = Point()
+            display.getRealSize(p)
+            var maxSize = p.y
+            if (p.x > maxSize) {
+                maxSize = p.x
+            }
+            width = maxSize + viewHelper.getNavBarHeight() // p.x // 直接按屏幕最大宽度x最大宽度显示，避免屏幕旋转后盖不住全屏
+            height = maxSize + viewHelper.getNavBarHeight()
+            mWindowManager.updateViewLayout(popupView, params)
+        }
+    }
 
     fun pause() {
         stopUpdate()
@@ -137,7 +151,6 @@ class FilterViewManager(private var context: Context){
                 brightnessFrames.add(b)
                 val alpha = 1 - (absBrightness / b)
                 alphaFrames.add((alpha * FilterViewConfig.FILTER_MAX_ALPHA).toInt())
-                Log.d("alphaTransBrightness", "$b ${alphaFrames.last}")
             }
 
             playFrames(alphaFrames, brightnessFrames, 1000)
@@ -157,9 +170,6 @@ class FilterViewManager(private var context: Context){
                } else {
                    fastUpdateFilter(filterViewConfig)
                }
-
-               GlobalStatus.currentFilterAlpah = filterViewConfig.filterAlpha
-               GlobalStatus.currentFilterBrightness = filterBrightness
            }
 
             if (backup) {
@@ -263,6 +273,8 @@ class FilterViewManager(private var context: Context){
                         }
                         mWindowManager.updateViewLayout(popupView, layoutParams)
                         filterBrightness = brightness
+                        GlobalStatus.currentFilterBrightness = brightness
+                        GlobalStatus.currentFilterAlpah = currentAlpha
                     }
                 }
             }
@@ -284,12 +296,12 @@ class FilterViewManager(private var context: Context){
             } else {
                 layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
             }
-            filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
-            popupView!!.postDelayed({
-                mWindowManager.updateViewLayout(popupView, layoutParams)
-            }, 100)
+            filterView!!.setFilterColorNow(filterViewConfig.filterAlpha, false)
+            mWindowManager.updateViewLayout(popupView, layoutParams)
 
             filterBrightness = filterViewConfig.filterBrightness
+            GlobalStatus.currentFilterBrightness = filterBrightness
+            GlobalStatus.currentFilterAlpah = currentAlpha
         }
     }
 }

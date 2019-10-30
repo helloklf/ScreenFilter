@@ -59,7 +59,6 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
 
             // FIXME:已知部分手机，即使环境亮度没改变也可能会疯狂报告亮度 - 比如说三星S8，这可咋整呢？
             override fun onSensorChanged(event: SensorEvent?) {
-                Log.d("onSensorChanged", "")
                 if (event != null && event.values.size > 0) {
 
                     // 获取光线强度
@@ -79,17 +78,18 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
         lightSensorManager.stop()
     }
 
-    public fun startSystemConfigWatcher() {
+    fun startSystemConfigWatcher() {
         getSystemConfig()
 
-        if (systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+        val auto = systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+
+        lightHandler.onModeChange(auto)
+        if (auto) {
             start()
         } else {
-            lightHandler.onBrightnessChange(systemBrightness)
             stop()
+            lightHandler.onBrightnessChange(systemBrightness)
         }
-
-        lightHandler.onModeChange(systemBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
 
         val contentResolver = context.contentResolver
 
@@ -98,7 +98,7 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
         contentResolver.registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
     }
 
-    public fun stopSystemConfigWatcher() {
+    fun stopSystemConfigWatcher() {
         stop()
         val contentResolver = context.contentResolver
 

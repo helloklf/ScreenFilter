@@ -206,6 +206,15 @@
                 android:orientation="vertical"
                 android:padding="10dp">
                 <Switch
+                    android:id="@+id/brightness_controller"
+                    style="@style/option_title"
+                    android:text="@string/brightness_controller" />
+
+                <TextView
+                    style="@style/option_desc"
+                    android:text="@string/brightness_controller_desc" />
+
+                <Switch
                     android:id="@+id/lock_off"
                     style="@style/option_title"
                     android:text="@string/lock_off" />

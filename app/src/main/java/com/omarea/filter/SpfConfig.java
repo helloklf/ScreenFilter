@@ -9,7 +9,7 @@ public class SpfConfig {
 
     // 平滑亮度
     public static String SMOOTH_ADJUSTMENT = "SMOOTH_ADJUSTMENT";
-    public static boolean SMOOTH_ADJUSTMENT_DEFAULT = false;
+    public static boolean SMOOTH_ADJUSTMENT_DEFAULT = true;
 
     // 息屏暂停
     public static String SCREEN_OFF_PAUSE = "SCREEN_OFF_PAUSE";
@@ -46,4 +46,8 @@ public class SpfConfig {
     // 硬件加速
     public static String HARDWARE_ACCELERATED = "HARDWARE_ACCELERATED";
     public static boolean HARDWARE_ACCELERATED_DEFAULT = true;
+
+    // 通知中心显示亮度控制器
+    public static String BRIGHTNESS_CONTROLLER = "BRIGHTNESS_CONTROLLER";
+    public static boolean BRIGHTNESS_CONTROLLER_DEFAULT = false;
 }

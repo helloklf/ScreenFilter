@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="40dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageButton
+        android:background="@android:color/transparent"
+        android:id="@+id/brightness_minus"
+        android:tint="@color/notice_color_bg"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:padding="0dp"
+        android:scaleType="centerInside"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/minus" />
+
+    <FrameLayout
+        android:layout_height="8dp"
+        android:layout_weight="1"
+        android:layout_width="0dp">
+        <ProgressBar
+            android:id="@+id/brightness_current"
+            android:progressDrawable="@drawable/progress_shape"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
+
+    <ImageButton
+        android:background="@android:color/transparent"
+        android:layout_marginStart="10dp"
+        android:padding="0dp"
+        android:tint="@color/colorAccent"
+        android:scaleType="centerInside"
+        android:src="@drawable/plus"
+        android:id="@+id/brightness_plus"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
+</LinearLayout>
