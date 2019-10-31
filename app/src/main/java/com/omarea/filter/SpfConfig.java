@@ -17,7 +17,7 @@ public class SpfConfig {
 
     // 息屏关闭滤镜
     public static String SCREEN_OFF_CLOSE = "SCREEN_OFF_CLOSE";
-    public static boolean SCREEN_OFF_CLOSE_DEFAULT = true;
+    public static boolean SCREEN_OFF_CLOSE_DEFAULT = false;
 
     // 横屏优化
     public static String LANDSCAPE_OPTIMIZE = "LANDSCAPE_OPTIMIZE";
