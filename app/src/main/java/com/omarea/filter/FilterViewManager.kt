@@ -263,6 +263,7 @@ class FilterViewManager(private var context: Context){
                         filterView?.run {
                             filterView?.setFilterColorNow(currentAlpha, brightness == null)
                         }
+                        GlobalStatus.currentFilterAlpah = currentAlpha
                     }
 
                     if (brightness != null) {
@@ -274,7 +275,6 @@ class FilterViewManager(private var context: Context){
                         mWindowManager.updateViewLayout(popupView, layoutParams)
                         filterBrightness = brightness
                         GlobalStatus.currentFilterBrightness = brightness
-                        GlobalStatus.currentFilterAlpah = currentAlpha
                     }
                 }
             }
