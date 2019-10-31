@@ -60,8 +60,10 @@ class ReceiverLock(private var callbacks: Handler) : BroadcastReceiver() {
             if (receiver == null) {
                 return
             }
-            context.applicationContext.unregisterReceiver(receiver)
-            receiver = null
+            try {
+                context.applicationContext.unregisterReceiver(receiver)
+                receiver = null
+            } catch (ex: java.lang.Exception) {}
         }
     }
 }

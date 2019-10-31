@@ -10,5 +10,5 @@
 
     <color name="black_overlay">#66000000</color>
     <color name="notice_color_bg">#66888888</color>
-    <color name="notice_color_fg">#8BC34A</color>
+    <color name="notice_color_fg">#88888888</color>
 </resources>

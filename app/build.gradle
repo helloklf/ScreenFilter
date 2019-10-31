@@ -10,8 +10,8 @@ android {
         applicationId "com.omarea.filter"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 50
-        versionName "1.2.0"
+        versionCode 52
+        versionName "1.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -19,10 +19,11 @@ android {
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            debuggable = false
+            debuggable = true
         }
         debug {
             minifyEnabled false
+            debuggable = true
         }
     }
 }

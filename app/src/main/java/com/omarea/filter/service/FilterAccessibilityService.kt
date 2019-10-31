@@ -182,8 +182,14 @@ class FilterAccessibilityService : AccessibilityService() {
         }
 
         notificationHelper?.cancelNotification()
-        brightnessControlerBroadcast?.run {
-            unregisterReceiver(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            brightnessControlerBroadcast?.run {
+                try {
+                    unregisterReceiver(this)
+                } catch (ex: java.lang.Exception){
+
+                }
+            }
         }
     }
 

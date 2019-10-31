@@ -69,7 +69,7 @@
     <string name="write_settings_unallowed">本应用没有修改系统设置的权限，请通过系统的“自动亮度开关进行切换”</string>
     <string name="write_settings_unsupported">本功能不支持Android M(6.0)以前的系统！</string>
     <string name="lock_off">息屏关闭滤镜</string>
-    <string name="lock_off_desc">为了AOD，息屏/锁屏时关闭滤镜</string>
+    <string name="lock_off_desc">为了AOD，[息屏/锁屏] 时关闭滤镜</string>
     <string name="channel_brightness_controller_text">亮度控制</string>
     <string name="channel_brightness_controller">brightness_controller</string>
 
@@ -77,5 +77,5 @@
     <string name="action_plus">com.omarea.filter.brightness.changed.plus</string>
 
     <string name="brightness_controller">亮度控制器</string>
-    <string name="brightness_controller_desc">手动亮度时，在显示亮度调节通知</string>
+    <string name="brightness_controller_desc">手动控制亮度时，显示亮度调节通知</string>
 </resources>

@@ -35,7 +35,7 @@
         android:background="@android:color/transparent"
         android:layout_marginStart="10dp"
         android:padding="0dp"
-        android:tint="@color/colorAccent"
+        android:tint="@color/notice_color_bg"
         android:scaleType="centerInside"
         android:src="@drawable/plus"
         android:id="@+id/brightness_plus"
