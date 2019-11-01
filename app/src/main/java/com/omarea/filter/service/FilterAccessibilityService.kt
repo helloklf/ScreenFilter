@@ -413,6 +413,10 @@ class FilterAccessibilityService : AccessibilityService() {
             return
         }
 
-        notificationHelper?.updateNotification()
+        if (config.getBoolean(SpfConfig.BRIGHTNESS_CONTROLLER, SpfConfig.BRIGHTNESS_CONTROLLER_DEFAULT)) {
+            notificationHelper?.updateNotification()
+        } else {
+            // notificationHelper?.cancelNotification()
+        }
     }
 }
