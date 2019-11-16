@@ -6,6 +6,7 @@ public class SpfConfig {
     // 亮度偏移量（1表示1%,100表示100%）
     public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET_V2";
     public static int BRIGTHNESS_OFFSET_DEFAULT = 0;
+    public static int BRIGTHNESS_OFFSET_LEVELS = 50;
 
     // 平滑亮度
     public static String SMOOTH_ADJUSTMENT = "SMOOTH_ADJUSTMENT";

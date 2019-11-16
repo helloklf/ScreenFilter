@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.provider.Settings
 import android.support.v4.app.NotificationCompat
-import android.util.Log
 import android.widget.RemoteViews
 import com.omarea.filter.R
 import com.omarea.filter.SpfConfig
@@ -21,38 +20,46 @@ class NotificationHelper(private var context: Context) {
     private var channelCreated = false
     private val uniqueID = 101
 
-    fun updateNotification() {
+    companion object {
+        private var toticeVisible = false
+    }
+
+    fun updateNotification(autoMode: Boolean = true) {
         val minus = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_minus)), 0);
         val plus = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_plus)), 0);
 
-        /*
-         * 通知布局如果使用自定义布局文件中的话要通过RemoteViews类来实现，
-         * 其实无论是使用系统提供的布局还是自定义布局，都是通过RemoteViews类实现，如果使用系统提供的布局，
-         * 系统会默认提供一个RemoteViews对象。如果使用自定义布局的话这个RemoteViews对象需要我们自己创建，
-         * 并且加入我们需要的对应的控件事件处理，然后通过setContent(RemoteViews remoteViews)方法传参实现
-         */
         val remoteViews = RemoteViews(context.getPackageName(), R.layout.notification);
-        /*
-         * 对于自定义布局文件中的控件通过RemoteViews类的对象进行事件处理
-         */
         remoteViews.setOnClickPendingIntent(R.id.brightness_minus, minus);
         remoteViews.setOnClickPendingIntent(R.id.brightness_plus, plus);
-        var current = 0
+
         val config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
-        var max = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT)
+        if (autoMode) {
+            val brightnessManual = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_manual)), 0);
+            remoteViews.setOnClickPendingIntent(R.id.brightness_auto_manual, brightnessManual)
+            val levels = SpfConfig.BRIGTHNESS_OFFSET_LEVELS
+            remoteViews.setProgressBar(R.id.brightness_current, levels, (config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) + (levels / 2)), false)
+            remoteViews.setImageViewResource(R.id.brightness_auto_manual, R.drawable.brightness_auto)
+        } else {
+            val brightnessAuto = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_auto)), 0);
+            remoteViews.setOnClickPendingIntent(R.id.brightness_auto_manual, brightnessAuto)
+            remoteViews.setImageViewResource(R.id.brightness_auto_manual, R.drawable.brightness_manual)
 
-        try {
-            val contentResolver = context.contentResolver
-            current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
-        } catch (ex: Exception) {
+            var current = 0
+            var max = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT)
+
+            try {
+                val contentResolver = context.contentResolver
+                current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+            } catch (ex: Exception) {
+            }
+
+            if (current > max && current < 2048) {
+                max = 2047
+                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, max).apply()
+            }
+
+            remoteViews.setProgressBar(R.id.brightness_current, if (current > max) current else max, current, false)
         }
-
-        if (current > max && current < 2048) {
-            max = 2047
-            config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, max).apply()
-        }
-
-        remoteViews.setProgressBar(R.id.brightness_current, if (current > max) current else max, current, false)
 
         val notificationBuilder = NotificationCompat.Builder(context)
                 .setContentTitle(context.getString(R.string.app_name)) // 创建通知的标题
@@ -84,10 +91,12 @@ class NotificationHelper(private var context: Context) {
         notification!!.flags = Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
 
         notificationManager.notify(uniqueID, notification); // 发送通知
-        Log.d("bNotification", "---" + max + "  " + current)
+
+        toticeVisible = true
     }
 
     fun cancelNotification() {
         notificationManager.cancel(uniqueID)
+        toticeVisible = false
     }
 }

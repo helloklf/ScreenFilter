@@ -10,6 +10,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 
+import com.omarea.filter.GlobalStatus;
 import com.omarea.filter.R;
 import com.omarea.filter.SpfConfig;
 
@@ -34,9 +35,17 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
                         brightnessMinus(context);
                     } else if (action.equals(context.getString(R.string.action_plus))) {
                         brightnessPlus(context);
+                    } else if (action.equals(context.getString(R.string.action_auto))) {
+                        brightnessAutoMode(context);
                     }
                 } else {
-                    Toast.makeText(context, "自动亮度模式下，无法手动调节亮度", Toast.LENGTH_LONG).show();
+                    if (action.equals(context.getString(R.string.action_minus))) {
+                        offsetMinus(context);
+                    } else if (action.equals(context.getString(R.string.action_plus))) {
+                        offsetPlus(context);
+                    } else if (action.equals(context.getString(R.string.action_manual))) {
+                        brightnessManualMode(context);
+                    }
                 }
             } catch (Exception ignored) { }
         }
@@ -124,5 +133,45 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
                 }
             }
         } catch (Exception ex) {}
+    }
+
+    private void brightnessManualMode(Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        try {
+            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+        } catch (Exception ex) {
+        }
+    }
+
+    private void brightnessAutoMode(Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        try {
+            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+        } catch (Exception ex) {
+        }
+    }
+
+    private void offsetMinus(Context context) {
+        SharedPreferences config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE);
+        int currentValue = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT);
+        if (currentValue > SpfConfig.BRIGTHNESS_OFFSET_LEVELS / -2) {
+            config.edit().putInt(SpfConfig.BRIGTHNESS_OFFSET, currentValue - 1).apply();
+            Runnable runnable = GlobalStatus.INSTANCE.getFilterRefresh();
+            if (runnable != null) {
+                runnable.run();
+            }
+        }
+    }
+
+    private void offsetPlus(Context context) {
+        SharedPreferences config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE);
+        int currentValue = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT);
+        if (currentValue < SpfConfig.BRIGTHNESS_OFFSET_LEVELS / 2) {
+            config.edit().putInt(SpfConfig.BRIGTHNESS_OFFSET, currentValue + 1).apply();
+            Runnable runnable = GlobalStatus.INSTANCE.getFilterRefresh();
+            if (runnable != null) {
+                runnable.run();
+            }
+        }
     }
 }

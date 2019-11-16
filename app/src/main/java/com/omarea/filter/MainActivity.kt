@@ -117,6 +117,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 屏幕滤镜强度偏移量
+        brightness_offset.max = SpfConfig.BRIGTHNESS_OFFSET_LEVELS
         brightness_offset.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -248,6 +249,8 @@ class MainActivity : AppCompatActivity() {
                 filter_light.text = "×"
             }
             filter_alpha.text = ((GlobalStatus.currentFilterAlpah * 1000 / FilterViewConfig.FILTER_MAX_ALPHA).toInt() / 10.0).toString() + "%"
+
+            brightness_offset.progress = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) + (brightness_offset.max / 2)
         }
     }
 

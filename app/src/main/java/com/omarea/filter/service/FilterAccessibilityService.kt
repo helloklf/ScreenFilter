@@ -92,7 +92,7 @@ class FilterAccessibilityService : AccessibilityService() {
             screenOn = true
             if ((!GlobalStatus.filterEnabled) && config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)) {
                 filterOpen()
-            } else {
+            } else if (GlobalStatus.filterEnabled) {
                 filterRefresh()
                 lightHistory.clear()
             }
@@ -103,11 +103,10 @@ class FilterAccessibilityService : AccessibilityService() {
                 isAutoBrightness = auto
                 if (auto) {
                     startSmoothLightTimer()
-                    notificationHelper?.cancelNotification()
                 } else {
                     stopSmoothLightTimer()
-                    updateNotification()
                 }
+                updateNotification()
             }
             override fun onBrightnessChange(brightness: Int) { onBrightnessChanged(brightness) }
             override fun onLuxChange(currentLux: Float) { onLuxChanged(currentLux) }
@@ -164,11 +163,20 @@ class FilterAccessibilityService : AccessibilityService() {
         brightnessControlerBroadcast?.run {
             registerReceiver(this, IntentFilter(getString(R.string.action_minus)))
             registerReceiver(this, IntentFilter(getString(R.string.action_plus)))
+            registerReceiver(this, IntentFilter(getString(R.string.action_auto)))
+            registerReceiver(this, IntentFilter(getString(R.string.action_manual)))
         }
+        updateNotification()
     }
 
     private fun filterClose() {
         try {
+            val config = FilterViewConfig()
+            config.smoothChange = false
+            config.filterBrightness = 1
+
+            filterViewManager.updateFilterByConfig(config)
+
             lightSensorWatcher?.stopSystemConfigWatcher()
 
             filterViewManager.close()
@@ -202,6 +210,7 @@ class FilterAccessibilityService : AccessibilityService() {
             } else {
                 onBrightnessChanged(Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS))
             }
+            updateNotification()
         }
     }
 
@@ -411,14 +420,10 @@ class FilterAccessibilityService : AccessibilityService() {
 
     // 更新通知
     private fun updateNotification() {
-        if (isAutoBrightness) {
-            return
-        }
-
         if (config.getBoolean(SpfConfig.BRIGHTNESS_CONTROLLER, SpfConfig.BRIGHTNESS_CONTROLLER_DEFAULT)) {
-            notificationHelper?.updateNotification()
+            notificationHelper?.updateNotification(isAutoBrightness)
         } else {
-            // notificationHelper?.cancelNotification()
+            notificationHelper?.cancelNotification()
         }
     }
 }

@@ -75,6 +75,8 @@
 
     <string name="action_minus">com.omarea.filter.brightness.changed.minus</string>
     <string name="action_plus">com.omarea.filter.brightness.changed.plus</string>
+    <string name="action_manual">com.omarea.filter.brightness.changed.manual</string>
+    <string name="action_auto">com.omarea.filter.brightness.changed.auto</string>
 
     <string name="brightness_controller">亮度控制器</string>
     <string name="brightness_controller_desc">手动控制亮度时，显示亮度调节通知</string>

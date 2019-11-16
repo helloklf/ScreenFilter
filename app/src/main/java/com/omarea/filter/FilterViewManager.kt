@@ -10,7 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import com.omarea.filter.common.ViewHelper
-import java.util.*
+import java.lang.Exception
 import kotlin.math.abs
 
 class FilterViewManager(private var context: Context) {
@@ -387,22 +387,35 @@ class FilterViewManager(private var context: Context) {
     private fun fastUpdateFilter(filterViewConfig: FilterViewConfig) {
         stopUpdate()
 
-        filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
-        currentAlpha = filterViewConfig.filterAlpha
+        // 为了避免亮度调高导致亮瞎眼，优先降低亮度
+        if (currentAlpha < filterViewConfig.filterAlpha) {
+            filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
+            currentAlpha = filterViewConfig.filterAlpha
+        }
 
-        if (filterViewConfig.filterBrightness != filterBrightness) {
+        val to = if (filterViewConfig.filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+            FilterViewConfig.FILTER_BRIGHTNESS_MAX
+        } else {
+            filterViewConfig.filterBrightness
+        }
+
+        try {
             val layoutParams = this.layoutParams!!
-            if (filterViewConfig.filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+            if (to >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
                 layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
             } else {
                 layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
             }
-            filterView!!.setFilterColorNow(filterViewConfig.filterAlpha, false)
+            filterBrightness = to
             mWindowManager.updateViewLayout(popupView, layoutParams)
-
-            filterBrightness = filterViewConfig.filterBrightness
-            GlobalStatus.currentFilterBrightness = filterBrightness
-            GlobalStatus.currentFilterAlpah = currentAlpha
+            if (currentAlpha != filterViewConfig.filterAlpha) {
+                filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
+                currentAlpha = filterViewConfig.filterAlpha
+            }
+        } catch (ex: Exception){
         }
+
+        GlobalStatus.currentFilterBrightness = filterBrightness
+        GlobalStatus.currentFilterAlpah = currentAlpha
     }
 }
