@@ -217,7 +217,7 @@ class FilterAccessibilityService : AccessibilityService() {
         }
         handler.postDelayed({
             triggerScreenCap()
-        }, 1200)
+        }, 1050)
     }
 
     /**
@@ -269,8 +269,6 @@ class FilterAccessibilityService : AccessibilityService() {
      * 周围光线发生变化时触发
      */
     private fun onLuxChanged(currentLux: Float) {
-        updateFilterByLux(currentLux)
-
         val history = LightHistory()
         history.run {
             time = System.currentTimeMillis()
@@ -282,6 +280,10 @@ class FilterAccessibilityService : AccessibilityService() {
         }
 
         lightHistory.add(history)
+
+        if (isFirstUpdate) {
+            updateFilterByLux(currentLux)
+        }
 
         startSmoothLightTimer()
     }
@@ -337,8 +339,6 @@ class FilterAccessibilityService : AccessibilityService() {
         try {
             if (lightHistory.size > 0) {
                 if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
-                    updateFilterByLux(lightHistory.last().lux)
-                } else {
                     val currentTime = System.currentTimeMillis()
                     val result = lightHistory.filter { (currentTime - it.time) < 11000 }
 
@@ -353,6 +353,8 @@ class FilterAccessibilityService : AccessibilityService() {
                         avgLux = lightHistory.last().lux
                     }
                     updateFilterByLux(avgLux)
+                } else {
+                    updateFilterByLux(lightHistory.last().lux)
                 }
             }
         } catch (ex: Exception) {

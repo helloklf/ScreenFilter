@@ -65,14 +65,15 @@ class NotificationHelper(private var context: Context) {
                 //.setDefaults(Notification.DEFAULT_ALL)  // 设置通知提醒方式为系统默认的提醒方式
                 .setAutoCancel(true)
                 .setWhen(System.currentTimeMillis())
-                .setSound(null)
-                .setVibrate(null)
                 .setContent(remoteViews) // 通过设置RemoteViews对象来设置通知的布局，这里我们设置为自定义布局
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!channelCreated) {
                 val channel = NotificationChannel(channelId, context.getString(R.string.channel_brightness_controller_text), NotificationManager.IMPORTANCE_DEFAULT)
+                channel.enableVibration(false)
+                channel.enableLights(false)
+                channel.setSound(null, null)
                 notificationManager.createNotificationChannel(channel)
             }
             channelCreated = true
