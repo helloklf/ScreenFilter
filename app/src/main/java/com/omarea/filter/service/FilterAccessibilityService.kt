@@ -84,15 +84,20 @@ class FilterAccessibilityService : AccessibilityService() {
         }
 
         receiverLock = ReceiverLock.autoRegister(this, ScreenEventHandler({
-            screenOn = false
-            if (config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
-                filterClose()
+            // 为啥已经监听到息屏了还要手动判断屏幕状态呢？
+            // 因为，丢特么的的，在某些手机上，
+            // 使用电源键快速息屏，并用指纹立即解锁（息屏时间不超过5秒）的话，息屏广播会在解锁广播之后发送
+            if (!ScreenState(this).isScreenOn()) {
+                screenOn = false
+                if (config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
+                    filterClose()
+                }
             }
         }, {
             screenOn = true
             if ((!GlobalStatus.filterEnabled) && config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)) {
                 filterOpen()
-            } else if (GlobalStatus.filterEnabled) {
+            } else if (GlobalStatus.filterEnabled && !config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
                 filterRefresh()
                 lightHistory.clear()
             }
@@ -144,58 +149,61 @@ class FilterAccessibilityService : AccessibilityService() {
     override fun onInterrupt() {}
 
     private fun filterOpen() {
-        isFirstUpdate = true
+        synchronized(GlobalStatus.filterEnabled) {
+            isFirstUpdate = true
 
-        filterViewManager.open()
+            filterViewManager.open()
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-            screenOn = ScreenState(this).isScreenOn()
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+                screenOn = ScreenState(this).isScreenOn()
+            }
+
+            lightSensorWatcher?.startSystemConfigWatcher()
+
+            GlobalStatus.filterRefresh = Runnable { filterRefresh() }
+
+            GlobalStatus.screenCap = Runnable { onScreenCap() }
+
+            GlobalStatus.filterEnabled = true
+
+            brightnessControlerBroadcast?.run {
+                registerReceiver(this, IntentFilter(getString(R.string.action_minus)))
+                registerReceiver(this, IntentFilter(getString(R.string.action_plus)))
+                registerReceiver(this, IntentFilter(getString(R.string.action_auto)))
+                registerReceiver(this, IntentFilter(getString(R.string.action_manual)))
+            }
+            updateNotification()
         }
-
-        lightSensorWatcher?.startSystemConfigWatcher()
-
-        GlobalStatus.filterRefresh = Runnable { filterRefresh() }
-
-        GlobalStatus.screenCap = Runnable { onScreenCap() }
-
-        GlobalStatus.filterEnabled = true
-
-        brightnessControlerBroadcast?.run {
-            registerReceiver(this, IntentFilter(getString(R.string.action_minus)))
-            registerReceiver(this, IntentFilter(getString(R.string.action_plus)))
-            registerReceiver(this, IntentFilter(getString(R.string.action_auto)))
-            registerReceiver(this, IntentFilter(getString(R.string.action_manual)))
-        }
-        updateNotification()
     }
 
     private fun filterClose() {
-        try {
-            val config = FilterViewConfig()
-            config.smoothChange = false
-            config.filterBrightness = 1
+        synchronized(GlobalStatus.filterEnabled) {
+            try {
+                val config = FilterViewConfig()
+                config.smoothChange = false
+                config.filterBrightness = 1
 
-            filterViewManager.updateFilterByConfig(config)
+                filterViewManager.updateFilterByConfig(config)
 
-            lightSensorWatcher?.stopSystemConfigWatcher()
+                lightSensorWatcher?.stopSystemConfigWatcher()
 
-            filterViewManager.close()
+                filterViewManager.close()
 
-            GlobalStatus.filterRefresh = null
-            GlobalStatus.filterEnabled = false
-            lightHistory.clear()
-            stopSmoothLightTimer()
-            filterBrightness = -1
-        } catch (ex: Exception) {
-        }
+                GlobalStatus.filterRefresh = null
+                GlobalStatus.filterEnabled = false
+                lightHistory.clear()
+                stopSmoothLightTimer()
+                filterBrightness = -1
+            } catch (ex: Exception) {
+            }
 
-        notificationHelper?.cancelNotification()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            brightnessControlerBroadcast?.run {
-                try {
-                    unregisterReceiver(this)
-                } catch (ex: java.lang.Exception){
-
+            notificationHelper?.cancelNotification()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                brightnessControlerBroadcast?.run {
+                    try {
+                        unregisterReceiver(this)
+                    } catch (ex: java.lang.Exception) {
+                    }
                 }
             }
         }
@@ -389,7 +397,7 @@ class FilterAccessibilityService : AccessibilityService() {
         var offsetPractical = 0.toDouble()
 
         // 横屏
-        if (isLandscape) {
+        if (isLandscape && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
             staticOffset += 0.1
         } else {
             offsetPractical += dynamicOptimize.brightnessOptimization(luxValue, GlobalStatus.sampleData!!.getScreentMinLight())

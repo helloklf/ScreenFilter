@@ -10,8 +10,11 @@ class ScreenState(private var context: Context) {
     fun isScreenLocked(): Boolean {
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val display = windowManager.defaultDisplay
-        if (display.state != Display.STATE_ON) {
-            return true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            if (display.state != Display.STATE_ON) {
+                return true
+            }
+            return false
         }
 
         val mKeyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
