@@ -1,6 +1,7 @@
 package com.omarea.filter
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.omarea.shared.FileWrite
 import org.json.JSONObject
@@ -23,13 +24,28 @@ class SampleData {
         this.readConfig(context)
     }
 
+    private fun getOriginConfigObject(context: Context, officialOnlay: Boolean): JSONObject {
+        val customConfig = FileWrite.getPrivateFilePath(context, filterConfig)
+        val configFile = if ((!officialOnlay) && File(customConfig).exists()) {
+            File(customConfig).readBytes()
+        } else {
+            try {
+                context.assets.open("for_" + Build.PRODUCT + ".json").readBytes()
+            } catch (ex: java.lang.Exception) {
+                context.assets.open("amoled.json").readBytes()
+            }
+        }
+
+        val jsonObject = JSONObject(String(configFile))
+
+        return jsonObject
+    }
+
     public fun readConfig(context: Context, officialOnlay: Boolean = false) {
         try {
-            samples.clear()
-            val customConfig = FileWrite.getPrivateFilePath(context, filterConfig)
-            val configFile = if ((!officialOnlay) && File(customConfig).exists()) File(customConfig).readBytes() else context.assets.open(filterConfig).readBytes()
+            val jsonObject = getOriginConfigObject(context, officialOnlay)
 
-            val jsonObject = JSONObject(String(configFile))
+            samples.clear()
             val samples = jsonObject.getJSONObject("samples")
             for (item in samples.keys()) {
                 val lux = item.toInt()
@@ -50,6 +66,14 @@ class SampleData {
                 this.screentMinLight = screentMinLight
             } else {
                 this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+            }
+            if (officialOnlay) {
+                // Xiaomi MIX3、CC9、M9、K20 Pro
+                if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
+                    setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
+                } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
+                    setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
+                }
             }
         } catch (ex: Exception) {
             samples.put(0, FilterViewConfig.FILTER_BRIGHTNESS_MIN)

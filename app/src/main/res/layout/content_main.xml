@@ -174,8 +174,37 @@
                     android:text="@string/dynamic_optimize" />
 
                 <TextView
+                    android:layout_marginBottom="4dp"
                     style="@style/option_desc"
                     android:text="@string/dynamic_optimize_desc" />
+
+                <LinearLayout
+                    android:layout_marginBottom="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <SeekBar
+                        android:id="@+id/dynamic_optimize_limit"
+                        android:max="300"
+                        android:min="0"
+                        android:paddingEnd="6dp"
+                        android:paddingStart="6dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/dynamic_optimize_limit_text"
+                        android:layout_marginLeft="6dp"
+                        android:textAlignment="center"
+                        android:text="0Lux"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <TextView
+                    style="@style/option_desc"
+                    android:text="@string/dynamic_optimize_lux_desc" />
 
                 <Switch
                     android:id="@+id/smooth_brightness"
@@ -239,8 +268,17 @@
 
                 <TextView
                     style="@style/option_desc"
-                    android:layout_marginBottom="0dp"
                     android:text="@string/hide_in_recent_desc" />
+
+                <Switch
+                    android:id="@+id/hide_start_icon"
+                    android:text="@string/hide_start_icon"
+                    style="@style/option_title" />
+
+                <TextView
+                    style="@style/option_desc"
+                    android:layout_marginBottom="0dp"
+                    android:text="@string/hide_start_icon_desc" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

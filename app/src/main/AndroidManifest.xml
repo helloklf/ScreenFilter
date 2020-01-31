@@ -44,6 +44,15 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
+        <activity-alias
+            android:name=".SettingsActivity"
+            android:targetActivity="MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name=".ScreenCapActivity"
             android:screenOrientation="behind"

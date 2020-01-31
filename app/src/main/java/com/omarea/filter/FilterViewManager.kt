@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import com.omarea.filter.common.ViewHelper
-import java.lang.Exception
 import kotlin.math.abs
 
 class FilterViewManager(private var context: Context) {

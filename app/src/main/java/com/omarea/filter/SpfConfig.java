@@ -44,6 +44,10 @@ public class SpfConfig {
     public static String DYNAMIC_OPTIMIZE = "DYNAMIC_OPTIMIZE";
     public static boolean DYNAMIC_OPTIMIZE_DEFAULT = false;
 
+    // 动态优化（虚拟环境） 亮度限制(Lux)
+    public static String DYNAMIC_OPTIMIZE_LIMIT = "DYNAMIC_OPTIMIZE_LIMIT";
+    public static float DYNAMIC_OPTIMIZE_LIMIT_DEFAULT = 0;
+
     // 硬件加速
     public static String HARDWARE_ACCELERATED = "HARDWARE_ACCELERATED";
     public static boolean HARDWARE_ACCELERATED_DEFAULT = true;

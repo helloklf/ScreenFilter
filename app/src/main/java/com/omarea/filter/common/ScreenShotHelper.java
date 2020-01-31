@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
+
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Handler
-import android.util.Log
 
 /**
  * 监听屏幕开关事件

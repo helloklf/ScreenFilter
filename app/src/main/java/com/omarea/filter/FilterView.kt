@@ -3,7 +3,6 @@ package com.omarea.filter
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 
 class FilterView : View {
@@ -36,8 +35,8 @@ class FilterView : View {
             effectiveValue = FilterViewConfig.FILTER_MAX_ALPHA
         }
 
-        if (this.currentAlpha != (effectiveValue / 4.4).toInt()) {
-            this.currentAlpha = (effectiveValue / 4.4).toInt()
+        if (this.currentAlpha != (effectiveValue / 4.2).toInt()) {
+            this.currentAlpha = (effectiveValue / 4.2).toInt()
             invalidate()
         }
     }

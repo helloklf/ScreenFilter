@@ -2,9 +2,11 @@ package com.omarea.filter
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Build
@@ -74,10 +76,15 @@ class MainActivity : AppCompatActivity() {
         config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
 
         if (!config.contains(SpfConfig.SCREENT_MAX_LIGHT)) {
-            if (Build.PRODUCT == "perseus") { // Xiaomi MIX3 屏幕最大亮度2047
+            // Xiaomi MIX3、CC9、M9、K20 Pro
+            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
                 // GlobalStatus.sampleData!!.setScreentMinLight(30)
                 GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
+            } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
+                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
+                // GlobalStatus.sampleData!!.setScreentMinLight(30)
+                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
             }
         }
 
@@ -148,6 +155,21 @@ class MainActivity : AppCompatActivity() {
             restartFilter()
         }
 
+        val limitLux = config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, SpfConfig.DYNAMIC_OPTIMIZE_LIMIT_DEFAULT)
+        dynamic_optimize_limit.progress = (limitLux * 10).toInt()
+        dynamic_optimize_limit_text.text = limitLux.toString() + "Lux"
+        dynamic_optimize_limit.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                dynamic_optimize_limit_text.text = (progress / 10f).toString() + "Lux"
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                config.edit().putFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, seekBar!!.progress / 10f).apply()
+                GlobalStatus.filterRefresh?.run()
+            }
+        })
+
         // 平滑光线传奇数值
         smooth_brightness.isChecked = config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)
         smooth_brightness.setOnClickListener {
@@ -176,7 +198,6 @@ class MainActivity : AppCompatActivity() {
         lock_off.setOnClickListener {
             config.edit().putBoolean(SpfConfig.SCREEN_OFF_CLOSE, (it as Switch).isChecked).apply()
         }
-
 
         // 自动亮度
         val contentResolver = getContentResolver()
@@ -224,6 +245,23 @@ class MainActivity : AppCompatActivity() {
             } catch (ex: java.lang.Exception) {
             }
         }
+
+        val p: PackageManager = getPackageManager()
+        val startActivity = ComponentName(getApplicationContext(), MainActivity::class.java)
+        hide_start_icon.setOnClickListener { v ->
+            try {
+                if (hide_start_icon.isChecked()) {
+                    p.setComponentEnabledSetting(startActivity, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+                } else {
+                    p.setComponentEnabledSetting(startActivity, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+                }
+            } catch (ex: java.lang.Exception) {
+                Toast.makeText(v.context, ex.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val activityState = p.getComponentEnabledSetting(startActivity)
+        hide_start_icon.isChecked = activityState != PackageManager.COMPONENT_ENABLED_STATE_ENABLED && activityState != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
     }
 
     private fun restartFilter() {

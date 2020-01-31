@@ -10,7 +10,6 @@ import android.service.quicksettings.TileService;
 import android.support.annotation.RequiresApi;
 import android.widget.Toast;
 
-import com.omarea.filter.GlobalStatus;
 import com.omarea.filter.R;
 import com.omarea.filter.SpfConfig;
 @RequiresApi(api = Build.VERSION_CODES.N)

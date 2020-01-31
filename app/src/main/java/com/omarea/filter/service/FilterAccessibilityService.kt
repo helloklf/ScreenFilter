@@ -39,8 +39,8 @@ class FilterAccessibilityService : AccessibilityService() {
     private var filterBrightness = 0 // 当前由滤镜控制的屏幕亮度
     private var isFirstScreenCap = true
 
-    private var displayWidth:Int = 0;
-    private var displayHeight:Int = 0;
+    private var displayWidth: Int = 0;
+    private var displayHeight: Int = 0;
 
     // 当前手机屏幕是否处于开启状态
     private var screenOn = true
@@ -112,8 +112,14 @@ class FilterAccessibilityService : AccessibilityService() {
                 }
                 updateNotification()
             }
-            override fun onBrightnessChange(brightness: Int) { onBrightnessChanged(brightness) }
-            override fun onLuxChange(currentLux: Float) { onLuxChanged(currentLux) }
+
+            override fun onBrightnessChange(brightness: Int) {
+                onBrightnessChanged(brightness)
+            }
+
+            override fun onLuxChange(currentLux: Float) {
+                onLuxChanged(currentLux)
+            }
         })
 
         // 获取分辨率大小
@@ -128,6 +134,8 @@ class FilterAccessibilityService : AccessibilityService() {
         if (config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)) {
             filterOpen()
         }
+
+        GlobalStatus.screenCap = Runnable { onScreenCap() }
 
         super.onServiceConnected()
     }
@@ -161,8 +169,6 @@ class FilterAccessibilityService : AccessibilityService() {
             lightSensorWatcher?.startSystemConfigWatcher()
 
             GlobalStatus.filterRefresh = Runnable { filterRefresh() }
-
-            GlobalStatus.screenCap = Runnable { onScreenCap() }
 
             GlobalStatus.filterEnabled = true
 
@@ -418,8 +424,20 @@ class FilterAccessibilityService : AccessibilityService() {
         // 横屏
         if (isLandscape && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
             staticOffset += 0.1
-        } else {
-            offsetPractical += dynamicOptimize.brightnessOptimization(luxValue, GlobalStatus.sampleData!!.getScreentMinLight())
+        } else if (config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
+            val dynamicOptimizeLux = config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, SpfConfig.DYNAMIC_OPTIMIZE_LIMIT_DEFAULT)
+            val intensity = 1f - (if (dynamicOptimizeLux == 0f) {
+                if (luxValue <= dynamicOptimizeLux) {
+                    0f
+                } else {
+                    1f
+                }
+            } else if (luxValue <= dynamicOptimizeLux) {
+                luxValue / dynamicOptimizeLux
+            } else {
+                1f
+            })
+            offsetPractical += dynamicOptimize.brightnessOptimization(intensity, GlobalStatus.sampleData!!.getScreentMinLight())
         }
 
         val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(optimizedLux, staticOffset, offsetPractical)
