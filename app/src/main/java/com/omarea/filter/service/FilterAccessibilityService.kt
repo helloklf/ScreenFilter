@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.provider.Settings
-import android.util.Log
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
@@ -148,6 +147,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
     override fun onInterrupt() {}
 
+    // 打开滤镜
     private fun filterOpen() {
         synchronized(GlobalStatus.filterEnabled) {
             isFirstUpdate = true
@@ -176,6 +176,7 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
+    // 关闭滤镜
     private fun filterClose() {
         synchronized(GlobalStatus.filterEnabled) {
             try {
@@ -209,6 +210,7 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
+    // 刷新滤镜
     private fun filterRefresh() {
         if (GlobalStatus.filterEnabled) {
             if (isAutoBrightness) {
@@ -340,38 +342,54 @@ class FilterAccessibilityService : AccessibilityService() {
         if (smoothLightTimer == null) {
             smoothLightTimer = Timer()
             smoothLightTimer!!.schedule(object : TimerTask() {
+                private var upOnly = false;
+                private var lastValue = -1f
                 override fun run() {
                     handler.post {
-                        smoothLightTimerTick()
+                        lastValue = smoothLightTimerTick(upOnly, lastValue)
                     }
+                    upOnly = !upOnly
                 }
-            }, 4500, 6000)
+            }, 4500, 3000)
         }
     }
 
     /**
      * 更新滤镜 使用最近的光线传感器样本平均值
      */
-    private fun smoothLightTimerTick() {
+    private fun smoothLightTimerTick(upOnly: Boolean, lastValue: Float): Float {
+        var targetLux: Float = -1F
         try {
             if (lightHistory.size > 0) {
                 if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
                     val currentTime = System.currentTimeMillis()
                     val result = lightHistory.filter { (currentTime - it.time) < 11000 }
 
-                    val avgLux: Float
+                    var avgLux: Float
+                    val lastSample = lightHistory.last().lux
                     if (result.isNotEmpty()) {
                         var total: Double = 0.toDouble()
                         for (history in result) {
                             total += history.lux
                         }
                         avgLux = (total / result.size).toFloat()
+                        // 如果侦测到大幅的环境光变化，积极的提高亮度
+                        if (lastSample > (avgLux + 5)) {
+                            avgLux = lastSample
+                            // 清空样本数据
+                            synchronized(lightHistory) {
+                                lightHistory.clear()
+                            }
+                        }
                     } else {
-                        avgLux = lightHistory.last().lux
+                        avgLux = lastSample
                     }
-                    updateFilterByLux(avgLux)
+                    targetLux = avgLux
                 } else {
-                    updateFilterByLux(lightHistory.last().lux)
+                    targetLux = lightHistory.last().lux
+                }
+                if (lastValue < targetLux || !upOnly) {
+                    updateFilterByLux(targetLux)
                 }
             }
         } catch (ex: Exception) {
@@ -379,6 +397,7 @@ class FilterAccessibilityService : AccessibilityService() {
                 Toast.makeText(this, "更新滤镜出现异常", Toast.LENGTH_SHORT).show()
             }
         }
+        return targetLux
     }
 
     private fun stopSmoothLightTimer() {
