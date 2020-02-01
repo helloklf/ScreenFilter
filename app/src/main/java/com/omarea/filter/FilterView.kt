@@ -2,6 +2,7 @@ package com.omarea.filter
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 
@@ -25,9 +26,20 @@ class FilterView : View {
 
     private fun init() {
         currentAlpha = 0
+        val filterColor = GlobalStatus.sampleData!!.getFilterColor()
+        red = Color.red(filterColor)
+        green = Color.green(filterColor)
+        blue = Color.blue(filterColor)
     }
 
-    fun setFilterColorNow(alpha: Int, updateView: Boolean = true) {
+    fun setFilterColor(r: Int, g: Int, b: Int) {
+        this.red = r
+        this.green = g
+        this.blue = b
+        invalidate()
+    }
+
+    fun setAlpha(alpha: Int) {
         var effectiveValue = alpha
         if (effectiveValue < 0) {
             effectiveValue = 0

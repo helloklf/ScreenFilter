@@ -1,8 +1,10 @@
 package com.omarea.filter
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Point
+import android.graphics.drawable.GradientDrawable
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -16,8 +18,10 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
+import com.omarea.filter.common.UITools
 import com.omarea.filter.light.LightSensorManager
 import kotlinx.android.synthetic.main.activity_sample_edit.*
 
@@ -113,7 +117,7 @@ class SampleEditActivity : AppCompatActivity() {
             mWindowManager.updateViewLayout(filterPopup, layoutParams)
         }
 
-        filterView.setFilterColorNow(filterViewConfig.filterAlpha)
+        filterView.setAlpha(filterViewConfig.filterAlpha)
 
         // 亮度锁定
         // val lp = getWindow().getAttributes()
@@ -203,6 +207,9 @@ class SampleEditActivity : AppCompatActivity() {
         })
         */
         updateChart()
+
+        setViewBackground(filter_color, GlobalStatus.sampleData!!.getFilterColor())
+        filter_color.setOnClickListener { openColorPicker() }
     }
 
     override fun onPause() {
@@ -214,6 +221,60 @@ class SampleEditActivity : AppCompatActivity() {
             alertDialog!!.dismiss()
         }
         super.onPause()
+    }
+
+    /**
+     * 选择滤镜颜色
+     */
+    private fun openColorPicker() {
+        val view: View = getLayoutInflater().inflate(R.layout.filter_color_picker, null)
+        val currentColor: Int = GlobalStatus.sampleData!!.getFilterColor()
+        val alphaBar = view.findViewById<SeekBar>(R.id.color_alpha)
+        val redBar = view.findViewById<SeekBar>(R.id.color_red)
+        val greenBar = view.findViewById<SeekBar>(R.id.color_green)
+        val blueBar = view.findViewById<SeekBar>(R.id.color_blue)
+        val colorPreview = view.findViewById<Button>(R.id.color_preview)
+        alphaBar.progress = Color.alpha(currentColor)
+        redBar.progress = Color.red(currentColor)
+        greenBar.progress = Color.green(currentColor)
+        blueBar.progress = Color.blue(currentColor)
+        colorPreview.setBackgroundColor(currentColor)
+        val listener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                val color = Color.argb(alphaBar.progress, redBar.progress, greenBar.progress, blueBar.progress)
+                colorPreview.setBackgroundColor(color)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        }
+        alphaBar.setOnSeekBarChangeListener(listener)
+        redBar.setOnSeekBarChangeListener(listener)
+        greenBar.setOnSeekBarChangeListener(listener)
+        blueBar.setOnSeekBarChangeListener(listener)
+        android.app.AlertDialog.Builder(this)
+                .setTitle("选择颜色")
+                .setView(view)
+                .setPositiveButton(android.R.string.ok) { dialog, which ->
+                    val color = Color.argb(alphaBar.progress, redBar.progress, greenBar.progress, blueBar.progress)
+                    GlobalStatus.sampleData!!.setFilterColor(color)
+                    val filterView = filterPopup?.findViewById<FilterView>(R.id.filter_view)
+                    filterView?.setFilterColor(redBar.progress, greenBar.progress, blueBar.progress)
+                    setViewBackground(filter_color, GlobalStatus.sampleData!!.getFilterColor())
+                }
+                .setNegativeButton(getString(android.R.string.cancel)) { dialog, which -> }
+                .create()
+                .show()
+    }
+
+    protected fun setViewBackground(view: View, color: Int) {
+        val drawable = GradientDrawable()
+        drawable.shape = GradientDrawable.RECTANGLE
+        drawable.gradientType = GradientDrawable.RECTANGLE
+        drawable.cornerRadius = UITools.dp2px(this, 15F).toFloat()
+        drawable.setColor(color)
+        drawable.setStroke(2, -0x777778)
+        view.background = drawable
     }
 
     /**

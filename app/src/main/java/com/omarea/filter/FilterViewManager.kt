@@ -157,7 +157,7 @@ class FilterViewManager(private var context: Context) {
                             if (currentAlpha != alphaTo) {
                                 currentAlpha = alphaTo
                                 filterView?.run {
-                                    filterView?.setFilterColorNow(currentAlpha)
+                                    filterView?.setAlpha(currentAlpha)
                                 }
                                 GlobalStatus.currentFilterAlpah = currentAlpha
                             }
@@ -195,7 +195,7 @@ class FilterViewManager(private var context: Context) {
                             if (currentAlpha != alphaTo) {
                                 currentAlpha = alphaTo
                                 filterView?.run {
-                                    filterView?.setFilterColorNow(currentAlpha)
+                                    filterView?.setAlpha(currentAlpha)
                                 }
                                 GlobalStatus.currentFilterAlpah = currentAlpha
                             }
@@ -332,7 +332,7 @@ class FilterViewManager(private var context: Context) {
 
                             currentAlpha = alpha
                             filterView?.run {
-                                filterView?.setFilterColorNow(currentAlpha)
+                                filterView?.setAlpha(currentAlpha)
                             }
                             GlobalStatus.currentFilterAlpah = currentAlpha
                         }
@@ -387,9 +387,13 @@ class FilterViewManager(private var context: Context) {
         stopUpdate()
 
         // 为了避免亮度调高导致亮瞎眼，优先降低亮度
-        if (currentAlpha < filterViewConfig.filterAlpha) {
-            filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
+
+        val delay = if (currentAlpha < filterViewConfig.filterAlpha) {
+            filterView!!.setAlpha(filterViewConfig.filterAlpha)
             currentAlpha = filterViewConfig.filterAlpha
+            2000L
+        } else {
+            0L
         }
 
         val to = if (filterViewConfig.filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
@@ -397,24 +401,25 @@ class FilterViewManager(private var context: Context) {
         } else {
             filterViewConfig.filterBrightness
         }
-
-        try {
-            val layoutParams = this.layoutParams!!
-            if (to >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-            } else {
-                layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
+        filterView?.postDelayed({
+            try {
+                val layoutParams = this.layoutParams!!
+                if (to >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                    layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                } else {
+                    layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
+                }
+                filterBrightness = to
+                mWindowManager.updateViewLayout(popupView, layoutParams)
+                if (currentAlpha != filterViewConfig.filterAlpha) {
+                    filterView!!.setAlpha(filterViewConfig.filterAlpha)
+                    currentAlpha = filterViewConfig.filterAlpha
+                }
+            } catch (ex: Exception){
             }
-            filterBrightness = to
-            mWindowManager.updateViewLayout(popupView, layoutParams)
-            if (currentAlpha != filterViewConfig.filterAlpha) {
-                filterView!!.setFilterColorNow(filterViewConfig.filterAlpha)
-                currentAlpha = filterViewConfig.filterAlpha
-            }
-        } catch (ex: Exception){
-        }
 
-        GlobalStatus.currentFilterBrightness = filterBrightness
-        GlobalStatus.currentFilterAlpah = currentAlpha
+            GlobalStatus.currentFilterBrightness = filterBrightness
+            GlobalStatus.currentFilterAlpah = currentAlpha
+        }, delay)
     }
 }

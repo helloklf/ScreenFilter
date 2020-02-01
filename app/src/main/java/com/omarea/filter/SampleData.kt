@@ -1,6 +1,7 @@
 package com.omarea.filter
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import android.util.Log
 import com.omarea.shared.FileWrite
@@ -17,6 +18,8 @@ class SampleData {
 
     // 屏幕亮度低于此值时才开启滤镜功能
     private var screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+    // 滤镜颜色
+    private var filterColor:Int = Color.BLACK
 
     private var filterConfig = "Samples.json"
 
@@ -67,9 +70,14 @@ class SampleData {
             } else {
                 this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
             }
+            if (jsonObject.has("filterColor")) {
+                this.screentMinLight = jsonObject.getInt("filterColor")
+            } else {
+                this.filterColor = Color.BLACK
+            }
             if (officialOnlay) {
-                // Xiaomi MIX3、CC9、M9、K20 Pro
-                if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
+                // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
+                if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis"  || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
                     setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
                 } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
                     setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
@@ -89,6 +97,7 @@ class SampleData {
         val config = JSONObject()
         config.putOpt("samples", sampleConfig)
         config.put("screentMinLight", this.screentMinLight)
+        config.put("filterColor", this.filterColor)
         val jsonStr = config.toString(2)
 
         if (!FileWrite.writePrivateFile(jsonStr.toByteArray(Charset.defaultCharset()), filterConfig, context)) {
@@ -239,5 +248,13 @@ class SampleData {
         } else {
             this.screentMinLight = value
         }
+    }
+
+    public fun setFilterColor(color: Int) {
+        this.filterColor = color
+    }
+
+    public fun getFilterColor(): Int {
+        return filterColor
     }
 }

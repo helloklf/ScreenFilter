@@ -76,14 +76,12 @@ class MainActivity : AppCompatActivity() {
         config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
 
         if (!config.contains(SpfConfig.SCREENT_MAX_LIGHT)) {
-            // Xiaomi MIX3、CC9、M9、K20 Pro
-            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
+            // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
+            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis"  || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
-                // GlobalStatus.sampleData!!.setScreentMinLight(30)
                 GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
             } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
-                // GlobalStatus.sampleData!!.setScreentMinLight(30)
                 GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
             }
         }

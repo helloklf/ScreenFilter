@@ -19,6 +19,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="AppTheme.OFF" parent="AppThemeOFF">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -55,5 +56,11 @@
 
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="btn_color_picker">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_gravity">center_vertical</item>
     </style>
 </resources>
