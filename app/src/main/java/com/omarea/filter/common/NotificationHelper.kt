@@ -73,6 +73,7 @@ class NotificationHelper(private var context: Context) {
                 .setAutoCancel(true)
                 .setWhen(System.currentTimeMillis())
                 .setContent(remoteViews) // 通过设置RemoteViews对象来设置通知的布局，这里我们设置为自定义布局
+                .setPriority(NotificationCompat.PRIORITY_MIN)
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

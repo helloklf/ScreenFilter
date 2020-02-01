@@ -61,17 +61,15 @@ class SampleData {
             }
             if (jsonObject.has("screentMinLight")) {
                 var screentMinLight = jsonObject.getInt("screentMinLight")
-                if (screentMinLight > FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                if (screentMinLight > FilterViewConfig.FILTER_BRIGHTNESS_MAX || screentMinLight < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
                     screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
-                } else if (screentMinLight < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
-                    screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MIN
                 }
                 this.screentMinLight = screentMinLight
             } else {
                 this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
             }
             if (jsonObject.has("filterColor")) {
-                this.screentMinLight = jsonObject.getInt("filterColor")
+                this.filterColor = jsonObject.getInt("filterColor")
             } else {
                 this.filterColor = Color.BLACK
             }
