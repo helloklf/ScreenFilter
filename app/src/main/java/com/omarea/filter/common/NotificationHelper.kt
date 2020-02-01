@@ -64,7 +64,7 @@ class NotificationHelper(private var context: Context) {
         val notificationBuilder = NotificationCompat.Builder(context)
                 .setContentTitle(context.getString(R.string.app_name)) // 创建通知的标题
                 .setContentText(context.getString(R.string.brightness_control)) // 创建通知的内容
-                .setSmallIcon(R.mipmap.ic_launcher) // 创建通知的小图标
+                .setSmallIcon(R.drawable.ic_lightbulb) // 创建通知的小图标
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher)) // 创建通知的大图标
                 /*
                  * 是使用自定义视图还是系统提供的视图，上面4的属性一定要设置，不然这个通知显示不出来

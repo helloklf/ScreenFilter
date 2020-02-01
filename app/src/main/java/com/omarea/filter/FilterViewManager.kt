@@ -391,7 +391,7 @@ class FilterViewManager(private var context: Context) {
         val delay = if (currentAlpha < filterViewConfig.filterAlpha) {
             filterView!!.setAlpha(filterViewConfig.filterAlpha)
             currentAlpha = filterViewConfig.filterAlpha
-            2000L
+            200L
         } else {
             0L
         }
