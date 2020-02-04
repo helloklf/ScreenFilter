@@ -56,5 +56,11 @@ class FilterView : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawARGB(currentAlpha, red, green, blue)
+        /*
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && Build.PRODUCT == "tucana") {
+            // canvas.drawRect(720f, 10f, 750f, 30f, Paint().apply { color = Color.BLACK }) // Xiaomi CC9Pro 屏下光线传感器位置
+            canvas.drawRoundRect(720f, 5f, 750f, 30f, 12f, 12f, Paint().apply { color = Color.BLACK }) // Xiaomi CC9Pro 屏下光线传感器位置
+        }
+        */
     }
 }
