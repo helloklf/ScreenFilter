@@ -117,6 +117,7 @@
         </LinearLayout>
 
         <Button
+            android:visibility="gone"
             android:id="@+id/color_preview"
             android:layout_width="50dp"
             android:layout_height="35dp"
