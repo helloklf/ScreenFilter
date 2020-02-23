@@ -64,8 +64,12 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
             SharedPreferences config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE);
             int current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS);
             int max = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT);
-            if (current > max && current < 2048) {
-                max = 2047;
+            if (current > max) {
+                if (current < 2048) {
+                    max = 2047;
+                } else if (current < 4096) {
+                    max = 4095;
+                }
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, max).apply();
             }
 
@@ -102,8 +106,12 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
 
             int max = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT);
             int current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS);
-            if (current > max && current < 2048) {
-                max = 2047;
+            if (current > max) {
+                if (current < 2048) {
+                    max = 2047;
+                } else if (current < 4096) {
+                    max = 4095;
+                }
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, max).apply();
             }
 
@@ -132,14 +140,14 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
                     Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, 2047);
                 }
             }
-        } catch (Exception ex) {}
+        } catch (Exception ignored) {}
     }
 
     private void brightnessManualMode(Context context) {
         ContentResolver contentResolver = context.getContentResolver();
         try {
             Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 

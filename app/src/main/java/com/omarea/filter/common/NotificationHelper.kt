@@ -53,8 +53,12 @@ class NotificationHelper(private var context: Context) {
             } catch (ex: Exception) {
             }
 
-            if (current > max && current < 2048) {
-                max = 2047
+            if (current > max) {
+                if (current < 2048) {
+                    max = 2047
+                } else if (current < 4096) {
+                    max = 4095
+                }
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, max).apply()
             }
 
