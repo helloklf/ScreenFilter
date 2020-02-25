@@ -62,39 +62,23 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
         ContentResolver contentResolver = context.getContentResolver();
         try {
             SharedPreferences config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE);
-            int current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS);
             int max = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT);
+            int current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS);
             if (current > max) {
-                if (current < 2048) {
-                    max = 2047;
-                } else if (current < 4096) {
-                    max = 4095;
-                }
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, max).apply();
+                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, current).apply();
+                max = current;
             }
 
-            if (max < 246) {
-                if (current > 50) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 10);
-                } else if (current > 20) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 5);
-                } else if (current > 10) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 3);
-                } else if (current > 1) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 1);
-                }
-            } else {
-                if (current > 251) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 30);
-                } else if (current > 50) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 10);
-                } else if (current > 20) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 5);
-                } else if (current > 10) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 3);
-                } else if (current > 1) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 1);
-                }
+            if (current > max * 0.9) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int)(max * 0.1));
+            } else if (current > max * 0.5) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int)(max * 0.075));
+            } else if (current > max * 0.2) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int)(max * 0.0255));
+            } else if (current > 10) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int)(max * 0.0125));
+            } else if (current > 1) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 1);
             }
         } catch (Exception ex) {}
     }
@@ -107,38 +91,22 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
             int max = config.getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT);
             int current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS);
             if (current > max) {
-                if (current < 2048) {
-                    max = 2047;
-                } else if (current < 4096) {
-                    max = 4095;
-                }
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, max).apply();
+                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, current).apply();
+                max = current;
             }
 
-            if (max < 246) {
-                if (current < 10) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 1);
-                } else if (current < 20) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 3);
-                } else if (current < 50) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 5);
-                } else if (current < 251) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 10);
-                } else {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, 255);
-                }
+            if (current < 10) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 1);
+            } else if (current < max * 0.1) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int)(max * 0.0125));
+            } else if (current < max * 0.2) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int)(max * 0.0255));
+            } else if (current < max * 0.5) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int)(max * 0.075));
+            } else if (current < max * 0.9) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int)(max * 0.1));
             } else {
-                if (current < 10) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 1);
-                } else if (current < 20) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 5);
-                } else if (current < 251) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 10);
-                } else if (current < 2047) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 30);
-                } else if (current < max) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, 2047);
-                }
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, max);
             }
         } catch (Exception ignored) {}
     }

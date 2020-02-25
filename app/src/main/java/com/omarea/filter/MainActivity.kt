@@ -2,6 +2,7 @@ package com.omarea.filter
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -17,10 +18,8 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Checkable
-import android.widget.SeekBar
-import android.widget.Switch
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import com.omarea.filter.common.NotificationHelper
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
@@ -75,14 +74,16 @@ class MainActivity : AppCompatActivity() {
         }
         config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
 
-        if (!config.contains(SpfConfig.SCREENT_MAX_LIGHT)) {
+        if (!(config.contains(SpfConfig.SCREENT_MAX_LIGHT) && config.contains(SpfConfig.TARGET_DEVICE))) {
             // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
-            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis"  || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
+            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
                 GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
             } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
                 GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
+            } else {
+                openGuide()
             }
         }
 
@@ -156,12 +157,14 @@ class MainActivity : AppCompatActivity() {
         val limitLux = config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, SpfConfig.DYNAMIC_OPTIMIZE_LIMIT_DEFAULT)
         dynamic_optimize_limit.progress = (limitLux * 10).toInt()
         dynamic_optimize_limit_text.text = limitLux.toString() + "Lux"
-        dynamic_optimize_limit.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        dynamic_optimize_limit.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 dynamic_optimize_limit_text.text = (progress / 10f).toString() + "Lux"
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
+
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 config.edit().putFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, seekBar!!.progress / 10f).apply()
                 GlobalStatus.filterRefresh?.run()
@@ -235,9 +238,7 @@ class MainActivity : AppCompatActivity() {
             config.edit().putBoolean(SpfConfig.BRIGHTNESS_CONTROLLER, checkable.isChecked).apply()
 
             try {
-                if (checkable.isChecked
-                        && GlobalStatus.filterEnabled
-                        && Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL) {
+                if (checkable.isChecked && GlobalStatus.filterEnabled) {
                     NotificationHelper(this).updateNotification()
                 }
             } catch (ex: java.lang.Exception) {
@@ -387,5 +388,34 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "您的系统版本过低，暂不支持本功能~", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun openGuide() {
+        val dialog = layoutInflater.inflate(R.layout.dialog_guide, null);
+        val guideAmoled = dialog.findViewById<RadioButton>(R.id.guide_amoled)
+        val guideLcd = dialog.findViewById<RadioButton>(R.id.guide_lcd)
+        dialog.findViewById<View>(R.id.guide_next).setOnClickListener {
+            if (guideAmoled.isChecked || guideLcd.isChecked) {
+                try {
+                    val contentResolver = contentResolver
+                    val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+                    if (current >= 100) {
+                        config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, current).apply()
+                        if (guideLcd.isChecked) {
+                            config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_LCD).apply()
+                        } else {
+                            config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
+                        }
+                        GlobalStatus.sampleData!!.readConfig(true)
+                        recreate()
+                    } else {
+                        Toast.makeText(this, getString(R.string.step_warn), Toast.LENGTH_SHORT).show()
+                    }
+                } catch (ex: Exception) {
+                    Toast.makeText(this, getString(R.string.guide_fail), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        AlertDialog.Builder(this).setView(dialog).setCancelable(false).create().show()
     }
 }

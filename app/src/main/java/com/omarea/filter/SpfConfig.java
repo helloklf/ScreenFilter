@@ -32,6 +32,11 @@ public class SpfConfig {
     public static String SCREENT_MAX_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MAX_LIGHT_DEFAULT = 255;
 
+    // 目标设备
+    public static String TARGET_DEVICE = "TARGET_DEVICE";
+    public static int TARGET_DEVICE_AMOLED = 1;
+    public static int TARGET_DEVICE_LCD = 2;
+
     // 屏幕最小亮度
     public static String SCREENT_MIN_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MIN_LIGHT_DEFAULT = 255;

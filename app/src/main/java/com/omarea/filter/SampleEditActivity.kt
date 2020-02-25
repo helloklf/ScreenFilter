@@ -149,7 +149,7 @@ class SampleEditActivity : AppCompatActivity() {
             AlertDialog.Builder(this)
                     .setTitle(R.string.smaple_clear)
                     .setPositiveButton(R.string.sample_edit_confirm) { _, _ ->
-                        GlobalStatus.sampleData!!.readConfig(this.applicationContext, true)
+                        GlobalStatus.sampleData!!.readConfig(true)
                         this.hasChange = true
                         updateChart()
                     }

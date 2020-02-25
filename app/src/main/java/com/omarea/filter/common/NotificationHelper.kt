@@ -54,12 +54,8 @@ class NotificationHelper(private var context: Context) {
             }
 
             if (current > max) {
-                if (current < 2048) {
-                    max = 2047
-                } else if (current < 4096) {
-                    max = 4095
-                }
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, max).apply()
+                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, current).apply()
+                max = current
             }
 
             remoteViews.setProgressBar(R.id.brightness_current, if (current > max) current else max, current, false)

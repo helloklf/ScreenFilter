@@ -12,30 +12,36 @@ import java.nio.charset.Charset
 /**
  * 样本数据
  */
-class SampleData {
+class SampleData(private val context: Context) {
     // 样本数据（lux, Sample）
     private var samples = HashMap<Int, Int>()
 
     // 屏幕亮度低于此值时才开启滤镜功能
     private var screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
     // 滤镜颜色
-    private var filterColor:Int = Color.BLACK
+    private var filterColor: Int = Color.BLACK
 
     private var filterConfig = "Samples.json"
 
-    constructor (context: Context) {
-        this.readConfig(context)
+    private val applicationGlobalConfig = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
+
+    init {
+        this.readConfig()
     }
 
-    private fun getOriginConfigObject(context: Context, officialOnlay: Boolean): JSONObject {
+    private fun getOriginConfigObject(officialOnlay: Boolean): JSONObject {
         val customConfig = FileWrite.getPrivateFilePath(context, filterConfig)
         val configFile = if ((!officialOnlay) && File(customConfig).exists()) {
             File(customConfig).readBytes()
         } else {
-            try {
-                context.assets.open("for_" + Build.PRODUCT + ".json").readBytes()
-            } catch (ex: java.lang.Exception) {
-                context.assets.open("amoled.json").readBytes()
+            if (applicationGlobalConfig.getInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED) == SpfConfig.TARGET_DEVICE_AMOLED) {
+                try {
+                    context.assets.open("for_" + Build.PRODUCT + ".json").readBytes()
+                } catch (ex: java.lang.Exception) {
+                    context.assets.open("amoled.json").readBytes()
+                }
+            } else {
+                context.assets.open("lcd.json").readBytes()
             }
         }
 
@@ -44,9 +50,9 @@ class SampleData {
         return jsonObject
     }
 
-    public fun readConfig(context: Context, officialOnlay: Boolean = false) {
+    public fun readConfig(officialOnlay: Boolean = false) {
         try {
-            val jsonObject = getOriginConfigObject(context, officialOnlay)
+            val jsonObject = getOriginConfigObject(officialOnlay)
 
             samples.clear()
             val samples = jsonObject.getJSONObject("samples")
@@ -75,7 +81,7 @@ class SampleData {
             }
             if (officialOnlay) {
                 // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
-                if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis"  || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
+                if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
                     setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
                 } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
                     setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
