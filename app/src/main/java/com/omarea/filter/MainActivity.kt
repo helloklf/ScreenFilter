@@ -78,9 +78,11 @@ class MainActivity : AppCompatActivity() {
             // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
             if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
+                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
                 GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
             } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
                 config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
+                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
                 GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
             } else {
                 openGuide()
