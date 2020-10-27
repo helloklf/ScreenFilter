@@ -49,6 +49,7 @@
 
     <string name="accessibility_service_required">需要先启动辅助服务，才能使用本功能！</string>
     <string name="overlays_required">还未授予“显示悬浮窗/在应用上层显示”权限</string>
+    <string name="please_enable_filter">请先启用滤镜~</string>
 
     <string name="sample_add_title">添加/覆盖 样本</string>
     <string name="sample_edit_currentlux">当前环境光亮度(lux)：</string>

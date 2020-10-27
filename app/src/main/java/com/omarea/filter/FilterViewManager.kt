@@ -153,7 +153,7 @@ class FilterViewManager(private var context: Context) {
                         mWindowManager.updateViewLayout(popupView, layoutParams)
                         hardwareBrightness = filterBrightness
                     }
-                    if (filterAlpha != view.alpha.toInt()) {
+                    if (filterAlpha != (view.alpha * 1000).toInt()) {
                         lastFilterAlpha = filterAlpha
                         view.setAlpha(filterAlpha)
                     }
@@ -226,6 +226,28 @@ class FilterViewManager(private var context: Context) {
                 }
             }
             start()
+        }
+    }
+
+    fun filterManualUpdate () {
+        if (GlobalStatus.filterManualBrightness > -1) {
+            paused = true
+            val sampleData = GlobalStatus.sampleData!!
+            val view = filterView!!
+            val lp = layoutParams!!
+            stopUpdate()
+            sampleData.getConfigByBrightness(GlobalStatus.filterManualBrightness).run {
+                if (filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                    lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                } else {
+                    lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                }
+                mWindowManager.updateViewLayout(popupView, layoutParams)
+                lastFilterAlpha = filterAlpha
+                view.setAlpha(filterAlpha)
+            }
+        } else {
+            paused = false
         }
     }
 }

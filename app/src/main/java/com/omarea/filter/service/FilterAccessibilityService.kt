@@ -81,6 +81,9 @@ class FilterAccessibilityService : AccessibilityService() {
         GlobalStatus.filterClose = Runnable {
             filterClose()
         }
+        GlobalStatus.filterManualUpdate = Runnable {
+            filterViewManager.filterManualUpdate()
+        }
 
         receiverLock = ReceiverLock.autoRegister(this, ScreenEventHandler({
             // 为啥已经监听到息屏了还要手动判断屏幕状态呢？

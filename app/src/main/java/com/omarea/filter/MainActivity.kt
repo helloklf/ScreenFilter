@@ -340,9 +340,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 1 && GlobalStatus.filterOpen != null) {
-            GlobalStatus.filterOpen!!.run()
-        } else if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (!Settings.canDrawOverlays(this)) {
                     Toast.makeText(this, getString(R.string.get_permission_fail), Toast.LENGTH_LONG).show()
@@ -355,20 +353,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-
         return if (id == R.id.sample_edit) {
-            if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
-                Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
+            if (!GlobalStatus.filterEnabled) {
+                Toast.makeText(this, R.string.please_enable_filter, Toast.LENGTH_LONG).show()
                 return true
             }
 
             try {
                 val intent = Intent(this, SampleEditActivity::class.java)
                 startActivityForResult(intent, if (GlobalStatus.filterEnabled) 1 else 0)
-
-                if (GlobalStatus.filterClose != null) {
-                    GlobalStatus.filterClose!!.run()
-                }
             } catch (ex: Exception) {
             }
             return true

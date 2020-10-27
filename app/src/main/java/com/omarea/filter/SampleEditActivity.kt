@@ -59,70 +59,13 @@ class SampleEditActivity : AppCompatActivity() {
     }
 
     private fun filterClose() {
-        if (filterPopup != null) {
-            val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            mWindowManager.removeView(filterPopup)
-            filterPopup = null
-        }
-
-    }
-
-    private fun filterOpen() {
-        if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
-            Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
-            return
-        }
-        if (filterPopup != null) {
-            filterClose()
-        }
-
-        val params = WindowManager.LayoutParams()
-
-        // 类型
-        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
-        // 设置window type
-        //params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {//6.0+
-            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        } else {
-            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
-        }
-
-        params.format = PixelFormat.TRANSLUCENT
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_FULLSCREEN or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
-        val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
-        val display = mWindowManager.getDefaultDisplay()
-        val p = Point()
-        display.getRealSize(p)
-        params.width = p.y + getNavBarHeight() * 2 // -1
-        params.height = p.y + getNavBarHeight() * 2
-
-        filterPopup = LayoutInflater.from(this).inflate(R.layout.filter, null)
-        filterPopup!!.setLayerType(View.LAYER_TYPE_HARDWARE, null)
-        params.flags.and(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
-        mWindowManager.addView(filterPopup, params)
+        GlobalStatus.filterManualBrightness = -1
+        GlobalStatus.filterManualUpdate?.run()
     }
 
     private fun filterUpdate(screenBrightness: Int) {
-        val filterView = filterPopup!!.findViewById<FilterView>(R.id.filter_view)
-        val filterViewConfig = GlobalStatus.sampleData!!.getConfigByBrightness(screenBrightness)
-
-        val mWindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
-        val layoutParams = filterPopup!!.layoutParams as WindowManager.LayoutParams?
-        if (layoutParams != null) {
-            val ratio = filterViewConfig.getFilterBrightnessRatio()
-            layoutParams.screenBrightness = ratio
-            mWindowManager.updateViewLayout(filterPopup, layoutParams)
-        }
-
-        filterView.setAlpha(filterViewConfig.filterAlpha)
-
-        // 亮度锁定
-        // val lp = getWindow().getAttributes()
-        // lp.screenBrightness = config.getFilterBrightnessRatio()
-        // getWindow().setAttributes(lp)
+        GlobalStatus.filterManualBrightness = screenBrightness
+        GlobalStatus.filterManualUpdate?.run()
     }
 
     /**
@@ -297,7 +240,7 @@ class SampleEditActivity : AppCompatActivity() {
                 .create()
         alertDialog!!.show()
         alertDialog!!.getWindow()!!.setDimAmount(0f);
-        filterOpen()
+        GlobalStatus.filterManualUpdate?.run()
 
         dialogView.findViewById<Button>(R.id.sample_edit_cancel).setOnClickListener {
             // GlobalStatus.sampleData!!.removeSample(sampleBrightness.progress)
