@@ -22,4 +22,9 @@ public class ScreenShotService extends TileService {
             Log.e("ScreenCapActivity", "!!!" + ex.getMessage());
         }
     }
+
+    @Override
+    public void onStartListening() {
+        getQsTile().updateTile(); //更新Tile
+    }
 }

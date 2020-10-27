@@ -167,6 +167,8 @@ class SampleData(private val context: Context) {
         return FilterViewConfig.getDefault()
     }
 
+
+
     /**
      * 根据意图亮度百分比，获取滤镜配置
      */

@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import com.omarea.filter.common.ViewHelper
-import kotlin.math.abs
 
 class FilterViewManager(private var context: Context) {
     private val mWindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -24,7 +23,6 @@ class FilterViewManager(private var context: Context) {
     private var currentAlpha: Int = 0
     private var valueAnimator: ValueAnimator? = null
     private var valueAnimator2: ValueAnimator? = null
-    private var isPaused = false
     private var lastFilterViewConfig: FilterViewConfig? = null
 
     fun open() {
@@ -73,7 +71,6 @@ class FilterViewManager(private var context: Context) {
         stopUpdate()
         currentAlpha = 0
         lastFilterViewConfig = null
-        isPaused = false
         filterBrightness = -1
 
         if (popupView != null) {
@@ -97,195 +94,10 @@ class FilterViewManager(private var context: Context) {
         }
     }
 
-    fun pause() {
-        stopUpdate()
-        if (currentAlpha != 0) {
-            val layoutParams = this.layoutParams
-            if (layoutParams != null) {
-                val originBrightness = abs(layoutParams.screenBrightness) * FilterViewConfig.FILTER_BRIGHTNESS_MAX
-                val originAlpha = currentAlpha
-                val targetBrightness = originBrightness - ((originAlpha.toFloat() / FilterViewConfig.FILTER_MAX_ALPHA) * originBrightness)
-
-                brightnessTransAlpha(targetBrightness, originBrightness, targetBrightness)
-            }
-        }
-        isPaused = true
-    }
-
-    fun resume() {
-        isPaused = false
-        stopUpdate()
-        if (layoutParams != null && lastFilterViewConfig != null) {
-            brightnessTransAlpha(filterBrightness.toFloat(), filterBrightness.toFloat(), lastFilterViewConfig!!.filterBrightness.toFloat())
-        }
-    }
-
-    private fun brightnessTransAlpha(absBrightness: Float, originBrightness: Float, targetBrightness: Float) {
-        val layoutParams = this.layoutParams
-        if (layoutParams != null) {
-            val distanceBrightness = originBrightness - targetBrightness
-
-            val frames = 40
-            val stepBrightness = distanceBrightness / frames // 每一帧要调整的亮度百分比
-
-            stopUpdate()
-
-            var frame = 0
-            if (originBrightness > targetBrightness) {
-                if (targetBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                    layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-                } else {
-                    layoutParams.screenBrightness = targetBrightness / FilterViewConfig.FILTER_BRIGHTNESS_MAX.toFloat()
-                }
-                mWindowManager.updateViewLayout(popupView, layoutParams)
-                filterBrightness = targetBrightness.toInt()
-                GlobalStatus.currentFilterBrightness = targetBrightness.toInt()
-
-                valueAnimator = ValueAnimator.ofInt(frame, frames)
-                valueAnimator!!.run {
-                    duration = 1000
-                    addUpdateListener { animation ->
-                        val value = animation.animatedValue as Int
-                        if (value != frame) {
-                            frame = value
-
-                            val brightness = (originBrightness - (stepBrightness * frame)).toInt() // 当前帧应该设置到的亮度
-
-                            val alpha = 1 - (absBrightness / brightness) // 相应的 根据亮度的提升，也要降低滤镜的不透明度
-                            val alphaTo = if (alpha > 0) (alpha * FilterViewConfig.FILTER_MAX_ALPHA).toInt() else 0
-
-                            if (currentAlpha != alphaTo) {
-                                currentAlpha = alphaTo
-                                filterView?.run {
-                                    filterView?.setAlpha(currentAlpha)
-                                }
-                                GlobalStatus.currentFilterAlpah = currentAlpha
-                            }
-                        }
-                    }
-                    start()
-                }
-            } else {
-                /*
-                val alpha = 1 - (absBrightness / targetBrightness) // 相应的 根据亮度的提升，也要降低滤镜的不透明度
-                val alphaTo = if (alpha > 0) (alpha * FilterViewConfig.FILTER_MAX_ALPHA).toInt() else 0
-
-                if (currentAlpha != alphaTo) {
-                    currentAlpha = alphaTo
-                    filterView?.run {
-                        filterView?.setFilterColorNow(currentAlpha)
-                    }
-                    GlobalStatus.currentFilterAlpah = currentAlpha
-                }
-                */
-
-                valueAnimator = ValueAnimator.ofInt(frame, frames)
-                valueAnimator!!.run {
-                    duration = 1000
-                    addUpdateListener { animation ->
-                        val value = animation.animatedValue as Int
-                        if (value != frame) {
-                            frame = value
-
-                            val brightness = (originBrightness - (stepBrightness * frame)).toInt() // 当前帧应该设置到的亮度
-
-                            val alpha = 1 - (absBrightness / brightness) // 相应的 根据亮度的提升，也要降低滤镜的不透明度
-                            val alphaTo = if (alpha > 0) (alpha * FilterViewConfig.FILTER_MAX_ALPHA).toInt() else 0
-
-                            if (currentAlpha != alphaTo) {
-                                currentAlpha = alphaTo
-                                filterView?.run {
-                                    filterView?.setAlpha(currentAlpha)
-                                }
-                                GlobalStatus.currentFilterAlpah = currentAlpha
-                            }
-
-                            if (brightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                                layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-                            } else {
-                                layoutParams.screenBrightness = brightness / FilterViewConfig.FILTER_BRIGHTNESS_MAX.toFloat()
-                            }
-                            mWindowManager.updateViewLayout(popupView, layoutParams)
-                            filterBrightness = brightness
-                            GlobalStatus.currentFilterBrightness = brightness
-                        }
-                    }
-                    start()
-                }
-            }
-        }
-    }
-
-    /*
-    // 精确到帧的调整滤镜，实际上...并没有那么理想
-    private fun brightnessTransAlpha(absBrightness:Float, originBrightness:Float, targetBrightness: Float) {
-        val layoutParams = this.layoutParams
-        if (layoutParams != null) {
-            val distanceBrightness = originBrightness - targetBrightness
-
-            val frames = 50
-            val stepBrightness = distanceBrightness / frames // 每一帧要调整的亮度百分比
-
-            stopUpdate()
-
-            var frame = 0
-            valueAnimator = ValueAnimator.ofInt(frame, frames)
-            valueAnimator!!.run {
-                duration = 1000
-                addUpdateListener { animation ->
-                    val value = animation.animatedValue as Int
-                    if (value != frame) {
-                        frame = value
-
-                        val brightness = (originBrightness - (stepBrightness * frame)).toInt() // 当前帧应该设置到的亮度
-
-                        val alpha = 1 - (absBrightness / brightness) // 相应的 根据亮度的提升，也要降低滤镜的不透明度
-                        val alphaTo = if (alpha > 0) (alpha * FilterViewConfig.FILTER_MAX_ALPHA).toInt() else 0
-
-                        if (currentAlpha != alphaTo) {
-                            currentAlpha = alphaTo
-                            filterView?.run {
-                                filterView?.setFilterColorNow(currentAlpha)
-                            }
-                            GlobalStatus.currentFilterAlpah = currentAlpha
-                        }
-
-                        if (brightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                            layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-                        } else {
-                            layoutParams.screenBrightness = brightness / FilterViewConfig.FILTER_BRIGHTNESS_MAX.toFloat()
-                        }
-                        mWindowManager.updateViewLayout(popupView, layoutParams)
-                        filterBrightness = brightness
-                        GlobalStatus.currentFilterBrightness = brightness
-                    }
-                }
-                start()
-            }
-        }
-    }
-    */
-
     private val layoutParams: WindowManager.LayoutParams?
         get() {
             return popupView?.layoutParams as WindowManager.LayoutParams?
         }
-
-    fun updateFilterByConfig(filterViewConfig: FilterViewConfig, backup: Boolean = true) {
-        if (filterView != null) {
-            if (!isPaused) {
-                if (filterViewConfig.smoothChange) {
-                    smoothUpdateFilter(filterViewConfig)
-                } else {
-                    fastUpdateFilter(filterViewConfig)
-                }
-            }
-
-            if (backup) {
-                lastFilterViewConfig = filterViewConfig
-            }
-        }
-    }
 
     // 停止正在运行的滤镜更新动画
     private fun stopUpdate() {
@@ -299,127 +111,121 @@ class FilterViewManager(private var context: Context) {
         }
     }
 
-    // 使用平滑的动画更新滤镜
-    private fun smoothUpdateFilter(filterViewConfig: FilterViewConfig) {
-        stopUpdate()
-        val layoutParams = this.layoutParams!!
-
-        val perOld = this.currentAlpha
-        val toAlpha = filterViewConfig.filterAlpha
-        var alphaFrameCount: Int
-        if (perOld != toAlpha) {
-            val alphaDistance = toAlpha - perOld
-            val absDistance = Math.abs(alphaDistance)
-            alphaFrameCount = when {
-                absDistance < 1 -> 1
-                absDistance > 60 -> 60
-                else -> absDistance
-            }
-            if (alphaFrameCount > 20 && !filterView!!.isHardwareAccelerated) {
-                alphaFrameCount = 20
-            }
-
-            val stepByStep = alphaDistance / alphaFrameCount.toFloat()
-
-            var frame = 0
-            valueAnimator = ValueAnimator.ofInt(frame, alphaFrameCount).apply {
-                duration = 2000
-                addUpdateListener { animation ->
-                    (animation.animatedValue as Int).run {
-                        if (this != frame) {
-                            frame = this
-                            val alpha = (perOld + (frame * stepByStep)).toInt()
-
-                            currentAlpha = alpha
-                            filterView?.run {
-                                filterView?.setAlpha(currentAlpha)
-                            }
-                            GlobalStatus.currentFilterAlpah = currentAlpha
-                        }
-                    }
-                }
-                start()
-            }
+    private var lastBrightness: Int = 0
+    private var lastFilterAlpha: Int
+        get () {
+            return GlobalStatus.currentFilterAlpah
+        }
+        set (value) {
+            GlobalStatus.currentFilterAlpah = value
+        }
+    private var hardwareBrightness: Int
+        get () {
+            return GlobalStatus.currentFilterBrightness
+        }
+        set (value) {
+            GlobalStatus.currentFilterBrightness = value
         }
 
-        val currentBrightness = (Math.abs(layoutParams.screenBrightness) * FilterViewConfig.FILTER_BRIGHTNESS_MAX).toInt()
-        val toBrightness = filterViewConfig.filterBrightness
-        var brightnessFrameCount: Int
-        if (toBrightness != currentBrightness) {
-            val brightnessDistance = toBrightness - currentBrightness
-            val absDistance = Math.abs(brightnessDistance)
-            brightnessFrameCount = when {
-                absDistance < 1 -> 1
-                absDistance > 60 -> 60
-                else -> absDistance
-            }
-            if (brightnessFrameCount > 20 && !filterView!!.isHardwareAccelerated) {
-                brightnessFrameCount = 20
-            }
-            val stepByStep2 = brightnessDistance / brightnessFrameCount.toFloat()
-            var frame = 0
-            valueAnimator2 = ValueAnimator.ofInt(frame, brightnessFrameCount).apply {
-                duration = 2000
-                addUpdateListener { animation ->
-                    (animation.animatedValue as Int).run {
-                        if (this != frame) {
-                            frame = this
-                            val brightness = (currentBrightness + (frame * stepByStep2)).toInt()
+    private var paused = false
 
-                            if (brightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                                layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-                            } else {
-                                layoutParams.screenBrightness = brightness / FilterViewConfig.FILTER_BRIGHTNESS_MAX.toFloat()
-                            }
-                            mWindowManager.updateViewLayout(popupView, layoutParams)
-                            filterBrightness = brightness
-                            GlobalStatus.currentFilterBrightness = brightness
+    public fun setBrightness(brightness: Int) {
+        if (paused) {
+            return
+        }
+
+        val sampleData = GlobalStatus.sampleData!!
+        val view = filterView!!
+        val lp = layoutParams!!
+        stopUpdate()
+        valueAnimator = ValueAnimator.ofInt(lastBrightness, brightness).apply {
+            duration = 1000
+            addUpdateListener { animation ->
+                val current = (animation.animatedValue as Int)
+                lastBrightness = current
+                sampleData.getConfigByBrightness(current).run {
+                    if (hardwareBrightness != filterBrightness) {
+                        if (filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                            lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                        } else {
+                            lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
                         }
+                        mWindowManager.updateViewLayout(popupView, layoutParams)
+                        hardwareBrightness = filterBrightness
+                    }
+                    if (filterAlpha != view.alpha.toInt()) {
+                        lastFilterAlpha = filterAlpha
+                        view.setAlpha(filterAlpha)
                     }
                 }
-                start()
             }
+            start()
         }
     }
 
-    // 快速更新滤镜 而不是使用动画
-    private fun fastUpdateFilter(filterViewConfig: FilterViewConfig) {
+    fun pause () {
+        if (paused) {
+            return
+        }
+
+        paused = true
+        val sampleData = GlobalStatus.sampleData!!
+        val view = filterView!!
+        val lp = layoutParams!!
+        val toB = lastBrightness
         stopUpdate()
-
-        // 为了避免亮度调高导致亮瞎眼，优先降低亮度
-
-        val delay = if (currentAlpha < filterViewConfig.filterAlpha) {
-            filterView!!.setAlpha(filterViewConfig.filterAlpha)
-            currentAlpha = filterViewConfig.filterAlpha
-            200L
-        } else {
-            0L
-        }
-
-        val to = if (filterViewConfig.filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-            FilterViewConfig.FILTER_BRIGHTNESS_MAX
-        } else {
-            filterViewConfig.filterBrightness
-        }
-        filterView?.postDelayed({
-            try {
-                val layoutParams = this.layoutParams!!
-                if (to >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                    layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-                } else {
-                    layoutParams.screenBrightness = filterViewConfig.getFilterBrightnessRatio()
+        valueAnimator = ValueAnimator.ofInt(sampleData.getScreentMinLight(), 1).apply {
+            duration = 2000
+            addUpdateListener { animation ->
+                FilterViewConfig.getConfigByBrightness(toB, (animation.animatedValue as Int)).run {
+                    if (hardwareBrightness != filterBrightness) {
+                        if (filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                            lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                        } else {
+                            lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                        }
+                        mWindowManager.updateViewLayout(popupView, layoutParams)
+                        hardwareBrightness = filterBrightness
+                    }
+                    if (filterAlpha != view.alpha.toInt()) {
+                        lastFilterAlpha = filterAlpha
+                        view.setAlpha(filterAlpha)
+                    }
                 }
-                filterBrightness = to
-                mWindowManager.updateViewLayout(popupView, layoutParams)
-                if (currentAlpha != filterViewConfig.filterAlpha) {
-                    filterView!!.setAlpha(filterViewConfig.filterAlpha)
-                    currentAlpha = filterViewConfig.filterAlpha
-                }
-            } catch (ex: Exception){
             }
+            start()
+        }
+    }
+    fun resume () {
+        if (!paused) {
+            return
+        }
+        paused = false
 
-            GlobalStatus.currentFilterBrightness = filterBrightness
-            GlobalStatus.currentFilterAlpah = currentAlpha
-        }, delay)
+        val sampleData = GlobalStatus.sampleData!!
+        val view = filterView!!
+        val lp = layoutParams!!
+        stopUpdate()
+        valueAnimator = ValueAnimator.ofInt(1, sampleData.getScreentMinLight()).apply {
+            duration = 2000
+            addUpdateListener { animation ->
+                FilterViewConfig.getConfigByBrightness(lastBrightness, (animation.animatedValue as Int)).run {
+                    if (hardwareBrightness != filterBrightness) {
+                        if (filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                            lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                        } else {
+                            lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                        }
+                        mWindowManager.updateViewLayout(popupView, layoutParams)
+                        hardwareBrightness = filterBrightness
+                    }
+                    if (filterAlpha != view.alpha.toInt()) {
+                        lastFilterAlpha = filterAlpha
+                        view.setAlpha(filterAlpha)
+                    }
+                }
+            }
+            start()
+        }
     }
 }

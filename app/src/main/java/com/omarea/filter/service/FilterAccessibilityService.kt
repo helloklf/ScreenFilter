@@ -186,12 +186,6 @@ class FilterAccessibilityService : AccessibilityService() {
     private fun filterClose() {
         synchronized(GlobalStatus.filterEnabled) {
             try {
-                val config = FilterViewConfig()
-                config.smoothChange = false
-                config.filterBrightness = 1
-
-                filterViewManager.updateFilterByConfig(config)
-
                 lightSensorWatcher?.stopSystemConfigWatcher()
 
                 filterViewManager.close()
@@ -238,11 +232,11 @@ class FilterAccessibilityService : AccessibilityService() {
             filterViewManager.pause()
             handler.postDelayed({
                 filterViewManager.resume()
-            }, 4000)
+            }, 7000)
         }
         handler.postDelayed({
             triggerScreenCap()
-        }, 1050)
+        }, 2950)
     }
 
     /**
@@ -283,9 +277,7 @@ class FilterAccessibilityService : AccessibilityService() {
         // 当前亮度比率
         val ratio = (brightness.toFloat() / maxLight)
 
-        val config = GlobalStatus.sampleData!!.getFilterConfigByRatio(ratio)
-        config.smoothChange = false
-        updateFilterByConfig(config)
+        updateFilterToBrightness((ratio * FilterViewConfig.FILTER_BRIGHTNESS_MAX).toInt())
 
         updateNotification()
     }
@@ -356,7 +348,7 @@ class FilterAccessibilityService : AccessibilityService() {
                     }
                     upOnly = !upOnly
                 }
-            }, 4500, 3000)
+            }, 4500, 8000)
         }
     }
 
@@ -413,7 +405,7 @@ class FilterAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun updateFilterByLux(lux: Float, smoothChange: Boolean = !isFirstUpdate) {
+    private fun updateFilterByLux(lux: Float) {
         val luxValue = if (lux < 0) 0f else lux
         val optimizedLux = dynamicOptimize.luxOptimization(luxValue)
 
@@ -440,26 +432,17 @@ class FilterAccessibilityService : AccessibilityService() {
             offsetPractical += dynamicOptimize.brightnessOptimization(intensity, GlobalStatus.sampleData!!.getScreentMinLight())
         }
 
-        val filterViewConfig = GlobalStatus.sampleData!!.getFilterConfig(optimizedLux, staticOffset, offsetPractical)
-        var alpha = filterViewConfig.filterAlpha
-
-        if (alpha > FilterViewConfig.FILTER_MAX_ALPHA) {
-            alpha = FilterViewConfig.FILTER_MAX_ALPHA
-        } else if (alpha < 0) {
-            alpha = 0
+        GlobalStatus.sampleData!!.run {
+            val sampleValue = getVitualSample(optimizedLux)
+            sampleValue?.run {
+                val brightness = ((sampleValue + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * staticOffset)) * (1 + offsetPractical)).toInt()
+                updateFilterToBrightness(brightness)
+            }
         }
-        filterViewConfig.filterAlpha = alpha
-        filterViewConfig.smoothChange = smoothChange
-
-        updateFilterByConfig(filterViewConfig)
     }
 
-    private fun updateFilterByConfig(filterViewConfig: FilterViewConfig) {
-        // 如果开启了息屏暂停滤镜更新功能
-        if (!screenOn && config.getBoolean(SpfConfig.SCREEN_OFF_PAUSE, SpfConfig.SCREEN_OFF_PAUSE_DEFAULT)) {
-            return
-        }
-        filterViewManager.updateFilterByConfig(filterViewConfig)
+    private fun updateFilterToBrightness(brightness: Int) {
+        filterViewManager.setBrightness(brightness)
         isFirstUpdate = false
     }
 
