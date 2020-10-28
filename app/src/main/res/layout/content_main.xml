@@ -98,7 +98,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:text="@string/filter_enable"
-            android:textColor="@color/colorAccent" />
+            android:switchPadding="6dp"
+            android:textColor="?android:colorAccent" />
 
         <TextView
             style="@style/option_desc"
@@ -132,7 +133,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
                     android:orientation="horizontal">
 
                     <SeekBar
@@ -142,8 +142,6 @@
                         android:layout_weight="1"
                         android:max="40"
                         android:min="0"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="6dp"
                         android:progress="50" />
 
                     <TextView
@@ -160,6 +158,7 @@
                 </LinearLayout>
 
                 <Switch
+                    android:layout_marginTop="20dp"
                     android:id="@+id/landscape_optimize"
                     style="@style/option_title"
                     android:text="@string/landscape_optimize" />
@@ -188,8 +187,6 @@
                         android:id="@+id/dynamic_optimize_limit"
                         android:max="300"
                         android:min="0"
-                        android:paddingEnd="6dp"
-                        android:paddingStart="6dp"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content" />
@@ -202,11 +199,9 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/dynamic_optimize_lux_desc" />
 
                 <Switch
+                    android:layout_marginTop="20dp"
                     android:id="@+id/smooth_brightness"
                     style="@style/option_title"
                     android:text="@string/smooth_brightness" />
@@ -253,11 +248,13 @@
                     android:text="@string/lock_off_desc" />
 
                 <Switch
+                    android:visibility="gone"
                     android:id="@+id/hardware_acceleration"
                     style="@style/option_title"
                     android:text="@string/hardware_acceleration" />
 
                 <TextView
+                    android:visibility="gone"
                     style="@style/option_desc"
                     android:text="@string/hardware_acceleration_desc" />
 

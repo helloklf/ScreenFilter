@@ -8,7 +8,7 @@ android {
     defaultConfig {
         resConfigs "zh"
         applicationId "com.omarea.filter"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 200
         versionName "2.0.0 Preview"
