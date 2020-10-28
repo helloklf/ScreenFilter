@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#eee"
     tools:context=".SampleEditActivity">
 
     <ScrollView
@@ -18,15 +19,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="10dp"
-                android:paddingBottom="5dp">
-                <TextView
-                    style="@style/option_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@string/sample_chart" />
+                android:paddingBottom="1dp">
                     <HorizontalScrollView
+                        android:background="#fff"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <FrameLayout
@@ -36,20 +31,23 @@
                                 android:id="@+id/sample_chart"
                                 android:layout_width="4000dp"
                                 android:layout_height="400dp" />
+                            <TextView
+                                style="@style/option_title"
+                                android:paddingTop="25dp"
+                                android:layout_marginStart="35dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/sample_chart" />
                         </FrameLayout>
                     </HorizontalScrollView>
             </LinearLayout>
 
             <LinearLayout
+                android:background="#fff"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="10dp">
-
-                <TextView
-                    style="@style/option_title"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/sample_desc_title" />
 
                 <TextView
                     style="@style/option_desc"
@@ -57,11 +55,13 @@
             </LinearLayout>
 
             <LinearLayout
+                android:background="@drawable/card_bg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:orientation="vertical"
-                android:padding="10dp">
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical">
 
                 <TextView
                     style="@style/option_title"
@@ -78,13 +78,15 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:layout_height="wrap_content">
-                        <TextView
+                        <ImageButton
                             android:id="@+id/screen_light_minus"
                             android:gravity="center"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:background="@android:color/transparent"
-                            android:text="－"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/minus"
+                            android:layout_marginEnd="10dp"
                             android:textColor="@color/colorPrimary" />
                         <SeekBar
                             android:id="@+id/screen_light_min"
@@ -95,13 +97,15 @@
                             android:min="0"
                             android:progress="1000" />
 
-                        <TextView
+                        <ImageButton
+                            android:layout_marginStart="10dp"
                             android:id="@+id/screen_light_plus"
                             android:gravity="center"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:background="@android:color/transparent"
-                            android:text="＋"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/plus"
                             android:textColor="@color/colorPrimary" />
                     </LinearLayout>
 
@@ -127,10 +131,13 @@
             </LinearLayout>
 
             <LinearLayout
-                android:padding="10dp"
+                android:background="@drawable/card_bg"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginTop="4dp"
                 android:layout_height="wrap_content">
 
                 <TextView
@@ -156,16 +163,12 @@
                 <Button
                     android:textColor="@color/colorAccent"
                     android:id="@+id/smaple_clear"
-                    style="@android:style/Widget.ActionButton"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
+                    style="@style/SceneButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="@string/smaple_clear"
                     android:textSize="12dp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

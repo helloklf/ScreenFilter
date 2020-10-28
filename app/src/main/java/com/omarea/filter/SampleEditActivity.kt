@@ -1,26 +1,21 @@
 package com.omarea.filter
 
-import android.content.Context
+import android.app.AlertDialog
 import android.graphics.Color
-import android.graphics.PixelFormat
-import android.graphics.Point
 import android.graphics.drawable.GradientDrawable
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
-import android.widget.Toast
+import com.omarea.common.ui.DialogHelper
 import com.omarea.filter.common.UITools
 import com.omarea.filter.light.LightSensorManager
 import kotlinx.android.synthetic.main.activity_sample_edit.*
@@ -89,7 +84,7 @@ class SampleEditActivity : AppCompatActivity() {
             openSampleCreate()
         }
         smaple_clear.setOnClickListener {
-            AlertDialog.Builder(this)
+            DialogHelper.animDialog(AlertDialog.Builder(this)
                     .setTitle(R.string.smaple_clear)
                     .setPositiveButton(R.string.sample_edit_confirm) { _, _ ->
                         GlobalStatus.sampleData!!.readConfig(true)
@@ -97,9 +92,7 @@ class SampleEditActivity : AppCompatActivity() {
                         updateChart()
                     }
                     .setNegativeButton(R.string.sample_edit_cancel) { _, _ ->
-                    }
-                    .create()
-                    .show()
+                    })
         }
 
         // 屏幕最低亮度调整
@@ -195,8 +188,8 @@ class SampleEditActivity : AppCompatActivity() {
         redBar.setOnSeekBarChangeListener(listener)
         greenBar.setOnSeekBarChangeListener(listener)
         blueBar.setOnSeekBarChangeListener(listener)
-        android.app.AlertDialog.Builder(this)
-                .setTitle("选择颜色")
+        DialogHelper.animDialog(AlertDialog.Builder(this)
+                .setTitle(getString(R.string.choose_color))
                 .setView(view)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
                     val color = Color.argb(alphaBar.progress, redBar.progress, greenBar.progress, blueBar.progress)
@@ -205,9 +198,7 @@ class SampleEditActivity : AppCompatActivity() {
                     filterView?.setFilterColor(redBar.progress, greenBar.progress, blueBar.progress)
                     setViewBackground(filter_color, GlobalStatus.sampleData!!.getFilterColor())
                 }
-                .setNegativeButton(getString(android.R.string.cancel)) { dialog, which -> }
-                .create()
-                .show()
+                .setNegativeButton(getString(android.R.string.cancel)) { dialog, which -> })
     }
 
     protected fun setViewBackground(view: View, color: Int) {
@@ -234,20 +225,19 @@ class SampleEditActivity : AppCompatActivity() {
         var currentLux = -1
 
         alertDialog = AlertDialog.Builder(this)
-                .setTitle(R.string.sample_add_title)
                 .setView(dialogView)
                 .setCancelable(false)
                 .create()
-        alertDialog!!.show()
-        alertDialog!!.getWindow()!!.setDimAmount(0f);
+        DialogHelper.animDialog(alertDialog)
+        alertDialog?.getWindow()?.setDimAmount(0f);
         GlobalStatus.filterManualUpdate?.run()
 
-        dialogView.findViewById<Button>(R.id.sample_edit_cancel).setOnClickListener {
+        dialogView.findViewById<View>(R.id.sample_edit_cancel).setOnClickListener {
             // GlobalStatus.sampleData!!.removeSample(sampleBrightness.progress)
             alertDialog!!.dismiss()
         }
 
-        dialogView.findViewById<Button>(R.id.sample_save).setOnClickListener {
+        dialogView.findViewById<View>(R.id.sample_save).setOnClickListener {
             GlobalStatus.sampleData!!.replaceSample(sampleLuxView.progress, sampleBrightness.progress)
 
             alertDialog!!.dismiss()
@@ -321,26 +311,26 @@ class SampleEditActivity : AppCompatActivity() {
                 sampleBrightnessText.text = (progress / 10.0).toString()
             }
         })
-        dialogView.findViewById<TextView>(R.id.sample_edit_applay).setOnClickListener {
+        dialogView.findViewById<View>(R.id.sample_edit_applay).setOnClickListener {
             sampleLuxValueView.text = currentLux.toString()
             sampleLuxView.progress = currentLux
         }
-        dialogView.findViewById<TextView>(R.id.sample_edit_minus).setOnClickListener {
+        dialogView.findViewById<View>(R.id.sample_edit_minus).setOnClickListener {
             if (sampleLuxView.progress > 0) {
                 sampleLuxView.progress -= 1
             }
         }
-        dialogView.findViewById<TextView>(R.id.sample_edit_plus).setOnClickListener {
+        dialogView.findViewById<View>(R.id.sample_edit_plus).setOnClickListener {
             if (sampleLuxView.progress < sampleLuxView.max) {
                 sampleLuxView.progress += 1
             }
         }
-        dialogView.findViewById<TextView>(R.id.sample_edit_alpha_minus).setOnClickListener {
+        dialogView.findViewById<View>(R.id.sample_edit_alpha_minus).setOnClickListener {
             if (sampleBrightness.progress > 0) {
                 sampleBrightness.progress -= 1
             }
         }
-        dialogView.findViewById<TextView>(R.id.sample_edit_alpha_plus).setOnClickListener {
+        dialogView.findViewById<View>(R.id.sample_edit_alpha_plus).setOnClickListener {
             if (sampleBrightness.progress < sampleLuxView.max) {
                 sampleBrightness.progress += 1
             }

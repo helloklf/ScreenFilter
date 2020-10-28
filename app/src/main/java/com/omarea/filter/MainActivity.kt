@@ -20,6 +20,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import com.omarea.common.ui.DialogHelper
 import com.omarea.filter.common.NotificationHelper
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
@@ -106,8 +107,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, R.string.accessibility_service_required, Toast.LENGTH_SHORT).show()
                     filterSwitch.isChecked = false
                     try {
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        startActivity(intent)
+                        startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                     } catch (ex: java.lang.Exception) {
                     }
                 } else {
@@ -133,11 +133,11 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val lightLuxOffset = progress - (brightness_offset.max / 2)
                 config.edit().putInt(SpfConfig.BRIGTHNESS_OFFSET, lightLuxOffset).apply()
-                when {
-                    lightLuxOffset > 0 -> brightness_offset_text.text = "+$lightLuxOffset"
-                    lightLuxOffset < 0 -> brightness_offset_text.text = lightLuxOffset.toString()
-                    else -> brightness_offset_text.text = "100"
-                }
+                brightness_offset_text.text = (when {
+                    lightLuxOffset > 0 -> "+$lightLuxOffset"
+                    lightLuxOffset < 0 -> lightLuxOffset.toString()
+                    else -> "100"
+                }) + "%"
                 filterRefresh()
             }
         })
@@ -172,12 +172,6 @@ class MainActivity : AppCompatActivity() {
                 GlobalStatus.filterRefresh?.run()
             }
         })
-
-        // 平滑光线传奇数值
-        smooth_brightness.isChecked = config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)
-        smooth_brightness.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.SMOOTH_ADJUSTMENT, (it as Switch).isChecked).apply()
-        }
 
         // 从最近任务隐藏
         hide_in_recent.isChecked = config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT)
@@ -365,6 +359,13 @@ class MainActivity : AppCompatActivity() {
             } catch (ex: Exception) {
             }
             return true
+        } else if (id == R.id.question) {
+            try {
+                val intent = Intent(this, HelpActivity::class.java)
+                startActivity(intent)
+            } catch (ex: Exception) {
+            }
+            return true
         } else super.onOptionsItemSelected(item)
     }
 
@@ -411,6 +412,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        AlertDialog.Builder(this).setView(dialog).setCancelable(false).create().show()
+        DialogHelper.animDialog(AlertDialog.Builder(this).setView(dialog).setCancelable(false))
     }
 }

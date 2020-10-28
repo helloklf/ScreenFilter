@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#eee"
+    tools:context=".MainActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_marginTop="?attr/actionBarSize"
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card_bg"
+
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                style="@style/option_title"
+                android:text="@string/brightness_control" />
+
+            <TextView
+                style="@style/option_desc"
+                android:layout_marginBottom="0dp"
+                android:text="@string/brightness_control_content" />
+        </LinearLayout>
+
+        <!--声明-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card_bg"
+
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                style="@style/option_title"
+                android:text="@string/statement" />
+
+            <TextView
+                style="@style/option_desc"
+                android:text="@string/statement_content" />
+
+            <TextView
+                style="@style/option_desc"
+                android:layout_marginBottom="0dp"
+                android:autoLink="all"
+                android:gravity="end"
+                android:text="@string/author" />
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

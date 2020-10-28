@@ -27,13 +27,13 @@
                 android:text="A" />
 
             <SeekBar
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
                 android:id="@+id/color_alpha"
-                android:layout_width="match_parent"
+                android:alpha="1"
+                android:thumb="@drawable/seekbar_thumb_solid"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/alpha_gradient"
                 android:max="255"
@@ -52,16 +52,17 @@
                 android:text="R" />
 
             <SeekBar
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
                 android:id="@+id/color_red"
-                android:layout_width="match_parent"
+                android:alpha="1"
+                android:thumb="@drawable/seekbar_thumb_solid"
+                style="@style/SceneSeekBar"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/red_gradient"
-                android:max="20"
+                android:max="255"
                 android:progressDrawable="@android:color/transparent" />
         </LinearLayout>
 
@@ -78,16 +79,17 @@
                 android:text="G" />
 
             <SeekBar
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
                 android:id="@+id/color_green"
-                android:layout_width="match_parent"
+                android:alpha="1"
+                android:thumb="@drawable/seekbar_thumb_solid"
+                style="@style/SceneSeekBar"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/green_gradient"
-                android:max="20"
+                android:max="255"
                 android:progressDrawable="@android:color/transparent" />
         </LinearLayout>
 
@@ -103,16 +105,17 @@
                 android:text="B" />
 
             <SeekBar
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
                 android:id="@+id/color_blue"
-                android:layout_width="match_parent"
+                android:alpha="1"
+                android:thumb="@drawable/seekbar_thumb_solid"
+                style="@style/SceneSeekBar"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/blue_gradient"
-                android:max="20"
+                android:max="255"
                 android:progressDrawable="@android:color/transparent" />
         </LinearLayout>
 

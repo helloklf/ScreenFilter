@@ -1,23 +1,24 @@
 <resources>
     <string name="app_name">屏幕滤镜</string>
+    <string name="help_activity">滤镜说明</string>
+    <string name="sample_edit_activity">高级设置</string>
     <string name="screenshot_tile">正常截图</string>
     <string name="screenshot_tile_fail">屏幕滤镜调用截图失败</string>
     <string name="screenshot_tile_output">保存路径：</string>
-    <string name="sample_edit">高级设置</string>
     <string name="shortcut_on">启用滤镜</string>
     <string name="shortcut_off">关闭滤镜</string>
 
-    <string name="ambient_light">环境光:</string>
+    <string name="ambient_light">环境光照:</string>
+    <string name="ambient_light2">环境光照(Lux):</string>
     <string name="filter_light">物理亮度:</string>
     <string name="filter_alpha">滤镜浓度:</string>
 
     <string name="automatic_brightness_config">自动亮度设置</string>
     <string name="other_config">其它设置</string>
-    <string name="help_infos">帮助说明</string>
 
     <string name="filter_enable">启用滤镜</string>
     <string name="filter_disabled">禁用滤镜</string>
-    <string name="screen_min_light">最低屏幕亮度</string>
+    <string name="screen_min_light">最低硬件亮度</string>
     <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，可设为屏幕开启DC调光的亮度级别，对于全程PWM调光的屏幕，则应设为最高值。\n\n小米9、MIX3 建议设为30%，三星S8 建议设为95%，其它机型自测哦！</string>
     <string name="auto_adjustment">自动亮度</string>
     <string name="auto_adjustment_desc">此开关跟随系统自带的“自动亮度”开关</string>
@@ -43,19 +44,17 @@
     <string name="quick_tile_off">已开关闭幕滤镜</string>
 
     <string name="sample_chart">当前样本数据</string>
-    <string name="sample_desc_title">样本说明</string>
-    <string name="sample_desc">样本数据用于计算不同环境光下的屏幕亮度，上图中x轴表示环境光强度(lux)，y轴表示屏幕亮度。</string>
+    <string name="sample_desc">样本数据用于计算不同环境光下的屏幕亮度\n图中 x轴表示环境光强度(lux)，y轴表示屏幕亮度。</string>
 
     <string name="accessibility_service_required">需要先启动辅助服务，才能使用本功能！</string>
     <string name="overlays_required">还未授予“显示悬浮窗/在应用上层显示”权限</string>
     <string name="please_enable_filter">请先启用滤镜~</string>
 
-    <string name="sample_add_title">添加/覆盖 样本</string>
-    <string name="sample_edit_currentlux">当前环境光亮度(lux)：</string>
-    <string name="sample_brightness">屏幕亮度</string>
-    <string name="sample_brightness_desc">拖动滑块到屏幕亮度合适为止，然后点击确定保存样本</string>
+    <string name="sample_add_title">添加样本数据</string>
+    <string name="sample_edit_currentlux">当前传感器数值(lux)</string>
+    <string name="sample_brightness">屏幕亮度(%)</string>
     <string name="sample_edit_cancel">取消</string>
-    <string name="sample_edit_confirm">确定</string>
+    <string name="sample_edit_confirm">保存</string>
     <string name="sample_edit_applay">使用</string>
     <string name="sample_edit_delete">删除</string>
     <string name="smaple_clear">清空自定义</string>
@@ -65,8 +64,6 @@
     <string name="get_permission_fail">获取悬浮窗显示权限失败！</string>
     <string name="pwm_amoled">为PWM调光的AMOLED屏幕而准备</string>
     <string name="permission_required">应用需要显示悬浮窗(叠加层)权限</string>
-    <string name="smooth_brightness">平均环境光</string>
-    <string name="smooth_brightness_desc">获取环境光亮度时，使用十秒内的平均值</string>
     <string name="write_settings_unallowed">本应用没有修改系统设置的权限，请通过系统的“自动亮度开关进行切换”</string>
     <string name="write_settings_unsupported">本功能不支持Android M(6.0)以前的系统！</string>
     <string name="lock_off">息屏关闭滤镜</string>
@@ -94,4 +91,10 @@
     <string name="step_next">下一步</string>
     <string name="step_warn">请完成向导第一步！</string>
     <string name="guide_fail">初始化配置失败</string>
+
+    <string name="execute_success">执行成功</string>
+    <string name="execute_fail">执行失败</string>
+    <string name="execute_wait">正在执行，请稍等…</string>
+    <string name="btn_confirm">确定</string>
+    <string name="choose_color">选择颜色</string>
 </resources>

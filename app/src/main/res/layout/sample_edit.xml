@@ -6,16 +6,32 @@
     android:paddingLeft="17dp"
     android:paddingTop="10dp"
     android:paddingRight="17dp">
+    <TextView
+        android:textSize="20sp"
+        style="@style/option_desc"
+        android:layout_marginBottom="20dp"
+        android:text="@string/sample_add_title" />
 
     <TextView
+        android:layout_marginBottom="8dp"
         style="@style/option_title"
-        android:text="@string/ambient_light" />
+        android:text="@string/ambient_light2" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/sample_edit_minus"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="10dp"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/minus"
+            android:textColor="@color/colorPrimary" />
         <SeekBar
             android:id="@+id/sample_lux"
             android:layout_width="0dp"
@@ -24,12 +40,21 @@
             android:min="0"
             android:max="4000" />
 
+        <ImageButton
+            android:id="@+id/sample_edit_plus"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="10dp"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/plus"
+            android:textColor="@color/colorPrimary" />
+
         <TextView
             android:layout_width="50dp"
-            android:gravity="center_horizontal"
+            android:textAlignment="textEnd"
             android:id="@+id/sample_lux_text"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:text="0lux" />
     </LinearLayout>
 
@@ -37,22 +62,33 @@
         android:paddingTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
+        <ImageView
+            android:alpha="0.5"
+            android:src="@drawable/light_sensor"
+            android:scaleType="centerInside"
+            android:layout_width="18dp"
+            android:layout_height="18dp" />
+
         <TextView
-            style="@style/option_desc"
+            style="@style/textSmall"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/sample_edit_currentlux" />
 
         <TextView
             android:id="@+id/sample_edit_brightness"
-            style="@style/option_desc"
-            android:layout_width="40dp"
+            style="@style/textSmall"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:gravity="start" />
 
         <TextView
             android:id="@+id/sample_edit_applay"
-            style="@style/option_desc"
+            style="@style/textSmall"
+            android:layout_marginStart="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -65,37 +101,30 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <TextView
-            android:id="@+id/sample_edit_minus"
-            style="@style/option_desc"
-            android:gravity="center"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginStart="10dp"
-            android:background="@android:color/transparent"
-            android:text="－"
-            android:textColor="@color/colorPrimary" />
-
-        <TextView
-            android:id="@+id/sample_edit_plus"
-            style="@style/option_desc"
-            android:gravity="center"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginStart="20dp"
-            android:background="@android:color/transparent"
-            android:text="＋"
-            android:textColor="@color/colorPrimary" />
     </LinearLayout>
 
     <TextView
         style="@style/option_title"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/sample_brightness" />
 
     <LinearLayout
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageButton
+            android:id="@+id/sample_edit_alpha_minus"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/minus"
+            android:textColor="@color/colorPrimary" />
         <SeekBar
             android:id="@+id/sample_brightness"
             android:layout_width="0dp"
@@ -103,18 +132,21 @@
             android:layout_weight="1"
             android:min="0"
             android:max="1000" />
+        <ImageButton
+            android:id="@+id/sample_edit_alpha_plus"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="10dp"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@drawable/plus"
+            android:textColor="@color/colorPrimary" />
 
         <TextView
             android:id="@+id/sample_brightness_text"
             android:layout_width="50dp"
-            android:gravity="center_horizontal"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="%" />
+            android:textAlignment="textEnd"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
@@ -132,33 +164,8 @@
             android:layout_gravity="center_vertical"
             android:layout_marginBottom="0dp"
             android:layout_weight="1"
-            android:text="@string/sample_brightness_desc" />
+            android:text="" />
 
-        <TextView
-            android:id="@+id/sample_edit_alpha_minus"
-            style="@style/option_desc"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginBottom="0dp"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:text="－"
-            android:textColor="@color/colorPrimary" />
-
-        <TextView
-            android:id="@+id/sample_edit_alpha_plus"
-            style="@style/option_desc"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginBottom="0dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="20dp"
-            android:background="@android:color/transparent"
-            android:gravity="center"
-            android:text="＋"
-            android:textColor="@color/colorPrimary" />
     </LinearLayout>
 
     <LinearLayout

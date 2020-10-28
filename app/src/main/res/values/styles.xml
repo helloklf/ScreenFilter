@@ -48,14 +48,14 @@
 
     <style name="option_title" parent="textTitle">
         <item name="android:layout_width">match_parent</item>
+        <item name="android:gravity">center_vertical</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">2dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
     </style>
 
     <style name="option_desc" parent="textSmall">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">20dp</item>
     </style>
 
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
@@ -70,6 +70,8 @@
 
 
     <style name="textTitle" parent="@style/TextAppearance.AppCompat.Title">
+        <item name="fontFamily">sans-serif-black</item>
+        <item name="android:minHeight">22dp</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">14dp</item>
@@ -88,7 +90,8 @@
     </style>
 
     <style name="textSmall">
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textColor">#888888</item>
+        <item name="alpha">0.8</item>
         <item name="android:textSize">11dp</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
@@ -165,5 +168,10 @@
         <item name="android:paddingRight">12dp</item>
         <item name="android:textSize">13dp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="dialogAnim">
+        <item name="android:windowExitAnimation">@anim/dialog_exit</item>
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
     </style>
 </resources>
