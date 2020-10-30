@@ -3,8 +3,12 @@ package com.omarea.filter
 import java.util.*
 
 class DynamicOptimize {
-
+    private val enableLuxOptimize = false
     fun luxOptimization(lux: Float): Float {
+        if (!enableLuxOptimize) {
+            return lux
+        }
+
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         if (hour < 21 && hour > 6) {
