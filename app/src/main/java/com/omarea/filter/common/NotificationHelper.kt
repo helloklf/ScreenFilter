@@ -29,23 +29,23 @@ class NotificationHelper(private var context: Context) {
     fun updateNotification(autoMode: Boolean = true) {
         val config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
 
-        val minus = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_minus)), 0);
-        val plus = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_plus)), 0);
-        val on = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_on)), 0);
-        val off = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_off)), 0);
+        val minus = PendingIntent.getBroadcast(context, 11, Intent(context.getString(R.string.action_minus)), PendingIntent.FLAG_UPDATE_CURRENT);
+        val plus = PendingIntent.getBroadcast(context, 12, Intent(context.getString(R.string.action_plus)), PendingIntent.FLAG_UPDATE_CURRENT);
+        val on = PendingIntent.getBroadcast(context, 13, Intent(context.getString(R.string.action_on)), PendingIntent.FLAG_UPDATE_CURRENT);
+        val off = PendingIntent.getBroadcast(context, 14, Intent(context.getString(R.string.action_off)), PendingIntent.FLAG_UPDATE_CURRENT);
 
         val remoteViews = RemoteViews(context.getPackageName(), R.layout.notification);
         remoteViews.setOnClickPendingIntent(R.id.brightness_minus, minus);
         remoteViews.setOnClickPendingIntent(R.id.brightness_plus, plus);
 
         if (autoMode) {
-            val brightnessManual = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_manual)), 0);
+            val brightnessManual = PendingIntent.getBroadcast(context, 15, Intent(context.getString(R.string.action_manual)), PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.brightness_auto_manual, brightnessManual)
             val levels = SpfConfig.BRIGTHNESS_OFFSET_LEVELS
             remoteViews.setProgressBar(R.id.brightness_current, levels, (config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) + (levels / 2)), false)
             remoteViews.setImageViewResource(R.id.brightness_auto_manual, R.drawable.icon_brightness_auto)
         } else {
-            val brightnessAuto = PendingIntent.getBroadcast(context, 0, Intent(context.getString(R.string.action_auto)), 0);
+            val brightnessAuto = PendingIntent.getBroadcast(context, 16, Intent(context.getString(R.string.action_auto)), PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.brightness_auto_manual, brightnessAuto)
             remoteViews.setImageViewResource(R.id.brightness_auto_manual, R.drawable.icon_brightness_manual)
 
@@ -69,6 +69,7 @@ class NotificationHelper(private var context: Context) {
         if (GlobalStatus.filterEnabled) {
             remoteViews.setOnClickPendingIntent(R.id.brightness_power_switch, off)
             remoteViews.setImageViewResource(R.id.brightness_power_switch, R.drawable.icon_power_on)
+            remoteViews.setViewVisibility(R.id.brightness_controller, View.VISIBLE)
         } else {
             remoteViews.setOnClickPendingIntent(R.id.brightness_power_switch, on)
             remoteViews.setImageViewResource(R.id.brightness_power_switch, R.drawable.icon_power_off)

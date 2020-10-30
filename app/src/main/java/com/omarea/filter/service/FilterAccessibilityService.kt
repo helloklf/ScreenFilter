@@ -206,6 +206,7 @@ class FilterAccessibilityService : AccessibilityService() {
             }
 
             updateNotification()
+            /*
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 brightnessControlerBroadcast?.run {
                     try {
@@ -214,6 +215,7 @@ class FilterAccessibilityService : AccessibilityService() {
                     }
                 }
             }
+            */
         }
     }
 
