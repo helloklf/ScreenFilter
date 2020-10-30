@@ -1,5 +1,6 @@
 package com.omarea.filter
 
+import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.pm.ActivityInfo
@@ -153,9 +154,6 @@ class FilterViewManager(private var context: Context) {
                             hardwareBrightness = filterBrightness
                         }
                         if (filterAlpha != (view.alpha * 1000).toInt()) {
-                            if (filterAlpha < 200) {
-                                Log.d("Filter", "" + this.filterAlpha + " - " + current)
-                            }
                             lastFilterAlpha = filterAlpha
                             view.setAlpha(filterAlpha)
                         }
@@ -196,6 +194,17 @@ class FilterViewManager(private var context: Context) {
                     }
                 }
             }
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator?) {
+                }
+                override fun onAnimationEnd(animation: Animator?) {
+
+                }
+                override fun onAnimationCancel(animation: Animator?) {
+                }
+                override fun onAnimationRepeat(animation: Animator?) {
+                }
+            })
             start()
         }
     }

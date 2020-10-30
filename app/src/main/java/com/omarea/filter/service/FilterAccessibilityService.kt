@@ -10,7 +10,9 @@ import android.graphics.Point
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
@@ -24,11 +26,11 @@ import com.omarea.filter.light.LightSensorWatcher
 import java.io.File
 import java.util.*
 
-class FilterAccessibilityService : AccessibilityService() {
+class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Companion.IWindowAnalyzerResult {
     private lateinit var config: SharedPreferences
     private var dynamicOptimize: DynamicOptimize = DynamicOptimize()
     private var lightSensorWatcher: LightSensorWatcher? = null
-    private var handler = Handler()
+    private var handler = Handler(Looper.getMainLooper())
     private var isLandscape = false
     private val lightHistory = LinkedList<LightHistory>()
     private lateinit var filterViewManager: FilterViewManager
@@ -48,14 +50,14 @@ class FilterAccessibilityService : AccessibilityService() {
     // 屏幕解锁事件监听
     private var receiverLock: ReceiverLock? = null
 
-    // 是否是首次更新屏幕滤镜
-    private var isFirstUpdate = false
-
     // 是否正在使用自动亮度调节
     private var isAutoBrightness = false
 
     // 计算平滑亮度的定时器
     private var smoothLightTimer: Timer? = null
+
+    // 窗口层次分析器
+    private lateinit var windowAnalyzer: WindowAnalyzer
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
 
@@ -66,6 +68,7 @@ class FilterAccessibilityService : AccessibilityService() {
         config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
         notificationHelper = NotificationHelper(this)
         updateNotification()
+        windowAnalyzer = WindowAnalyzer(this)
 
         if (GlobalStatus.sampleData == null) {
             GlobalStatus.sampleData = SampleData(applicationContext)
@@ -73,9 +76,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
         filterViewManager = FilterViewManager(this)
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-            screenOn = ScreenState(this).isScreenOn()
-        }
+        screenOn = ScreenState(this).isScreenOn()
 
         GlobalStatus.filterOpen = Runnable {
             filterOpen()
@@ -99,13 +100,25 @@ class FilterAccessibilityService : AccessibilityService() {
             }
         }, {
             screenOn = true
-            if ((!GlobalStatus.filterEnabled) && config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)) {
+            if (
+                    (!GlobalStatus.filterEnabled) &&
+                    config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)
+            ) {
                 filterOpen()
-            } else if (GlobalStatus.filterEnabled && !config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
+            } else if (
+                    GlobalStatus.filterEnabled &&
+                    !config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
                 filterRefresh()
-                lightHistory.clear()
             }
         }))
+        brightnessControlerBroadcast?.run {
+            registerReceiver(this, IntentFilter(getString(R.string.action_minus)))
+            registerReceiver(this, IntentFilter(getString(R.string.action_plus)))
+            registerReceiver(this, IntentFilter(getString(R.string.action_auto)))
+            registerReceiver(this, IntentFilter(getString(R.string.action_manual)))
+            registerReceiver(this, IntentFilter(getString(R.string.action_on)))
+            registerReceiver(this, IntentFilter(getString(R.string.action_off)))
+        }
 
         lightSensorWatcher = LightSensorWatcher(this, object : LightHandler {
             override fun onModeChange(auto: Boolean) {
@@ -130,7 +143,7 @@ class FilterAccessibilityService : AccessibilityService() {
         // 获取分辨率大小
         val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val point = Point()
-        wm.getDefaultDisplay().getRealSize(point);
+        wm.defaultDisplay.getRealSize(point);
 
         displayHeight = point.y
         displayWidth = point.x
@@ -162,61 +175,38 @@ class FilterAccessibilityService : AccessibilityService() {
 
     // 打开滤镜
     private fun filterOpen() {
-        synchronized(GlobalStatus.filterEnabled) {
-            isFirstUpdate = true
+        filterViewManager.open()
 
-            filterViewManager.open()
+        screenOn = ScreenState(this).isScreenOn()
 
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-                screenOn = ScreenState(this).isScreenOn()
-            }
+        lightSensorWatcher?.startSystemConfigWatcher()
 
-            lightSensorWatcher?.startSystemConfigWatcher()
+        GlobalStatus.filterRefresh = Runnable { filterRefresh() }
 
-            GlobalStatus.filterRefresh = Runnable { filterRefresh() }
+        GlobalStatus.filterEnabled = true
 
-            GlobalStatus.filterEnabled = true
-
-            brightnessControlerBroadcast?.run {
-                registerReceiver(this, IntentFilter(getString(R.string.action_minus)))
-                registerReceiver(this, IntentFilter(getString(R.string.action_plus)))
-                registerReceiver(this, IntentFilter(getString(R.string.action_auto)))
-                registerReceiver(this, IntentFilter(getString(R.string.action_manual)))
-                registerReceiver(this, IntentFilter(getString(R.string.action_on)))
-                registerReceiver(this, IntentFilter(getString(R.string.action_off)))
-            }
-            updateNotification()
-        }
+        updateNotification()
+        Log.d("Filter", "Filter - ON")
     }
 
     // 关闭滤镜
     private fun filterClose() {
-        synchronized(GlobalStatus.filterEnabled) {
-            try {
-                lightSensorWatcher?.stopSystemConfigWatcher()
+        try {
+            lightSensorWatcher?.stopSystemConfigWatcher()
 
-                filterViewManager.close()
+            filterViewManager.close()
 
-                GlobalStatus.filterRefresh = null
-                GlobalStatus.filterEnabled = false
-                lightHistory.clear()
-                stopSmoothLightTimer()
-                filterBrightness = -1
-            } catch (ex: Exception) {
-            }
-
-            updateNotification()
-            /*
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                brightnessControlerBroadcast?.run {
-                    try {
-                        unregisterReceiver(this)
-                    } catch (ex: java.lang.Exception) {
-                    }
-                }
-            }
-            */
+            GlobalStatus.filterRefresh = null
+            GlobalStatus.filterEnabled = false
+            lightHistory.clear()
+            stopSmoothLightTimer()
+            filterBrightness = -1
+            Log.d("Filter", "Filter - OFF")
+        } catch (ex: Exception) {
+            Log.d("Filter", "Filter - OFF" + ex.message)
         }
+
+        updateNotification()
     }
 
     // 刷新滤镜
@@ -305,11 +295,11 @@ class FilterAccessibilityService : AccessibilityService() {
             lightHistory.removeFirst()
         }
 
-        lightHistory.add(history)
-
-        if (isFirstUpdate) {
+        if (lightHistory.isEmpty()) {
             updateFilterByLux(currentLux)
         }
+
+        lightHistory.add(history)
 
         startSmoothLightTimer()
     }
@@ -320,6 +310,7 @@ class FilterAccessibilityService : AccessibilityService() {
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         if (newConfig != null) {
+            val currentLandscape = isLandscape
             if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 isLandscape = false
             } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -339,6 +330,61 @@ class FilterAccessibilityService : AccessibilityService() {
                     filterViewManager.updateSize()
                 }
             }
+
+            // 判断是否发生了屏幕旋转
+            if (currentLandscape != isLandscape) {
+                if (isLandscape) {
+                    if (
+                            config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT) &&
+                            config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)
+                    ) {
+                        windowAnalyzer.analysis(null, this)
+                    }
+                } else if (videoPlaying && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
+                    onViedPlayerLeave()
+                }
+            }
+        }
+    }
+
+    private val videoApps = arrayListOf<String>(
+            "com.bilibili.app.in",
+            "tv.danmaku.bili",
+            "com.qiyi.video",
+            "com.qiyi.video.sdkplayer",
+            "com.tencent.qqlive",
+            "com.mxtech.videoplayer.pro",
+            "com.mxtech.videoplayer.ad")
+
+    // 是否在视频播放中
+    private var videoPlaying = false
+    // 处理窗口层次分析结果
+    override fun onWindowAnalyzerResult(packageName: String) {
+        handler.post {
+            if (videoApps.contains(packageName)) {
+                Log.d("Filter", "LANDSCAPE_OPTIMIZE " + packageName + " - isVideoApp")
+                onViedPlayerEnter()
+            } else {
+                onViedPlayerLeave()
+                Log.d("Filter", "LANDSCAPE_OPTIMIZE " + packageName + " Unknown")
+            }
+        }
+    }
+
+    private fun onViedPlayerEnter () {
+        filterClose()
+        videoPlaying = true
+    }
+
+    private fun onViedPlayerLeave () {
+        if (videoPlaying) {
+            if (
+                    config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT) &&
+                    config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)
+            ) {
+                filterOpen()
+            }
+            videoPlaying = false
         }
     }
 
@@ -422,7 +468,6 @@ class FilterAccessibilityService : AccessibilityService() {
 
     private fun updateFilterToBrightness(brightness: Int) {
         filterViewManager.setBrightness(brightness)
-        isFirstUpdate = false
     }
 
     // 更新通知
