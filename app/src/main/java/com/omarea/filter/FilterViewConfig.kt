@@ -38,6 +38,7 @@ class FilterViewConfig {
             } else {
                 brightness
             }
+
             if (screentMinLight == FILTER_BRIGHTNESS_MAX) {
                 val config = getDefault()
                 config.filterBrightness = FILTER_BRIGHTNESS_MAX

@@ -2,6 +2,7 @@ package com.omarea.filter
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
@@ -23,7 +24,6 @@ class FilterViewManager(private var context: Context) {
     private var filterBrightness = 0 // 当前由滤镜控制的屏幕亮度
     private var currentAlpha: Int = 0
     private var valueAnimator: ValueAnimator? = null
-    private var valueAnimator2: ValueAnimator? = null
     private var lastFilterViewConfig: FilterViewConfig? = null
     private var fadeInDuration = 3000L
 
@@ -42,6 +42,7 @@ class FilterViewManager(private var context: Context) {
 
         params.gravity = Gravity.NO_GRAVITY
         params.format = PixelFormat.TRANSLUCENT
+        params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                 WindowManager.LayoutParams.FLAG_FULLSCREEN or
@@ -103,10 +104,6 @@ class FilterViewManager(private var context: Context) {
         if (valueAnimator != null && valueAnimator!!.isRunning) {
             valueAnimator!!.cancel()
             valueAnimator = null
-        }
-        if (valueAnimator2 != null && valueAnimator2!!.isRunning) {
-            valueAnimator2!!.cancel()
-            valueAnimator2 = null
         }
     }
 

@@ -47,6 +47,17 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
                         brightnessManualMode(context);
                     }
                 }
+                if (action.equals(context.getString(R.string.action_on))) {
+                    Runnable runnable = GlobalStatus.INSTANCE.getFilterOpen();
+                    if (runnable != null) {
+                        runnable.run();
+                    }
+                } else if (action.equals(context.getString(R.string.action_off))) {
+                    Runnable runnable = GlobalStatus.INSTANCE.getFilterClose();
+                    if (runnable != null) {
+                        runnable.run();
+                    }
+                }
             } catch (Exception ignored) {
             }
         }

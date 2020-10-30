@@ -1,5 +1,6 @@
 package com.omarea.filter
 
+import android.content.SharedPreferences
 import java.util.*
 
 class DynamicOptimize {
@@ -26,13 +27,13 @@ class DynamicOptimize {
     private val lateNightTime = 22 * 60; // 深夜时间 22:00
     private val morningTime = 7 * 60 + 30 // 早晨 7:30
     private val dawnTime = 6 * 60 // 黎明 6：00
-    fun brightnessOptimization(intensity: Float, screentMinLight: Int): Double {
+    fun brightnessOptimization(): Double {
         var offsetValue: Double = 0.toDouble();
         val calendar = Calendar.getInstance()
         val value = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
 
         // 在深夜光线极暗的情况下
-        if (intensity > 0f && (value >= nightTime || value < morningTime)) {
+        if (value >= nightTime || value < morningTime) {
             if (value >= nightTime) {
                 offsetValue -= ((value - nightTime) / 10.0 / 23) // 24:00 - 20:30 = 210 , 210 / 10.0 / 23 ≈ 0.9
             } else if (value < dawnTime) {
@@ -42,6 +43,37 @@ class DynamicOptimize {
             }
         }
 
-        return offsetValue * intensity
+        return offsetValue
+    }
+
+    fun optimizedBrightness(lux: Float, config: SharedPreferences): Int? {
+        val luxValue = if (lux < 0) 0f else lux
+        val optimizedLux = luxOptimization(luxValue)
+
+        // 亮度微调
+        val staticOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
+        var offsetPractical = 0.0
+
+        if (config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
+            val dynamicOptimizeLux = config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, SpfConfig.DYNAMIC_OPTIMIZE_LIMIT_DEFAULT)
+            if (luxValue <= dynamicOptimizeLux) {
+                offsetPractical += brightnessOptimization()
+            }
+        }
+
+
+        val sampleValue = GlobalStatus.sampleData?.getVitualSample(optimizedLux)
+        sampleValue?.run {
+            val value = (((sampleValue) * (1 + offsetPractical)) + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * staticOffset)).toInt()
+
+            return (if (value > FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                FilterViewConfig.FILTER_BRIGHTNESS_MAX
+            } else if (value < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
+                FilterViewConfig.FILTER_BRIGHTNESS_MIN
+            } else {
+                value
+            })
+        }
+        return null
     }
 }

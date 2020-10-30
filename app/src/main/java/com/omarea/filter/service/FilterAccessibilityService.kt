@@ -65,6 +65,7 @@ class FilterAccessibilityService : AccessibilityService() {
         }
         config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
         notificationHelper = NotificationHelper(this)
+        updateNotification()
 
         if (GlobalStatus.sampleData == null) {
             GlobalStatus.sampleData = SampleData(applicationContext)
@@ -181,6 +182,8 @@ class FilterAccessibilityService : AccessibilityService() {
                 registerReceiver(this, IntentFilter(getString(R.string.action_plus)))
                 registerReceiver(this, IntentFilter(getString(R.string.action_auto)))
                 registerReceiver(this, IntentFilter(getString(R.string.action_manual)))
+                registerReceiver(this, IntentFilter(getString(R.string.action_on)))
+                registerReceiver(this, IntentFilter(getString(R.string.action_off)))
             }
             updateNotification()
         }
@@ -202,7 +205,7 @@ class FilterAccessibilityService : AccessibilityService() {
             } catch (ex: Exception) {
             }
 
-            notificationHelper?.cancelNotification()
+            updateNotification()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 brightnessControlerBroadcast?.run {
                     try {
@@ -236,11 +239,11 @@ class FilterAccessibilityService : AccessibilityService() {
             filterViewManager.pause()
             handler.postDelayed({
                 filterViewManager.resume()
-            }, 7000)
+            }, 5500)
         }
         handler.postDelayed({
             triggerScreenCap()
-        }, 2950)
+        }, 2050)
     }
 
     /**
@@ -410,38 +413,8 @@ class FilterAccessibilityService : AccessibilityService() {
     }
 
     private fun updateFilterByLux(lux: Float) {
-        val luxValue = if (lux < 0) 0f else lux
-        val optimizedLux = dynamicOptimize.luxOptimization(luxValue)
-
-        // 亮度微调
-        var staticOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
-        var offsetPractical = 0.toDouble()
-
-        // 横屏
-        if (isLandscape && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
-            staticOffset += 0.1
-        } else if (config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
-            val dynamicOptimizeLux = config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, SpfConfig.DYNAMIC_OPTIMIZE_LIMIT_DEFAULT)
-            val intensity = 1f - (if (dynamicOptimizeLux == 0f) {
-                if (luxValue <= dynamicOptimizeLux) {
-                    0f
-                } else {
-                    1f
-                }
-            } else if (luxValue <= dynamicOptimizeLux) {
-                luxValue / dynamicOptimizeLux
-            } else {
-                1f
-            })
-            offsetPractical += dynamicOptimize.brightnessOptimization(intensity, GlobalStatus.sampleData!!.getScreentMinLight())
-        }
-
-        GlobalStatus.sampleData!!.run {
-            val sampleValue = getVitualSample(optimizedLux)
-            sampleValue?.run {
-                val brightness = ((sampleValue + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * staticOffset)) * (1 + offsetPractical)).toInt()
-                updateFilterToBrightness(brightness)
-            }
+        dynamicOptimize.optimizedBrightness(lux, config)?.run {
+            updateFilterToBrightness(this)
         }
     }
 

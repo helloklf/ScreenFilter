@@ -1,6 +1,8 @@
 package com.omarea.filter
 
 import android.app.AlertDialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.hardware.Sensor
@@ -24,6 +26,8 @@ class SampleEditActivity : AppCompatActivity() {
     private var filterPopup: View? = null
     private var hasChange = false
     private var alertDialog: AlertDialog? = null
+    private lateinit var config: SharedPreferences
+    private lateinit var dynamicOptimize: DynamicOptimize
 
     /**
      * 获取导航栏高度
@@ -46,9 +50,9 @@ class SampleEditActivity : AppCompatActivity() {
      */
     fun getStatusHeight(): Int {
         var result = 0;
-        val resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
+            result = resources.getDimensionPixelSize(resourceId);
         }
         return result
     }
@@ -61,6 +65,15 @@ class SampleEditActivity : AppCompatActivity() {
     private fun filterUpdate(screenBrightness: Int) {
         GlobalStatus.filterManualBrightness = screenBrightness
         GlobalStatus.filterManualUpdate?.run()
+    }
+
+    private fun filterUpdateByLux(lux: Float): Int? {
+        DynamicOptimize().optimizedBrightness(lux, config)?.run {
+            GlobalStatus.filterManualBrightness = this
+            GlobalStatus.filterManualUpdate?.run()
+            return this
+        }
+        return null
     }
 
     /**
@@ -76,6 +89,8 @@ class SampleEditActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sample_edit)
+        config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
+        dynamicOptimize = DynamicOptimize()
 
         // 全屏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -267,11 +282,9 @@ class SampleEditActivity : AppCompatActivity() {
                         sampleLuxValueView.text = limitedValue.toString()
                         sampleLuxView.progress = limitedValue
 
-                        val sample = GlobalStatus.sampleData!!.getVitualSample(limitedValue)
-                        if (sample != null) {
-                            sampleBrightness.progress = sample
-                            sampleBrightnessText.text = (sample / 10.0).toString()
-                            filterUpdate(sample)
+                        filterUpdateByLux(limitedValue.toFloat())?.run {
+                            sampleBrightness.progress = this
+                            sampleBrightnessText.text = (this / 10.0).toString()
                         }
                     }
                     currentLux = lux
@@ -298,6 +311,7 @@ class SampleEditActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sampleBrightness.min = 1
         }
+
         sampleBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
             }

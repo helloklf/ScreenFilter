@@ -4,7 +4,7 @@ public class SpfConfig {
     public static String FILTER_SPF = "FILTER_SPF";
 
     // 亮度偏移量（1表示1%,100表示100%）
-    public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET_V2";
+    public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET_V3";
     public static int BRIGTHNESS_OFFSET_DEFAULT = 0;
     public static int BRIGTHNESS_OFFSET_LEVELS = 50;
 
