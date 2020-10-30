@@ -4,7 +4,7 @@
     <!--设置ProgressBar背景色-->
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="#f0f0f0" />
+            <solid android:color="#33888888" />
             <corners android:radius="5dp" />
         </shape>
     </item>
