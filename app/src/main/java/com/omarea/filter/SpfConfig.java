@@ -53,10 +53,6 @@ public class SpfConfig {
     public static String DYNAMIC_OPTIMIZE_LIMIT = "DYNAMIC_OPTIMIZE_LIMIT";
     public static float DYNAMIC_OPTIMIZE_LIMIT_DEFAULT = 0;
 
-    // 硬件加速
-    public static String HARDWARE_ACCELERATED = "HARDWARE_ACCELERATED";
-    public static boolean HARDWARE_ACCELERATED_DEFAULT = true;
-
     // 通知中心显示亮度控制器
     public static String BRIGHTNESS_CONTROLLER = "BRIGHTNESS_CONTROLLER";
     public static boolean BRIGHTNESS_CONTROLLER_DEFAULT = false;

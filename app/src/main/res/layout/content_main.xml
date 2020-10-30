@@ -258,22 +258,7 @@
                 style="@style/option_desc"
                 android:text="@string/lock_off_desc" />
         </LinearLayout>
-        <LinearLayout
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/card_bg"
-            android:orientation="vertical">
-            <Switch
-                android:id="@+id/hardware_acceleration"
-                style="@style/option_title"
-                android:text="@string/hardware_acceleration" />
 
-            <TextView
-                style="@style/option_desc"
-                android:text="@string/hardware_acceleration_desc" />
-        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -30,8 +30,6 @@
 
     <string name="hide_in_recent">从最近任务隐藏</string>
     <string name="hide_in_recent_desc">不要在最近任务列表显示本应用</string>
-    <string name="hardware_acceleration">硬件加速</string>
-    <string name="hardware_acceleration_desc">启用提高亮度变化平滑度，关闭可节省内存</string>
 
     <string name="accessibility_description">通过辅助服务，提高滤镜显示层级，以便能够覆盖状态栏、导航栏、锁屏界面。</string>
     <string name="brightness_control">如何调节亮度</string>

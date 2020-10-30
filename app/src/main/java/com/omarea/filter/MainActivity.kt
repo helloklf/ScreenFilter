@@ -181,16 +181,6 @@ class MainActivity : AppCompatActivity() {
             setExcludeFromRecents()
         }
 
-        // 硬件加速
-        hardware_acceleration.isChecked = config.getBoolean(SpfConfig.HARDWARE_ACCELERATED, SpfConfig.HARDWARE_ACCELERATED_DEFAULT)
-        hardware_acceleration.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.HARDWARE_ACCELERATED, (it as Switch).isChecked).apply()
-            if (GlobalStatus.filterEnabled) {
-                GlobalStatus.filterClose?.run()
-                GlobalStatus.filterOpen?.run()
-            }
-        }
-
         // 息屏关闭
         lock_off.isChecked = config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)
         lock_off.setOnClickListener {
