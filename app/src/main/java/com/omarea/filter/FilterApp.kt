@@ -7,6 +7,7 @@ public class FilterApp : Application() {
     companion object {
         public lateinit var context: Context
     }
+
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         context = this

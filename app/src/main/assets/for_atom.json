@@ -10,5 +10,6 @@
     "10000": 900,
     "20000": 1000
   },
-  "screentMinLight": 10
+  "screentMinLight": 251,
+  "filterColor": -16777216
 }

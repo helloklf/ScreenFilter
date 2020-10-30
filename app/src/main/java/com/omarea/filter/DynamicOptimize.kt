@@ -19,7 +19,7 @@ class DynamicOptimize {
     }
 
     private val nightTime = 20 * 60 + 50 // 夜晚时间 20:50
-    private val lateNightTime = 22*60; // 深夜时间 22:00
+    private val lateNightTime = 22 * 60; // 深夜时间 22:00
     private val morningTime = 7 * 60 + 30 // 早晨 7:30
     private val dawnTime = 6 * 60 // 黎明 6：00
     fun brightnessOptimization(intensity: Float, screentMinLight: Int): Double {

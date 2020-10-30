@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,7 @@ class FilterViewManager(private var context: Context) {
     private var valueAnimator: ValueAnimator? = null
     private var valueAnimator2: ValueAnimator? = null
     private var lastFilterViewConfig: FilterViewConfig? = null
+    private var fadeInDuration = 3000L
 
     fun open() {
         if (popupView != null) {
@@ -113,17 +115,17 @@ class FilterViewManager(private var context: Context) {
 
     private var lastBrightness: Int = 0
     private var lastFilterAlpha: Int
-        get () {
+        get() {
             return GlobalStatus.currentFilterAlpah
         }
-        set (value) {
+        set(value) {
             GlobalStatus.currentFilterAlpah = value
         }
     private var hardwareBrightness: Int
-        get () {
+        get() {
             return GlobalStatus.currentFilterBrightness
         }
-        set (value) {
+        set(value) {
             GlobalStatus.currentFilterBrightness = value
         }
 
@@ -139,23 +141,30 @@ class FilterViewManager(private var context: Context) {
         val lp = layoutParams!!
         stopUpdate()
         valueAnimator = ValueAnimator.ofInt(lastBrightness, brightness).apply {
-            duration = 1000
+            var lastTick = -2
+            duration = fadeInDuration
             addUpdateListener { animation ->
                 val current = (animation.animatedValue as Int)
-                lastBrightness = current
-                sampleData.getConfigByBrightness(current).run {
-                    if (hardwareBrightness != filterBrightness) {
-                        if (filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                            lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-                        } else {
-                            lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                if (current != lastTick) {
+                    lastTick = -2
+                    lastBrightness = current
+                    sampleData.getConfigByBrightness(current).run {
+                        if (hardwareBrightness != filterBrightness) {
+                            if (filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                                lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                            } else {
+                                lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                            }
+                            mWindowManager.updateViewLayout(popupView, layoutParams)
+                            hardwareBrightness = filterBrightness
                         }
-                        mWindowManager.updateViewLayout(popupView, layoutParams)
-                        hardwareBrightness = filterBrightness
-                    }
-                    if (filterAlpha != (view.alpha * 1000).toInt()) {
-                        lastFilterAlpha = filterAlpha
-                        view.setAlpha(filterAlpha)
+                        if (filterAlpha != (view.alpha * 1000).toInt()) {
+                            if (filterAlpha < 200) {
+                                Log.d("Filter", "" + this.filterAlpha + " - " + current)
+                            }
+                            lastFilterAlpha = filterAlpha
+                            view.setAlpha(filterAlpha)
+                        }
                     }
                 }
             }
@@ -163,7 +172,7 @@ class FilterViewManager(private var context: Context) {
         }
     }
 
-    fun pause () {
+    fun pause() {
         if (paused) {
             return
         }
@@ -196,7 +205,8 @@ class FilterViewManager(private var context: Context) {
             start()
         }
     }
-    fun resume () {
+
+    fun resume() {
         if (!paused) {
             return
         }
@@ -207,7 +217,7 @@ class FilterViewManager(private var context: Context) {
         val lp = layoutParams!!
         stopUpdate()
         valueAnimator = ValueAnimator.ofInt(1, sampleData.getScreentMinLight()).apply {
-            duration = 2000
+            duration = fadeInDuration
             addUpdateListener { animation ->
                 FilterViewConfig.getConfigByBrightness(lastBrightness, (animation.animatedValue as Int)).run {
                     if (hardwareBrightness != filterBrightness) {
@@ -229,7 +239,7 @@ class FilterViewManager(private var context: Context) {
         }
     }
 
-    fun filterManualUpdate () {
+    fun filterManualUpdate() {
         if (GlobalStatus.filterManualBrightness > -1) {
             paused = true
             val sampleData = GlobalStatus.sampleData!!

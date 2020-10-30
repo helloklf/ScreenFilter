@@ -18,10 +18,11 @@ class SampleData(private val context: Context) {
 
     // 屏幕亮度低于此值时才开启滤镜功能
     private var screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+
     // 滤镜颜色
     private var filterColor: Int = Color.BLACK
 
-    private var filterConfig = "Samples.json"
+    private var filterConfig = Build.PRODUCT + ".json"
 
     private val applicationGlobalConfig = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
 
@@ -166,7 +167,6 @@ class SampleData(private val context: Context) {
         }
         return FilterViewConfig.getDefault()
     }
-
 
 
     /**

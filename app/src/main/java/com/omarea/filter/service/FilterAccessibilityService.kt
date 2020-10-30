@@ -44,6 +44,7 @@ class FilterAccessibilityService : AccessibilityService() {
 
     // 当前手机屏幕是否处于开启状态
     private var screenOn = true
+
     // 屏幕解锁事件监听
     private var receiverLock: ReceiverLock? = null
 

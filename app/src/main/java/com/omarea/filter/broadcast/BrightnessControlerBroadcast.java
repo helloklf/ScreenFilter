@@ -47,12 +47,13 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
                         brightnessManualMode(context);
                     }
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         }
     }
 
     private boolean checkWriteSettings(Context context) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(context)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(context)) {
             return true;
         }
         return false;
@@ -70,17 +71,18 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
             }
 
             if (current > max * 0.9) {
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int)(max * 0.1));
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int) (max * 0.1));
             } else if (current > max * 0.5) {
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int)(max * 0.075));
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int) (max * 0.075));
             } else if (current > max * 0.2) {
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int)(max * 0.0255));
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int) (max * 0.0255));
             } else if (current > 10) {
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int)(max * 0.0125));
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - (int) (max * 0.0125));
             } else if (current > 1) {
                 Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current - 1);
             }
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
 
     private void brightnessPlus(Context context) {
@@ -98,17 +100,18 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
             if (current < 10) {
                 Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + 1);
             } else if (current < max * 0.1) {
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int)(max * 0.0125));
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int) (max * 0.0125));
             } else if (current < max * 0.2) {
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int)(max * 0.0255));
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int) (max * 0.0255));
             } else if (current < max * 0.5) {
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int)(max * 0.075));
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int) (max * 0.075));
             } else if (current < max * 0.9) {
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int)(max * 0.1));
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, current + (int) (max * 0.1));
             } else {
                 Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, max);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private void brightnessManualMode(Context context) {

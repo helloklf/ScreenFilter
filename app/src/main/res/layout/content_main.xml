@@ -25,6 +25,24 @@
                 android:layout_marginEnd="5dp"
                 android:layout_weight="1"
                 android:background="@drawable/card_bg"
+                android:gravity="center">
+
+                <Switch
+                    android:id="@+id/filter_switch"
+                    android:layout_marginBottom="0dp"
+                    style="@style/option_title"
+                    android:layout_width="wrap_content"
+                    android:switchPadding="6dp"
+                    android:text="@string/filter_enable"
+                    android:textColor="?android:colorAccent" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
@@ -89,23 +107,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/card_bg"
-                android:gravity="center">
-
-                <Switch
-                    android:id="@+id/filter_switch"
-                    android:layout_marginBottom="0dp"
-                    style="@style/option_title"
-                    android:layout_width="wrap_content"
-                    android:switchPadding="6dp"
-                    android:text="@string/filter_enable"
-                    android:textColor="?android:colorAccent" />
-            </LinearLayout>
         </LinearLayout>
 
 

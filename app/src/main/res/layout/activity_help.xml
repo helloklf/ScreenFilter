@@ -47,6 +47,63 @@
                 android:text="@string/brightness_control_content" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card_bg"
+
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                style="@style/option_title"
+                android:text="@string/help_breathing" />
+
+            <TextView
+                style="@style/option_desc"
+                android:layout_marginBottom="0dp"
+                android:text="@string/help_breathing_desc" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card_bg"
+
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                style="@style/option_title"
+                android:text="@string/help_deviation" />
+
+            <TextView
+                style="@style/option_desc"
+                android:layout_marginBottom="0dp"
+                android:text="@string/help_deviation_desc" />
+        </LinearLayout>
+
+        <!--声明-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card_bg"
+
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                style="@style/option_title"
+                android:text="@string/help_warn_title" />
+
+            <TextView
+                style="@style/option_desc"
+                android:text="@string/help_warn" />
+        </LinearLayout>
+
         <!--声明-->
         <LinearLayout
             android:layout_width="match_parent"
@@ -67,6 +124,7 @@
 
             <TextView
                 style="@style/option_desc"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="0dp"
                 android:autoLink="all"
                 android:gravity="end"

@@ -95,6 +95,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         setExcludeFromRecents()
         askForPermission()
+        FilterSample().getFilterAlpha(40)
 
         // 启用滤镜
         filter_switch.setOnClickListener { v ->
@@ -403,7 +404,9 @@ class MainActivity : AppCompatActivity() {
                             config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
                         }
                         GlobalStatus.sampleData!!.readConfig(true)
-                        recreate()
+                        myHandler.postDelayed(Runnable {
+                            recreate()
+                        }, 100)
                     } else {
                         Toast.makeText(this, getString(R.string.step_warn), Toast.LENGTH_SHORT).show()
                     }

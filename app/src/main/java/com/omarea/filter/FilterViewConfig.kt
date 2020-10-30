@@ -3,6 +3,7 @@ package com.omarea.filter
 class FilterViewConfig {
     // 0 - 1000 // 1000表示全黑，0 表示不使用滤镜
     internal var filterAlpha = 0
+
     // 0  - 1000，1000 表示最大亮度
     internal var filterBrightness = FILTER_BRIGHTNESS_MAX
 
@@ -30,7 +31,13 @@ class FilterViewConfig {
          * 根据所需的亮度值获取滤镜配置
          */
         fun getConfigByBrightness(brightness: Int, screentMinLight: Int = FILTER_BRIGHTNESS_MAX): FilterViewConfig {
-            val brightnessValue = if (brightness < FILTER_BRIGHTNESS_MIN) FILTER_BRIGHTNESS_MIN else if (brightness > FILTER_BRIGHTNESS_MAX) FILTER_BRIGHTNESS_MAX else brightness
+            val brightnessValue = if (brightness < FILTER_BRIGHTNESS_MIN) {
+                FILTER_BRIGHTNESS_MIN
+            } else if (brightness > FILTER_BRIGHTNESS_MAX) {
+                FILTER_BRIGHTNESS_MAX
+            } else {
+                brightness
+            }
             if (screentMinLight == FILTER_BRIGHTNESS_MAX) {
                 val config = getDefault()
                 config.filterBrightness = FILTER_BRIGHTNESS_MAX

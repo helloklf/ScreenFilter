@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.omarea.filter.R;
 import com.omarea.filter.SpfConfig;
+
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class SwitchBrightnessModeService extends TileService {
 
@@ -72,7 +73,8 @@ public class SwitchBrightnessModeService extends TileService {
                 getQsTile().setState(Tile.STATE_INACTIVE);
             }
             getQsTile().updateTile(); //更新Tile
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
 
     // 关闭下拉菜单的时候调用,当快速设置按钮并没有在编辑栏拖到设置栏中不会调用
