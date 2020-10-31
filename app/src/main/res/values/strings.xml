@@ -87,7 +87,7 @@
 
     <string name="hide_start_icon">隐藏启动图标 </string>
     <string name="hide_start_icon_desc">打开此开关后，本应用将从桌面隐藏，如果需要再恢复请到辅助服务界面，选中本应用进行操作</string>
-    <string name="guide_desc">本应用会根据你的设置调整预设，务必认真完成向导！</string>
+    <string name="guide_desc">应用会根据你的操作选择最佳配置，务必认真完成向导！</string>
     <string name="use_lcd">代替系统亮度调节</string>
     <string name="use_amoled">缓解PWM闪烁</string>
     <string name="use_device">选择您使用本应用的目的：</string>

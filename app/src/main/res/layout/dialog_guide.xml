@@ -7,9 +7,10 @@
 
     <TextView
         android:layout_marginTop="20dp"
-        android:textColor="@android:color/black"
-        android:textSize="15sp"
-        android:textStyle="bold"
+        android:textColor="?android:textColorSecondary"
+        android:textSize="18sp"
+        android:textStyle="normal"
+        android:fontFamily="sans-serif-light"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/step1" />
@@ -23,13 +24,15 @@
 
     <TextView
         android:layout_marginTop="30dp"
-        android:textColor="@android:color/black"
-        android:textSize="15sp"
-        android:textStyle="bold"
+        android:textColor="?android:textColorSecondary"
+        android:textSize="18sp"
+        android:textStyle="normal"
+        android:fontFamily="sans-serif-light"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/step2" />
     <TextView
+        android:layout_marginTop="6dp"
         android:layout_marginBottom="10dp"
         android:textSize="12sp"
         android:text="@string/use_device"
@@ -47,6 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <RadioButton
+            android:layout_marginTop="8dp"
             android:id="@+id/guide_lcd"
             android:textStyle="normal"
             android:text="@string/use_lcd"

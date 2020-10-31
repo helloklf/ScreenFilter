@@ -209,6 +209,13 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
         updateNotification()
     }
 
+    // 淡出滤镜
+    private fun fadeOut() {
+        filterViewManager.pause {
+            this.filterClose()
+        }
+    }
+
     // 刷新滤镜
     private fun filterRefresh() {
         if (GlobalStatus.filterEnabled) {
@@ -235,7 +242,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
         }
         handler.postDelayed({
             triggerScreenCap()
-        }, 2050)
+        }, 1900)
     }
 
     /**
@@ -273,10 +280,11 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, brightness).apply()
             maxLight = brightness
         }
+
         // 当前亮度比率
         val ratio = (brightness.toFloat() / maxLight)
 
-        updateFilterToBrightness((ratio * FilterViewConfig.FILTER_BRIGHTNESS_MAX).toInt())
+        updateFilterToBrightness((ratio * FilterViewConfig.FILTER_BRIGHTNESS_MAX).toInt(), false)
 
         updateNotification()
     }
@@ -354,10 +362,12 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             "com.qiyi.video.sdkplayer",
             "com.tencent.qqlive",
             "com.mxtech.videoplayer.pro",
-            "com.mxtech.videoplayer.ad")
+            "com.mxtech.videoplayer.ad",
+            "com.netease.cloudmusic")
 
     // 是否在视频播放中
     private var videoPlaying = false
+
     // 处理窗口层次分析结果
     override fun onWindowAnalyzerResult(packageName: String) {
         handler.post {
@@ -371,12 +381,12 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
         }
     }
 
-    private fun onViedPlayerEnter () {
-        filterClose()
+    private fun onViedPlayerEnter() {
+        fadeOut()
         videoPlaying = true
     }
 
-    private fun onViedPlayerLeave () {
+    private fun onViedPlayerLeave() {
         if (videoPlaying) {
             if (
                     config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT) &&
@@ -395,15 +405,20 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
         if (smoothLightTimer == null) {
             smoothLightTimer = Timer()
             smoothLightTimer!!.schedule(object : TimerTask() {
-                private var upOnly = false;
+                // 为了让从滤镜能在从室内走到室外时快速响应及时的提高亮度
+                // 同时又不至于因为短时间的手指遮挡屏幕导致屏幕突然变暗
+                // 这里加一个周期循环，0:正常调整滤镜亮度，1:只响应环境光线大幅提升
+                private var periodNum = 0
+
                 private var lastValue = -1f
                 override fun run() {
                     handler.post {
-                        lastValue = smoothLightTimerTick(upOnly, lastValue)
+                        lastValue = smoothLightTimerTick(periodNum != 0, lastValue)
                     }
-                    upOnly = !upOnly
+                    periodNum += 1
+                    periodNum %= 2
                 }
-            }, 4500, 8000)
+            }, 500, 4000)
         }
     }
 
@@ -414,34 +429,43 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
         var targetLux: Float = -1F
         try {
             if (lightHistory.size > 0) {
-                if (config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)) {
-                    val currentTime = System.currentTimeMillis()
-                    val result = lightHistory.filter { (currentTime - it.time) < 11000 }
+                // 计算一段时间内的绝对平均亮度(环境光)
+                val range = 10000 // 取最近10秒内的数据
+                val currentTime = System.currentTimeMillis()
+                val copy = LinkedList<LightHistory>().apply {
+                    addAll(lightHistory)
 
-                    var avgLux: Float
-                    val lastSample = lightHistory.last().lux
-                    if (result.isNotEmpty()) {
-                        var total: Double = 0.toDouble()
-                        for (history in result) {
-                            total += history.lux
-                        }
-                        avgLux = (total / result.size).toFloat()
-                        // 如果侦测到大幅的环境光变化，积极的提高亮度
-                        if (lastSample > (avgLux + 5)) {
-                            avgLux = lastSample
-                            // 清空样本数据
-                            synchronized(lightHistory) {
-                                lightHistory.clear()
-                            }
-                        }
-                    } else {
-                        avgLux = lastSample
+                    // 虚拟一个样本，表示光线传感器最后一次上报数值，并数值保持至今
+                    // 这样就可以让样本数据成为可以闭合的区间
+                    val virtualSample = lightHistory.last.apply {
+                        time = currentTime
                     }
-                    targetLux = avgLux
-                } else {
-                    targetLux = lightHistory.last().lux
+                    add(virtualSample)
                 }
-                if (lastValue < targetLux || !upOnly) {
+
+                var totalLux = 0.0
+                val rangeStart = currentTime - range
+                var lastHistory: LightHistory? = null
+                for (history in copy) {
+                    if (history.time > rangeStart) {
+                        if (lastHistory != null) {
+                            val startTime = if (lastHistory.time < rangeStart) rangeStart else lastHistory.time
+                            val endTime = history.time
+                            val lux = lastHistory.lux
+                            totalLux += (lux * (endTime - startTime))
+                        }
+                    }
+                    lastHistory = history
+                }
+                val absAvgLux = (if (totalLux > 0.0) {
+                    (totalLux / range).toFloat()
+                } else {
+                    copy.last.lux
+                })
+
+                targetLux = absAvgLux
+
+                if (!upOnly || (targetLux - lastValue > 200)) {
                     updateFilterByLux(targetLux)
                 }
             }
@@ -462,12 +486,12 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
 
     private fun updateFilterByLux(lux: Float) {
         dynamicOptimize.optimizedBrightness(lux, config)?.run {
-            updateFilterToBrightness(this)
+            updateFilterToBrightness(this, true)
         }
     }
 
-    private fun updateFilterToBrightness(brightness: Int) {
-        filterViewManager.setBrightness(brightness)
+    private fun updateFilterToBrightness(brightness: Int, smooth: Boolean) {
+        filterViewManager.setBrightness(brightness, smooth)
     }
 
     // 更新通知

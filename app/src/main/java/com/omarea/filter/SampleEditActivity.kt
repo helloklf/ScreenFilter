@@ -244,8 +244,7 @@ class SampleEditActivity : AppCompatActivity() {
                 .setCancelable(false)
                 .create()
         DialogHelper.animDialog(alertDialog)
-        alertDialog?.getWindow()?.setDimAmount(0f);
-        GlobalStatus.filterManualUpdate?.run()
+        alertDialog?.getWindow()?.setDimAmount(0f)
 
         dialogView.findViewById<View>(R.id.sample_edit_cancel).setOnClickListener {
             // GlobalStatus.sampleData!!.removeSample(sampleBrightness.progress)
