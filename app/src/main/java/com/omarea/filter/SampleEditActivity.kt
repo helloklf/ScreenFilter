@@ -21,6 +21,8 @@ import com.omarea.common.ui.DialogHelper
 import com.omarea.filter.common.UITools
 import com.omarea.filter.light.LightSensorManager
 import kotlinx.android.synthetic.main.activity_sample_edit.*
+import kotlinx.android.synthetic.main.content_main.*
+import org.w3c.dom.Text
 
 class SampleEditActivity : AppCompatActivity() {
     private var filterPopup: View? = null
@@ -237,6 +239,8 @@ class SampleEditActivity : AppCompatActivity() {
         val sampleLuxValueView = dialogView.findViewById<TextView>(R.id.sample_lux_text)
         val sampleBrightness = dialogView.findViewById<SeekBar>(R.id.sample_brightness)
         val sampleBrightnessText = dialogView.findViewById<TextView>(R.id.sample_brightness_text)
+        val filterLight = dialogView.findViewById<TextView>(R.id.filter_light)
+        val filterAlpha = dialogView.findViewById<TextView>(R.id.filter_alpha)
         var currentLux = -1f
 
         alertDialog = AlertDialog.Builder(this)
@@ -283,6 +287,9 @@ class SampleEditActivity : AppCompatActivity() {
                         filterUpdateByLux(lux)?.run {
                             sampleBrightness.progress = this
                             sampleBrightnessText.text = (this / 10.0).toString()
+
+                            filterLight.text = (GlobalStatus.currentFilterBrightness / 10f).toString() + "%"
+                            filterAlpha.text = ((GlobalStatus.currentFilterAlpah * 1000 / FilterViewConfig.FILTER_MAX_ALPHA).toInt() / 10.0).toString() + "%"
                         }
                     }
                     currentLux = lux
@@ -321,6 +328,9 @@ class SampleEditActivity : AppCompatActivity() {
                 filterUpdate(progress)
 
                 sampleBrightnessText.text = (progress / 10.0).toString()
+
+                filterLight.text = (GlobalStatus.currentFilterBrightness / 10f).toString() + "%"
+                filterAlpha.text = ((GlobalStatus.currentFilterAlpah * 1000 / FilterViewConfig.FILTER_MAX_ALPHA).toInt() / 10.0).toString() + "%"
             }
         })
         dialogView.findViewById<View>(R.id.sample_edit_applay).setOnClickListener {

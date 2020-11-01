@@ -11,7 +11,7 @@
     <string name="ambient_light">环境光照:</string>
     <string name="ambient_light_avg">平均光照:</string>
     <string name="ambient_light2">环境光照(Lux):</string>
-    <string name="filter_light">物理亮度:</string>
+    <string name="filter_light">硬件亮度:</string>
     <string name="filter_alpha">滤镜浓度:</string>
 
     <string name="automatic_brightness_config">自动亮度设置</string>
@@ -104,4 +104,5 @@
     <string name="execute_wait">正在执行，请稍等…</string>
     <string name="btn_confirm">确定</string>
     <string name="choose_color">选择颜色</string>
+    <string name="convert_result">换算结果：</string>
 </resources>

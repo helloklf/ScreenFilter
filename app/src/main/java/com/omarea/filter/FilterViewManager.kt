@@ -142,6 +142,22 @@ class FilterViewManager(private var context: Context) {
                         setBrightnessNow(current)
                     }
                 }
+
+                addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator?) {
+                    }
+                    override fun onAnimationEnd(animation: Animator?) {
+                        if (brightness != lastTick) {
+                            lastTick = brightness
+                            lastBrightness = brightness
+                            setBrightnessNow(brightness)
+                        }
+                    }
+                    override fun onAnimationCancel(animation: Animator?) {
+                    }
+                    override fun onAnimationRepeat(animation: Animator?) {
+                    }
+                })
                 start()
             }
         } else {
@@ -255,6 +271,19 @@ class FilterViewManager(private var context: Context) {
                     }
                 }
             }
+
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator?) {
+                }
+                override fun onAnimationEnd(animation: Animator?) {
+                    lastTick = lastBrightness
+                    setBrightnessNow(lastBrightness)
+                }
+                override fun onAnimationCancel(animation: Animator?) {
+                }
+                override fun onAnimationRepeat(animation: Animator?) {
+                }
+            })
             start()
         }
     }
