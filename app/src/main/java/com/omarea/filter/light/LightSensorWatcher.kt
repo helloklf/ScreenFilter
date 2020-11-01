@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener
 import android.net.Uri
 import android.os.Handler
 import android.provider.Settings
+import android.util.Log
 import com.omarea.filter.GlobalStatus
 
 class LightSensorWatcher(private var context: Context, private var lightHandler: LightHandler) {
@@ -60,7 +61,19 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
                 if (event != null && event.values.size > 0) {
 
                     // 获取光线强度
-                    val lux = event.values[0]
+                    val lux = event.values.first()
+
+                    /*
+                    // 多个传感器数值计算平均值（实际上好像多传感器的手机也不会报告两个值）
+                    val lux = event.values.run {
+                        var total = 0F
+                        for (value in this) {
+                            total += value
+                        }
+                        total / size
+                    }
+                    */
+
                     GlobalStatus.currentLux = lux
 
                     // 自动亮度模式下才根据环境光自动调整滤镜强度

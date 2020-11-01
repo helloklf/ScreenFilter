@@ -46,7 +46,7 @@
     <string name="author">—— 嘟嘟斯基\n http://vtools.omarea.com</string>
 
     <string name="quick_tile_on">已开启屏幕滤镜</string>
-    <string name="quick_tile_off">已开关闭幕滤镜</string>
+    <string name="quick_tile_off">已关闭屏幕滤镜</string>
 
     <string name="sample_chart">当前样本数据</string>
     <string name="sample_desc">样本数据用于计算不同环境光下的屏幕亮度\n图中 x轴表示环境光强度(lux)，y轴表示屏幕亮度。</string>
@@ -72,7 +72,7 @@
     <string name="write_settings_unallowed">本应用没有修改系统设置的权限，请通过系统的“自动亮度开关进行切换”</string>
     <string name="write_settings_unsupported">本功能不支持Android M(6.0)以前的系统！</string>
     <string name="lock_off">息屏关闭滤镜</string>
-    <string name="lock_off_desc">[息屏/锁屏]时关闭滤镜，避免AOD亮度过低</string>
+    <string name="lock_off_desc">使用滤镜后AOD过暗的手机可以试试</string>
     <string name="channel_brightness_controller_text">亮度控制</string>
     <string name="channel_brightness_controller">brightness_controller</string>
 
