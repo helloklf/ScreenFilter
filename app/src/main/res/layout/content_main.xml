@@ -58,7 +58,7 @@
                         android:textSize="11dp" />
 
                     <TextView
-                        android:id="@+id/light_lux_avg"
+                        android:id="@+id/light_lux"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
@@ -74,11 +74,11 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/ambient_light"
+                        android:text="@string/ambient_light_avg"
                         android:textSize="11dp" />
 
                     <TextView
-                        android:id="@+id/light_lux"
+                        android:id="@+id/light_lux_avg"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
