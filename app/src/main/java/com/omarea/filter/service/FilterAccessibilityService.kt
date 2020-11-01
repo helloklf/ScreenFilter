@@ -104,10 +104,18 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
                     (!GlobalStatus.filterEnabled) &&
                     config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)
             ) {
+                lightHistory.clear()
                 filterOpen()
             } else if (
                     GlobalStatus.filterEnabled &&
                     !config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
+                synchronized(lightHistory) {
+                    val history = lightHistory.lastOrNull()
+                    if (history != null) {
+                        lightHistory.clear()
+                        lightHistory.add(history)
+                    }
+                }
                 filterRefresh()
             }
         }))
