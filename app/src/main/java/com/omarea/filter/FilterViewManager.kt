@@ -43,6 +43,7 @@ class FilterViewManager(private var context: Context) {
     private fun resetState() {
         lastBrightness = 0
         lastFilterAlpha = 0
+        hardwareBrightness = 0
         filterPaused = false
     }
 
@@ -177,10 +178,9 @@ class FilterViewManager(private var context: Context) {
                 mWindowManager.updateViewLayout(popupView, layoutParams)
                 hardwareBrightness = filterBrightness
             }
-            if (filterAlpha != (filterView!!.alpha * 1000).toInt()) {
-                lastFilterAlpha = filterAlpha
-                filterView!!.setAlpha(filterAlpha)
-            }
+
+            lastFilterAlpha = filterAlpha
+            filterView!!.setAlpha(filterAlpha)
         }
     }
 

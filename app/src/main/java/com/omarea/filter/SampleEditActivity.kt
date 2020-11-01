@@ -276,7 +276,7 @@ class SampleEditActivity : AppCompatActivity() {
                 if (event != null && event.values.size > 0) {
                     // 获取光线强度
                     val lux = event.values[0]
-                    currentLuxView.text = lux.toString()
+                    currentLuxView.text = String.format("%.1f", lux)
                     if (currentLux < 0) {
                         sampleLuxValueView.text = lux.toString()
                         sampleLuxView.progress = lux.toInt()
@@ -334,10 +334,10 @@ class SampleEditActivity : AppCompatActivity() {
             }
         })
         dialogView.findViewById<View>(R.id.sample_edit_applay).setOnClickListener {
-            sampleLuxValueView.text = currentLux.toString()
-            val lux = currentLux.toInt()
+            val lux = Math.round(currentLux)
+            sampleLuxValueView.text = lux.toString()
             if (lux > sampleLuxView.max) {
-                sampleLuxView.max = lux
+                sampleLuxView.max = (lux + 1)
             }
             sampleLuxView.progress = lux
         }
