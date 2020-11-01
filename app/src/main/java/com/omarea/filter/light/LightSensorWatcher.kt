@@ -86,6 +86,7 @@ class LightSensorWatcher(private var context: Context, private var lightHandler:
             start()
         } else {
             stop()
+            GlobalStatus.currentLux = -1f
             lightHandler.onBrightnessChange(systemBrightness)
         }
 

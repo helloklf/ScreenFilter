@@ -9,6 +9,7 @@
     <string name="shortcut_off">关闭滤镜</string>
 
     <string name="ambient_light">环境光照:</string>
+    <string name="ambient_light_avg">平均光照:</string>
     <string name="ambient_light2">环境光照(Lux):</string>
     <string name="filter_light">物理亮度:</string>
     <string name="filter_alpha">滤镜浓度:</string>

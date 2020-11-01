@@ -3,6 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 android {
     signingConfigs {
+        omarea_Signing {
+            keyAlias 'omarea.com'
+            keyPassword 'asdf1234'
+            storeFile file('D:/omoarea.jks')
+            storePassword 'asdf1234'
+        }
     }
     compileSdkVersion 28
     defaultConfig {
@@ -10,8 +16,8 @@ android {
         applicationId "com.omarea.filter"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 203
-        versionName "2.0.0 Preview3"
+        versionCode 204
+        versionName "2.0.0 Preview4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -22,6 +28,7 @@ android {
             debuggable = false
         }
         debug {
+            // signingConfig signingConfigs.omarea_Signing
             minifyEnabled false
             debuggable = true
         }

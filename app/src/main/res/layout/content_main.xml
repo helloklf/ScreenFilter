@@ -16,7 +16,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="80dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -45,6 +45,26 @@
                 android:background="@drawable/card_bg"
                 android:gravity="center_vertical"
                 android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ambient_light"
+                        android:textSize="11dp" />
+
+                    <TextView
+                        android:id="@+id/light_lux_avg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="2dp"
+                        android:text="0"
+                        android:textSize="11dp" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

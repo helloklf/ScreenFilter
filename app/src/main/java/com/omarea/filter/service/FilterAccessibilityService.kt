@@ -111,6 +111,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
                 filterRefresh()
             }
         }))
+
         brightnessControlerBroadcast?.run {
             registerReceiver(this, IntentFilter(getString(R.string.action_minus)))
             registerReceiver(this, IntentFilter(getString(R.string.action_plus)))
@@ -220,9 +221,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
     private fun filterRefresh() {
         if (GlobalStatus.filterEnabled) {
             if (isAutoBrightness) {
-                lightHistory.lastOrNull()?.run {
-                    updateFilterByLux(this.lux)
-                }
+                smoothLightTimerTick(false, -1f)
             } else {
                 onBrightnessChanged(Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS))
             }
@@ -412,8 +411,10 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
 
                 private var lastValue = -1f
                 override fun run() {
-                    handler.post {
-                        lastValue = smoothLightTimerTick(periodNum != 0, lastValue)
+                    if (screenOn) {
+                        handler.post {
+                            lastValue = smoothLightTimerTick(periodNum != 0, lastValue,if(periodNum != 0) 4000 else 8000) // 取最近10秒内的数据)
+                        }
                     }
                     periodNum += 1
                     periodNum %= 2
@@ -425,12 +426,11 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
     /**
      * 更新滤镜 使用最近的光线传感器样本平均值
      */
-    private fun smoothLightTimerTick(upOnly: Boolean, lastValue: Float): Float {
+    private fun smoothLightTimerTick(upOnly: Boolean, lastValue: Float, range: Long = 4000L): Float {
         var targetLux: Float = -1F
         try {
             if (lightHistory.size > 0) {
                 // 计算一段时间内的绝对平均亮度(环境光)
-                val range = 10000 // 取最近10秒内的数据
                 val currentTime = System.currentTimeMillis()
                 val copy = LinkedList<LightHistory>().apply {
                     addAll(lightHistory)
@@ -466,6 +466,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
                 targetLux = absAvgLux
 
                 if (!upOnly || (targetLux - lastValue > 200)) {
+                    GlobalStatus.avgLux = targetLux
                     updateFilterByLux(targetLux)
                 }
             }
@@ -482,6 +483,8 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             smoothLightTimer!!.cancel()
             smoothLightTimer = null
         }
+
+        GlobalStatus.avgLux = -1f
     }
 
     private fun updateFilterByLux(lux: Float) {

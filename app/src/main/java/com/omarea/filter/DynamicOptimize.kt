@@ -5,7 +5,7 @@ import java.util.*
 
 class DynamicOptimize {
     private val enableLuxOptimize = false
-    fun luxOptimization(lux: Float): Float {
+    private fun luxOptimization(lux: Float): Float {
         if (!enableLuxOptimize) {
             return lux
         }
@@ -27,7 +27,7 @@ class DynamicOptimize {
     private val lateNightTime = 22 * 60; // 深夜时间 22:00
     private val morningTime = 7 * 60 + 30 // 早晨 7:30
     private val dawnTime = 6 * 60 // 黎明 6：00
-    fun brightnessOptimization(): Double {
+    private fun brightnessOptimization(): Double {
         var offsetValue: Double = 0.toDouble();
         val calendar = Calendar.getInstance()
         val value = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
@@ -43,7 +43,7 @@ class DynamicOptimize {
             }
         }
 
-        return offsetValue
+        return offsetValue * 0.3
     }
 
     fun optimizedBrightness(lux: Float, config: SharedPreferences): Int? {
@@ -54,6 +54,7 @@ class DynamicOptimize {
         val staticOffset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) / 100.0
         var offsetPractical = 0.0
 
+        // 夜间微调
         if (config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)) {
             val dynamicOptimizeLux = config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, SpfConfig.DYNAMIC_OPTIMIZE_LIMIT_DEFAULT)
             if (luxValue <= dynamicOptimizeLux) {

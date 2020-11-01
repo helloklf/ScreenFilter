@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         dynamic_optimize.isChecked = config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)
         dynamic_optimize.setOnClickListener {
             config.edit().putBoolean(SpfConfig.DYNAMIC_OPTIMIZE, (it as Switch).isChecked).apply()
-            restartFilter()
+            GlobalStatus.filterRefresh?.run()
         }
 
         val limitLux = config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, SpfConfig.DYNAMIC_OPTIMIZE_LIMIT_DEFAULT)
@@ -266,7 +266,16 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateInfo() {
         myHandler.post {
-            light_lux.text = GlobalStatus.currentLux.toString() + "lux"
+            if (GlobalStatus.currentLux > -1) {
+                light_lux.text = GlobalStatus.currentLux.toString() + "lux"
+            } else {
+                light_lux.text = ""
+            }
+            if (GlobalStatus.avgLux > -1) {
+                light_lux_avg.text = GlobalStatus.avgLux.toString() + "lux"
+            } else {
+                light_lux_avg.text = ""
+            }
             if (GlobalStatus.filterEnabled) {
                 filter_light.text = (GlobalStatus.currentFilterBrightness / 10f).toString() + "%"
             } else {
