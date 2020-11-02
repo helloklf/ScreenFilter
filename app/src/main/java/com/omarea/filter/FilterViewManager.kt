@@ -118,7 +118,7 @@ class FilterViewManager(private var context: Context) {
         }
 
     // 停止正在运行的滤镜更新动画
-    private fun stopUpdate() {
+    public fun stopUpdate() {
         if (valueAnimator != null && valueAnimator!!.isRunning) {
             valueAnimator!!.cancel()
             valueAnimator = null

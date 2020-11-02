@@ -95,7 +95,9 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             if (!ScreenState(this).isScreenOn()) {
                 screenOn = false
                 if (config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
-                    filterClose()
+                    // filterClose()
+                    // FIXME:效果非常好，但是有个致命的问题，那就是如果正在淡出滤镜期间，屏幕被点亮...
+                    fadeOut()
                 }
             }
         }, {
@@ -228,6 +230,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
     // 刷新滤镜
     private fun filterRefresh() {
         if (GlobalStatus.filterEnabled) {
+            filterViewManager.stopUpdate()
             if (isAutoBrightness) {
                 smoothLightTimerTick(false, -1f)
             } else {
