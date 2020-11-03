@@ -95,12 +95,17 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             if (!ScreenState(this).isScreenOn()) {
                 screenOn = false
                 if (config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
-                    // filterClose()
-                    // FIXME:效果非常好，但是有个致命的问题，那就是如果正在淡出滤镜期间，屏幕被点亮...
-                    fadeOut()
+                    if (GlobalStatus.filterEnabled) {
+                        // filterClose()
+                        // FIXME:效果非常好，但是有个致命的问题，那就是如果正在淡出滤镜期间，屏幕被点亮...
+                        fadeOut()
+                    }
                 }
             }
         }, {
+            if(screenOn == true) {
+                return@ScreenEventHandler
+            }
             screenOn = true
             if (
                     (!GlobalStatus.filterEnabled) &&
@@ -108,9 +113,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             ) {
                 lightHistory.clear()
                 filterOpen()
-            } else if (
-                    GlobalStatus.filterEnabled &&
-                    !config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)) {
+            } else if (GlobalStatus.filterEnabled) {
                 synchronized(lightHistory) {
                     val history = lightHistory.lastOrNull()
                     if (history != null) {

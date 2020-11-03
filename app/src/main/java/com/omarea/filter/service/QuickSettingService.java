@@ -36,8 +36,9 @@ public class QuickSettingService extends TileService {
 
         // 如果磁贴为激活状态 被点击 则动作为关闭滤镜
         if (toggleState == Tile.STATE_ACTIVE) {
-            if (GlobalStatus.INSTANCE.getFilterClose() != null) {
-                GlobalStatus.INSTANCE.getFilterClose().run();
+            Runnable close = GlobalStatus.INSTANCE.getFilterClose();
+            if (close != null) {
+                close.run();
                 config.edit().putBoolean(SpfConfig.FILTER_AUTO_START, false).apply();
 
                 Toast.makeText(this, R.string.quick_tile_off, Toast.LENGTH_SHORT).show();
@@ -46,8 +47,9 @@ public class QuickSettingService extends TileService {
         }
         // 如果磁贴为未激活状态 被点击 则动作为开启滤镜
         else if (toggleState == Tile.STATE_INACTIVE) {
+            Runnable open = GlobalStatus.INSTANCE.getFilterOpen();
             // 如果服务没启动
-            if (GlobalStatus.INSTANCE.getFilterOpen() == null) {
+            if (open == null) {
                 Toast.makeText(this, R.string.accessibility_service_required, Toast.LENGTH_SHORT).show();
                 try {
                     Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
@@ -57,8 +59,8 @@ public class QuickSettingService extends TileService {
             }
             // 正常开启滤镜
             else {
+                open.run();
                 config.edit().putBoolean(SpfConfig.FILTER_AUTO_START, true).apply();
-                GlobalStatus.INSTANCE.getFilterOpen().run();
 
                 getQsTile().setState(Tile.STATE_ACTIVE);
 

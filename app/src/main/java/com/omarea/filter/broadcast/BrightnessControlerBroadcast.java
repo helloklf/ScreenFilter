@@ -51,11 +51,17 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
                     Runnable runnable = GlobalStatus.INSTANCE.getFilterOpen();
                     if (runnable != null) {
                         runnable.run();
+
+                        SharedPreferences config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE);
+                        config.edit().putBoolean(SpfConfig.FILTER_AUTO_START, true).apply();
                     }
                 } else if (action.equals(context.getString(R.string.action_off))) {
                     Runnable runnable = GlobalStatus.INSTANCE.getFilterClose();
                     if (runnable != null) {
                         runnable.run();
+
+                        SharedPreferences config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE);
+                        config.edit().putBoolean(SpfConfig.FILTER_AUTO_START, false).apply();
                     }
                 }
             } catch (Exception ignored) {
