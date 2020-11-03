@@ -60,7 +60,12 @@ class FilterViewManager(private var context: Context) {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
         }
 
-        params.gravity = Gravity.NO_GRAVITY // Gravity.START or Gravity.TOP
+        val config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
+        if (config.getBoolean(SpfConfig.FILTER_ALIGN_START, SpfConfig.FILTER_ALIGN_START_DEFAULT)) {
+            params.gravity = Gravity.START or Gravity.TOP
+        } else {
+            params.gravity = Gravity.NO_GRAVITY
+        }
         params.format = PixelFormat.TRANSLUCENT
         params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or

@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.CompoundButton
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -84,6 +85,7 @@ class SampleEditActivity : AppCompatActivity() {
     private fun updateChart() {
         screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
         screen_light_min_ratio.text = (screen_light_min.progress / 10.0).toString()
+        filter_align_start.isChecked = config.getBoolean(SpfConfig.FILTER_ALIGN_START, SpfConfig.FILTER_ALIGN_START_DEFAULT)
 
         sample_chart.invalidate()
     }
@@ -145,6 +147,13 @@ class SampleEditActivity : AppCompatActivity() {
             } else if (screen_light_min.progress < screen_light_min.max) {
                 screen_light_min.progress = screen_light_min.max
             }
+        }
+
+        filter_align_start.setOnClickListener {
+            val checked = (it as CompoundButton).isChecked
+            config.edit().putBoolean(SpfConfig.FILTER_ALIGN_START, checked).apply()
+
+            recreate()
         }
 
         /*
