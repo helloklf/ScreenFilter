@@ -51,10 +51,12 @@
                 android:layout_height="20dp" />
 
             <TextView
+                android:id="@+id/brightness_value"
                 android:layout_gravity="center"
                 android:textSize="12sp"
                 android:text="00%"
-                android:textColor="#888"
+                android:textColor="#ffffff"
+                android:fontFamily="sans-serif-black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </FrameLayout>

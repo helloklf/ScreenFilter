@@ -42,8 +42,18 @@ class NotificationHelper(private var context: Context) {
             val brightnessManual = PendingIntent.getBroadcast(context, 15, Intent(context.getString(R.string.action_manual)), PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.brightness_auto_manual, brightnessManual)
             val levels = SpfConfig.BRIGTHNESS_OFFSET_LEVELS
-            remoteViews.setProgressBar(R.id.brightness_current, levels, (config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT) + (levels / 2)), false)
+            val offset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT)
+            remoteViews.setProgressBar(R.id.brightness_current, levels, offset + (levels / 2), false)
             remoteViews.setImageViewResource(R.id.brightness_auto_manual, R.drawable.icon_brightness_auto)
+            remoteViews.setTextViewText(R.id.brightness_value, "" + (
+                    if (offset > 0) {
+                        "+$offset%"
+                    } else if (offset < 0) {
+                        "$offset%"
+                    } else {
+                        "--"
+                    }
+            ))
         } else {
             val brightnessAuto = PendingIntent.getBroadcast(context, 16, Intent(context.getString(R.string.action_auto)), PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.brightness_auto_manual, brightnessAuto)
@@ -63,7 +73,11 @@ class NotificationHelper(private var context: Context) {
                 max = current
             }
 
-            remoteViews.setProgressBar(R.id.brightness_current, if (current > max) current else max, current, false)
+            val valueMax = if (current > max) current else max
+            remoteViews.setProgressBar(R.id.brightness_current, valueMax, current, false)
+            remoteViews.setTextViewText(R.id.brightness_value, "" + (
+                String.format("%.1f%%", current * 100f / valueMax)
+            ))
         }
 
         if (GlobalStatus.filterEnabled) {
