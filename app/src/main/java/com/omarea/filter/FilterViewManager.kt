@@ -60,7 +60,7 @@ class FilterViewManager(private var context: Context) {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
         }
 
-        params.gravity = Gravity.START or Gravity.TOP
+        params.gravity = Gravity.NO_GRAVITY // Gravity.START or Gravity.TOP
         params.format = PixelFormat.TRANSLUCENT
         params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or

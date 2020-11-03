@@ -38,14 +38,24 @@
             android:src="@drawable/minus" />
 
         <FrameLayout
-            android:layout_height="8dp"
+            android:layout_height="20dp"
             android:layout_weight="1"
             android:layout_width="0dp">
             <ProgressBar
                 android:id="@+id/brightness_current"
                 android:progressDrawable="@drawable/progress_shape"
+                android:minHeight="20dp"
+                android:maxHeight="20dp"
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:layout_gravity="center"
+                android:textSize="12sp"
+                android:text="00%"
+                android:textColor="#888"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </FrameLayout>
 

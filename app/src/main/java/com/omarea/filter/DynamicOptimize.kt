@@ -12,7 +12,8 @@ class DynamicOptimize {
 
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        if (hour < 21 && hour > 6) {
+        // 日间传感器数值补偿
+        if (hour in 7..20) {
             if (lux <= 2f) {
                 // 不在深夜时段，且光线传感器数值小于2，返回2，避免正常使用时间误入暗光模式，导致屏幕太暗
                 return 2f
@@ -20,6 +21,7 @@ class DynamicOptimize {
         } else if (lux < 1f) {
             return 0f
         }
+
         return lux
     }
 
