@@ -191,48 +191,50 @@ class FilterViewManager(private var context: Context) {
 
         filterPaused = true
         val sampleData = GlobalStatus.sampleData!!
-        val view = filterView!!
-        val lp = layoutParams!!
-        val toB = lastBrightness
-        stopUpdate()
-        valueAnimator = ValueAnimator.ofInt(sampleData.getScreentMinLight(), 1).apply {
-            duration = 2000
-            var lastTick = -2
-            addUpdateListener { animation ->
-                val current = (animation.animatedValue as Int)
-                if (current != lastTick) {
-                    lastTick = current
+        val view = filterView
+        val lp = layoutParams
+        if (view != null && lp != null) {
+            val toB = lastBrightness
+            stopUpdate()
+            valueAnimator = ValueAnimator.ofInt(sampleData.getScreentMinLight(), 1).apply {
+                duration = 2000
+                var lastTick = -2
+                addUpdateListener { animation ->
+                    val current = (animation.animatedValue as Int)
+                    if (current != lastTick) {
+                        lastTick = current
 
-                    FilterViewConfig.getConfigByBrightness(toB, current).run {
-                        if (hardwareBrightness != filterBrightness) {
-                            if (filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-                                lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-                            } else {
-                                lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                        FilterViewConfig.getConfigByBrightness(toB, current).run {
+                            if (hardwareBrightness != filterBrightness) {
+                                if (filterBrightness >= FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
+                                    lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                                } else {
+                                    lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                                }
+                                mWindowManager.updateViewLayout(popupView, layoutParams)
+                                hardwareBrightness = filterBrightness
                             }
-                            mWindowManager.updateViewLayout(popupView, layoutParams)
-                            hardwareBrightness = filterBrightness
-                        }
-                        if (filterAlpha != view.alpha.toInt()) {
-                            lastFilterAlpha = filterAlpha
-                            view.setAlpha(filterAlpha)
+                            if (filterAlpha != view.alpha.toInt()) {
+                                lastFilterAlpha = filterAlpha
+                                view.setAlpha(filterAlpha)
+                            }
                         }
                     }
                 }
-            }
 
-            addListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
-                }
-                override fun onAnimationEnd(animation: Animator?) {
-                    next?.run()
-                }
-                override fun onAnimationCancel(animation: Animator?) {
-                }
-                override fun onAnimationRepeat(animation: Animator?) {
-                }
-            })
-            start()
+                addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator?) {
+                    }
+                    override fun onAnimationEnd(animation: Animator?) {
+                        next?.run()
+                    }
+                    override fun onAnimationCancel(animation: Animator?) {
+                    }
+                    override fun onAnimationRepeat(animation: Animator?) {
+                    }
+                })
+                start()
+            }
         }
     }
 
