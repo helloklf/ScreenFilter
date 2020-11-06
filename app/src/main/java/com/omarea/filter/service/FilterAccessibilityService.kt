@@ -149,8 +149,11 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
                 onBrightnessChanged(brightness)
             }
 
+            private var lastSampleLux = -1f
             override fun onLuxChange(currentLux: Float) {
-                onLuxChanged(currentLux)
+                // fastUp 机制用于解决刚刚启动滤镜时响应过慢、以及从室内走到室外亮度调节过慢的问题
+                onLuxChanged(currentLux, lastSampleLux == -1f || currentLux - lastSampleLux > 200)
+                lastSampleLux = currentLux
             }
         })
 
@@ -305,7 +308,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
     /**
      * 周围光线发生变化时触发
      */
-    private fun onLuxChanged(currentLux: Float) {
+    private fun onLuxChanged(currentLux: Float, toFastUp: Boolean) {
         val history = LightHistory()
         history.run {
             time = System.currentTimeMillis()
@@ -316,7 +319,10 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             lightHistory.removeFirst()
         }
 
-        if (lightHistory.isEmpty()) {
+        if (toFastUp) {
+            lightHistory.clear()
+            updateFilterByLux(currentLux)
+        } else if (lightHistory.isEmpty()) {
             updateFilterByLux(currentLux)
         }
 

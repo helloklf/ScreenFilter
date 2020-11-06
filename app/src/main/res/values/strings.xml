@@ -87,7 +87,7 @@
     <string name="brightness_controller_desc">显示滤镜自带的亮度控制条</string>
 
     <string name="filter_align_start">左上对齐</string>
-    <string name="filter_align_start_desc">滤镜显示位置对齐左上角，可避免某些系统下旋转屏幕时无法全屏覆盖(如MIUI12)</string>
+    <string name="filter_align_start_desc">滤镜显示位置对齐左上角，如果滤镜无法完整覆盖屏幕，可尝试开启</string>
 
     <string name="hide_start_icon">隐藏启动图标 </string>
     <string name="hide_start_icon_desc">打开此开关后，本应用将从桌面隐藏，如果需要再恢复请到辅助服务界面，选中本应用进行操作</string>

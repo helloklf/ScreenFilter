@@ -45,7 +45,7 @@ class DynamicOptimize {
             }
         }
 
-        return offsetValue * 0.3
+        return offsetValue * 0.7
     }
 
     fun optimizedBrightness(lux: Float, config: SharedPreferences): Int? {

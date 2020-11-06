@@ -288,10 +288,10 @@ class SampleEditActivity : AppCompatActivity() {
                     currentLuxView.text = String.format("%.1f", lux)
                     if (currentLux < 0) {
                         sampleLuxValueView.text = lux.toString()
-                        sampleLuxView.progress = lux.toInt()
                         if (lux > sampleLuxView.max) {
                             sampleLuxView.max = lux.toInt()
                         }
+                        sampleLuxView.progress = lux.toInt()
 
                         filterUpdateByLux(lux)?.run {
                             sampleBrightness.progress = this

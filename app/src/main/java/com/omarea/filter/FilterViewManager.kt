@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
+import android.provider.Settings
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -94,6 +95,14 @@ class FilterViewManager(private var context: Context) {
 
     fun close() {
         stopUpdate()
+        try {
+            val contentResolver = context.getContentResolver()
+            val max = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE).getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT)
+            val b = ((lastBrightness / 1000f) * max).toInt()
+            val v = if (b > max) max else b
+            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, v)
+        } catch (ex: Exception) {
+        }
         resetState()
 
         if (popupView != null) {
@@ -309,8 +318,10 @@ class FilterViewManager(private var context: Context) {
                     lp.screenBrightness = filterBrightness.toFloat() / FilterViewConfig.FILTER_BRIGHTNESS_MAX
                 }
                 mWindowManager.updateViewLayout(popupView, layoutParams)
-                lastFilterAlpha = filterAlpha
                 view.setAlpha(filterAlpha)
+                lastFilterAlpha = filterAlpha
+                hardwareBrightness = filterBrightness
+                lastBrightness = GlobalStatus.filterManualBrightness
             }
         } else {
             filterPaused = false
