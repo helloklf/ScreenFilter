@@ -252,6 +252,7 @@ class FilterViewManager(private var context: Context) {
                     }
                     override fun onAnimationCancel(animation: Animator?) {
                         canceled = true
+                        filterPaused = false
                     }
                     override fun onAnimationRepeat(animation: Animator?) {
                     }
@@ -309,6 +310,7 @@ class FilterViewManager(private var context: Context) {
                 }
                 override fun onAnimationCancel(animation: Animator?) {
                     canceled = true
+
                 }
                 override fun onAnimationRepeat(animation: Animator?) {
                 }
