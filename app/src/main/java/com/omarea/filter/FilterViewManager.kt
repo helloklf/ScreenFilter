@@ -8,6 +8,7 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -159,16 +160,20 @@ class FilterViewManager(private var context: Context) {
                 }
 
                 addListener(object : Animator.AnimatorListener {
+                    var canceled = false
                     override fun onAnimationStart(animation: Animator?) {
                     }
                     override fun onAnimationEnd(animation: Animator?) {
-                        if (brightness != lastTick) {
-                            lastTick = brightness
-                            lastBrightness = brightness
-                            setBrightnessNow(brightness)
+                        if (!canceled) {
+                            if (brightness != lastTick) {
+                                lastTick = brightness
+                                lastBrightness = brightness
+                                setBrightnessNow(brightness)
+                            }
                         }
                     }
                     override fun onAnimationCancel(animation: Animator?) {
+                        canceled = true
                     }
                     override fun onAnimationRepeat(animation: Animator?) {
                     }
@@ -237,12 +242,16 @@ class FilterViewManager(private var context: Context) {
                 }
 
                 addListener(object : Animator.AnimatorListener {
+                    var canceled = false
                     override fun onAnimationStart(animation: Animator?) {
                     }
                     override fun onAnimationEnd(animation: Animator?) {
-                        next?.run()
+                        if (!canceled) {
+                            next?.run()
+                        }
                     }
                     override fun onAnimationCancel(animation: Animator?) {
+                        canceled = true
                     }
                     override fun onAnimationRepeat(animation: Animator?) {
                     }
@@ -289,13 +298,17 @@ class FilterViewManager(private var context: Context) {
             }
 
             addListener(object : Animator.AnimatorListener {
+                var canceled = false
                 override fun onAnimationStart(animation: Animator?) {
                 }
                 override fun onAnimationEnd(animation: Animator?) {
-                    lastTick = lastBrightness
-                    setBrightnessNow(lastBrightness)
+                    if (!canceled) {
+                        lastTick = lastBrightness
+                        setBrightnessNow(lastBrightness)
+                    }
                 }
                 override fun onAnimationCancel(animation: Animator?) {
+                    canceled = true
                 }
                 override fun onAnimationRepeat(animation: Animator?) {
                 }

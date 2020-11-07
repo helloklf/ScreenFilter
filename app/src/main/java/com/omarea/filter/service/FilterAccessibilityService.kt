@@ -106,6 +106,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             if(screenOn == true) {
                 return@ScreenEventHandler
             }
+            Log.d("Filter", "ScreenON")
             screenOn = true
             if (
                     (!GlobalStatus.filterEnabled) &&
