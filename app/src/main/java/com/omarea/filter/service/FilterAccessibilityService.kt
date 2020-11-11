@@ -200,6 +200,9 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
         lightSensorWatcher?.startSystemConfigWatcher()
 
         GlobalStatus.filterRefresh = Runnable { filterRefresh() }
+        GlobalStatus.filterUpdateTexture = Runnable {
+            filterViewManager.updateTexture()
+        }
 
         GlobalStatus.filterEnabled = true
 
@@ -216,6 +219,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
 
             GlobalStatus.filterRefresh = null
             GlobalStatus.filterEnabled = false
+            GlobalStatus.filterUpdateTexture = null
             lightHistory.clear()
             stopSmoothLightTimer()
             filterBrightness = -1

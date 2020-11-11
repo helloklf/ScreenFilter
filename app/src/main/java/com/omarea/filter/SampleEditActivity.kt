@@ -165,12 +165,12 @@ class SampleEditActivity : AppCompatActivity() {
                     .setSingleChoiceItems(R.array.filter_texture_items, -1) { dialog, index ->
                         config.edit().putInt(SpfConfig.TEXTURE, index + 1).apply()
                         dialog.dismiss()
-                        restartFilter()
+                        GlobalStatus.filterUpdateTexture?.run()
                     }
                     .setCancelable(false))
             } else {
                 config.edit().putInt(SpfConfig.TEXTURE, 0).apply()
-                restartFilter()
+                GlobalStatus.filterUpdateTexture?.run()
             }
 
         }

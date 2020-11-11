@@ -43,10 +43,14 @@ class FilterView : View {
 
     // 设置纹理
     fun setTexture(textureSand: Bitmap?) {
+        // 保存纹理资源文件
         this.texture = textureSand
+        // 计算纹理资源尺寸
         if (textureSand != null) {
             textureRect = Rect(0, 0, textureSand.width, textureSand.height)
         }
+        // 清空纹理全屏缓存
+        textureCache = null
 
         invalidate()
     }
@@ -72,7 +76,9 @@ class FilterView : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+
         fullSizeRect = Rect(0, 0, w, h)
+        // 清空纹理全屏缓存
         textureCache = null
     }
 

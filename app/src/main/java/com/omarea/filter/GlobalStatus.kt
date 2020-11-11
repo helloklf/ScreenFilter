@@ -10,6 +10,7 @@ object GlobalStatus {
     var sampleData: SampleData? = null
 
     var filterOpen: Runnable? = null
+    var filterUpdateTexture: Runnable? = null
     var filterClose: Runnable? = null
     var filterRefresh: Runnable? = null
     var filterManualUpdate: Runnable? = null

@@ -94,37 +94,47 @@ class FilterViewManager(private var context: Context) {
         mWindowManager.addView(popupView, params)
         filterView = popupView!!.findViewById(R.id.filter_view)
 
-        val texture = config.getInt(SpfConfig.TEXTURE, SpfConfig.TEXTURE_DEFAULT)
-        when(texture) {
-            0 -> {
-                filterView?.setTexture(null)
-            }
-            1 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand1))
-            }
-            2 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand2))
-            }
-            3 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand3))
-            }
-            4 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_mosaic1))
-            }
-            5 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_mosaic2))
-            }
-            6 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_paper1))
-            }
-            7 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_paper2))
-            }
-            8 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_stripe1))
-            }
-            9 -> {
-                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_stripe2))
+        // 设置纹理效果
+        updateTexture()
+    }
+
+    // 读取配置设置纹理效果
+    fun updateTexture () {
+        filterView?.run {
+            val config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
+            when(config.getInt(SpfConfig.TEXTURE, SpfConfig.TEXTURE_DEFAULT)) {
+                0 -> {
+                    setTexture(null)
+                }
+                1 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand1))
+                }
+                2 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand2))
+                }
+                3 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand3))
+                }
+                4 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_mosaic1))
+                }
+                5 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_mosaic2))
+                }
+                6 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_paper1))
+                }
+                7 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_paper2))
+                }
+                8 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_stripe1))
+                }
+                9 -> {
+                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_stripe2))
+                }
+                else -> {
+                }
             }
         }
     }
