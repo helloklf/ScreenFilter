@@ -173,6 +173,26 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <Switch
+                    android:id="@+id/filter_texture"
+                    style="@style/option_title"
+                    android:text="@string/filter_texture" />
+
+                <TextView
+                    style="@style/option_desc"
+                    android:text="@string/filter_texture_desc" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_marginBottom="60dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

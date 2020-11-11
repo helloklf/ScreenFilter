@@ -16,8 +16,8 @@ android {
         applicationId "com.omarea.filter"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 209
-        versionName "2.0.0 Preview9"
+        versionCode 211
+        versionName "2.0.0 Preview11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

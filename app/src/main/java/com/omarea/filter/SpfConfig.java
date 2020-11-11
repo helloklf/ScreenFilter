@@ -59,4 +59,8 @@ public class SpfConfig {
     // 通知中心显示亮度控制器
     public static String BRIGHTNESS_CONTROLLER = "BRIGHTNESS_CONTROLLER";
     public static boolean BRIGHTNESS_CONTROLLER_DEFAULT = false;
+
+    // 纹理素材
+    public static String TEXTURE = "TEXTURE";
+    public static int TEXTURE_DEFAULT = 0;
 }

@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.graphics.BitmapFactory
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
@@ -92,6 +93,40 @@ class FilterViewManager(private var context: Context) {
         popupView = LayoutInflater.from(context).inflate(R.layout.filter, null)
         mWindowManager.addView(popupView, params)
         filterView = popupView!!.findViewById(R.id.filter_view)
+
+        val texture = config.getInt(SpfConfig.TEXTURE, SpfConfig.TEXTURE_DEFAULT)
+        when(texture) {
+            0 -> {
+                filterView?.setTexture(null)
+            }
+            1 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand1))
+            }
+            2 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand2))
+            }
+            3 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand3))
+            }
+            4 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_mosaic1))
+            }
+            5 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_mosaic2))
+            }
+            6 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_paper1))
+            }
+            7 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_paper2))
+            }
+            8 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_stripe1))
+            }
+            9 -> {
+                filterView?.setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_stripe2))
+            }
+        }
     }
 
     fun close() {

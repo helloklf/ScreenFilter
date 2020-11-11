@@ -86,6 +86,7 @@ class SampleEditActivity : AppCompatActivity() {
         screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
         screen_light_min_ratio.text = (screen_light_min.progress / 10.0).toString()
         filter_align_start.isChecked = config.getBoolean(SpfConfig.FILTER_ALIGN_START, SpfConfig.FILTER_ALIGN_START_DEFAULT)
+        filter_texture.isChecked = config.getInt(SpfConfig.TEXTURE, SpfConfig.TEXTURE_DEFAULT) != 0
 
         sample_chart.invalidate()
     }
@@ -153,7 +154,25 @@ class SampleEditActivity : AppCompatActivity() {
             val checked = (it as CompoundButton).isChecked
             config.edit().putBoolean(SpfConfig.FILTER_ALIGN_START, checked).apply()
 
-            recreate()
+            restartFilter()
+        }
+
+        filter_texture.setOnClickListener {
+            val checked = (it as CompoundButton).isChecked
+            if (checked) {
+                DialogHelper.animDialog(AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.texture_chooser))
+                    .setSingleChoiceItems(R.array.filter_texture_items, -1) { dialog, index ->
+                        config.edit().putInt(SpfConfig.TEXTURE, index + 1).apply()
+                        dialog.dismiss()
+                        restartFilter()
+                    }
+                    .setCancelable(false))
+            } else {
+                config.edit().putInt(SpfConfig.TEXTURE, 0).apply()
+                restartFilter()
+            }
+
         }
 
         /*
@@ -172,6 +191,11 @@ class SampleEditActivity : AppCompatActivity() {
 
         setViewBackground(filter_color, GlobalStatus.sampleData!!.getFilterColor())
         filter_color.setOnClickListener { openColorPicker() }
+    }
+
+    private fun restartFilter() {
+        GlobalStatus.filterClose?.run()
+        GlobalStatus.filterOpen?.run()
     }
 
     override fun onPause() {
