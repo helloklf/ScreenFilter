@@ -43,6 +43,7 @@ class FilterView : View {
 
     // 设置纹理
     fun setTexture(textureSand: Bitmap?) {
+        this.texture?.recycle()
         // 保存纹理资源文件
         this.texture = textureSand
         // 计算纹理资源尺寸
@@ -50,6 +51,7 @@ class FilterView : View {
             textureRect = Rect(0, 0, textureSand.width, textureSand.height)
         }
         // 清空纹理全屏缓存
+        textureCache?.recycle()
         textureCache = null
 
         invalidate()
@@ -79,6 +81,7 @@ class FilterView : View {
 
         fullSizeRect = Rect(0, 0, w, h)
         // 清空纹理全屏缓存
+        textureCache?.recycle()
         textureCache = null
     }
 
@@ -90,12 +93,20 @@ class FilterView : View {
         return i
     }
 
+    override fun onDetachedFromWindow() {
+        texture?.recycle()
+        texture = null
+        textureCache?.recycle()
+        textureCache = null
+
+        super.onDetachedFromWindow()
+    }
 
     private fun repeatDrawTextureSand(canvas: Canvas) {
         val textureSand = this.texture ?: return
 
         if (textureCache == null) {
-            textureCache = Bitmap.createBitmap(this.width, this.height, Bitmap.Config.ARGB_8888)
+            textureCache = Bitmap.createBitmap(this.width, this.height, Bitmap.Config.ARGB_4444)
             val cacheCanvas = Canvas(textureCache!!)
 
             val width = canvas.width.toDouble()
@@ -121,6 +132,7 @@ class FilterView : View {
                     )
                 }
             }
+            System.gc()
         }
 
         canvas.drawBitmap(textureCache!!, fullSizeRect, fullSizeRect, emptyPaint)
