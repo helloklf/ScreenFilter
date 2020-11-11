@@ -113,14 +113,14 @@
     <string name="texture_chooser">选择纹理</string>
 
     <string-array name="filter_texture_items">
-        <item>磨砂感(暖阳)</item>
-        <item>磨砂感(深灰)</item>
-        <item>磨砂感(浅灰)</item>
-        <item>马赛克(黄)</item>
-        <item>马赛克(灰)</item>
-        <item>便条纸(白)</item>
-        <item>便条纸(黄)</item>
-        <item>条纹感(白灰)</item>
-        <item>条纹感(暖阳)</item>
+        <item>细磨砂 (暖阳)</item>
+        <item>细磨砂 (雅灰)</item>
+        <item>细磨砂 (洁白)</item>
+        <item>马赛克 (暖阳)</item>
+        <item>马赛克 (雅灰)</item>
+        <item>便签纸 (暖阳)</item>
+        <item>便签纸 (洁白)</item>
+        <item>条纹感 (暖阳)</item>
+        <item>条纹感 (洁白)</item>
     </string-array>
 </resources>
