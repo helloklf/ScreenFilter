@@ -31,7 +31,13 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
     private var dynamicOptimize: DynamicOptimize = DynamicOptimize()
     private var lightSensorWatcher: LightSensorWatcher? = null
     private var handler = Handler(Looper.getMainLooper())
-    private var isLandscape = false
+    private var isLandscape:Boolean
+        get () {
+            return GlobalStatus.isLandscape
+        }
+        set (value) {
+            GlobalStatus.isLandscape = value
+        }
     private val lightHistory = LinkedList<LightHistory>()
     private lateinit var filterViewManager: FilterViewManager
 

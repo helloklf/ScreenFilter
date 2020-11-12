@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.PixelFormat
 import android.graphics.Point
@@ -71,13 +72,24 @@ class FilterViewManager(private var context: Context) {
         }
         params.format = PixelFormat.TRANSLUCENT
         params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_FULLSCREEN or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+
+        // 使用纹理渲染时，禁用硬件加速可以节省大量RAM（虽然会增加CPU消耗）
+        if (config.getInt(SpfConfig.TEXTURE, SpfConfig.TEXTURE_DEFAULT) > 0) {
+            params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN or
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        } else {
+            params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN or
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                    WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+        }
 
         val p = Point()
         display.getRealSize(p)
@@ -98,42 +110,63 @@ class FilterViewManager(private var context: Context) {
         updateTexture()
     }
 
+    // 解码纹理资源
+    private fun getTexture(resId: Int): Bitmap? {
+        /*
+        val options = BitmapFactory.Options()
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            options.outConfig = Bitmap.Config.HARDWARE
+        }
+        return BitmapFactory.decodeResource(context.resources, resId, options)
+        */
+
+        return BitmapFactory.decodeResource(context.resources, resId)
+    }
+
     // 读取配置设置纹理效果
     fun updateTexture () {
         filterView?.run {
             val config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
-            when(config.getInt(SpfConfig.TEXTURE, SpfConfig.TEXTURE_DEFAULT)) {
-                0 -> {
-                    setTexture(null)
-                }
-                1 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand1))
-                }
-                2 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand2))
-                }
-                3 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_sand3))
-                }
-                4 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_mosaic1))
-                }
-                5 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_mosaic2))
-                }
-                6 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_paper1))
-                }
-                7 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_paper2))
-                }
-                8 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_stripe1))
-                }
-                9 -> {
-                    setTexture(BitmapFactory.decodeResource(context.resources, R.drawable.texture_stripe2))
-                }
-                else -> {
+            if (
+                    GlobalStatus.isLandscape &&
+                    config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)
+            ) {
+                setTexture(null)
+            } else {
+                when (config.getInt(SpfConfig.TEXTURE, SpfConfig.TEXTURE_DEFAULT)) {
+                    0 -> {
+                        setTexture(null)
+                    }
+                    1 -> {
+                        setTexture(getTexture(R.drawable.texture_sand1))
+                    }
+                    2 -> {
+                        setTexture(getTexture(R.drawable.texture_sand2))
+                    }
+                    3 -> {
+                        setTexture(getTexture(R.drawable.texture_sand3))
+                    }
+                    4 -> {
+                        setTexture(getTexture(R.drawable.texture_mosaic1))
+                    }
+                    5 -> {
+                        setTexture(getTexture(R.drawable.texture_mosaic2))
+                    }
+                    6 -> {
+                        setTexture(getTexture(R.drawable.texture_paper1))
+                    }
+                    7 -> {
+                        setTexture(getTexture(R.drawable.texture_paper2))
+                    }
+                    8 -> {
+                        setTexture(getTexture(R.drawable.texture_stripe1))
+                    }
+                    9 -> {
+                        setTexture(getTexture(R.drawable.texture_stripe2))
+                    }
+                    else -> {
+                    }
                 }
             }
         }

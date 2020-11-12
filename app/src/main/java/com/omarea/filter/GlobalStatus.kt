@@ -16,4 +16,5 @@ object GlobalStatus {
     var filterManualUpdate: Runnable? = null
     var filterManualBrightness: Int = -1
     var screenCap: Runnable? = null
+    var isLandscape = false
 }

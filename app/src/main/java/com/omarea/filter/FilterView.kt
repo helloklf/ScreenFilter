@@ -2,6 +2,7 @@ package com.omarea.filter
 
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import android.view.View
 
@@ -43,6 +44,8 @@ class FilterView : View {
 
     // 设置纹理
     fun setTexture(textureSand: Bitmap?) {
+        this.background = null
+
         this.texture?.recycle()
         // 保存纹理资源文件
         this.texture = textureSand
@@ -78,6 +81,7 @@ class FilterView : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        this.background = null
 
         fullSizeRect = Rect(0, 0, w, h)
         // 清空纹理全屏缓存
@@ -94,6 +98,8 @@ class FilterView : View {
     }
 
     override fun onDetachedFromWindow() {
+        this.background = null
+
         texture?.recycle()
         texture = null
         textureCache?.recycle()
@@ -102,11 +108,11 @@ class FilterView : View {
         super.onDetachedFromWindow()
     }
 
-    private fun repeatDrawTextureSand(canvas: Canvas) {
+    private fun drawTexture(canvas: Canvas) {
         val textureSand = this.texture ?: return
 
         if (textureCache == null) {
-            textureCache = Bitmap.createBitmap(this.width, this.height, Bitmap.Config.ARGB_4444)
+            textureCache = Bitmap.createBitmap(this.width, this.height, Bitmap.Config.ARGB_8888)
             val cacheCanvas = Canvas(textureCache!!)
 
             val width = canvas.width.toDouble()
@@ -132,16 +138,17 @@ class FilterView : View {
                     )
                 }
             }
-            System.gc()
+            // System.gc()
+            this.background = BitmapDrawable(resources, textureCache)
         }
 
-        canvas.drawBitmap(textureCache!!, fullSizeRect, fullSizeRect, emptyPaint)
+        // canvas.drawBitmap(textureCache!!, fullSizeRect, fullSizeRect, emptyPaint)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        repeatDrawTextureSand(canvas)
+        drawTexture(canvas)
 
         canvas.drawARGB(currentAlpha, red, green, blue)
         /*
