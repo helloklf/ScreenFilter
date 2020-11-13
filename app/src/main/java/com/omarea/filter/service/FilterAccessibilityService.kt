@@ -381,6 +381,8 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
                 } else if (videoPlaying && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
                     onViedPlayerLeave()
                 }
+
+                filterViewManager.updateTexture()
             }
         }
     }
