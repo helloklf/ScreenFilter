@@ -32,17 +32,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var systemBrightnessModeObserver: ContentObserver
     private val OVERLAY_PERMISSION_REQ_CODE = 0
 
+    /*
     private fun askForPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
-                Toast.makeText(this, getString(R.string.permission_required), Toast.LENGTH_LONG).show()
                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()))
                 startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
                 return
             }
         }
     }
-
+    */
 
     private var filterEnabled = GlobalStatus.filterEnabled
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,7 +94,6 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         setExcludeFromRecents()
-        askForPermission()
         FilterSample().getFilterAlpha(40)
 
         // 启用滤镜
@@ -334,14 +333,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        /*
         if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (!Settings.canDrawOverlays(this)) {
-                    Toast.makeText(this, getString(R.string.get_permission_fail), Toast.LENGTH_LONG).show()
                     finishAndRemoveTask()
                 }
             }
         }
+        */
         super.onActivityResult(requestCode, resultCode, data)
     }
 
