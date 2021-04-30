@@ -146,24 +146,15 @@ class FilterViewManager(private var context: Context) {
                         setTexture(getTexture(R.drawable.texture_sand2))
                     }
                     3 -> {
-                        setTexture(getTexture(R.drawable.texture_sand3))
-                    }
-                    4 -> {
-                        setTexture(getTexture(R.drawable.texture_mosaic1))
-                    }
-                    5 -> {
-                        setTexture(getTexture(R.drawable.texture_mosaic2))
-                    }
-                    6 -> {
                         setTexture(getTexture(R.drawable.texture_paper1))
                     }
-                    7 -> {
+                    4 -> {
                         setTexture(getTexture(R.drawable.texture_paper2))
                     }
-                    8 -> {
+                    5 -> {
                         setTexture(getTexture(R.drawable.texture_stripe1))
                     }
-                    9 -> {
+                    6 -> {
                         setTexture(getTexture(R.drawable.texture_stripe2))
                     }
                     else -> {
