@@ -54,7 +54,7 @@ public class SpfConfig {
 
     // 动态优化（虚拟环境） 亮度限制(Lux)
     public static String DYNAMIC_OPTIMIZE_LIMIT = "DYNAMIC_OPTIMIZE_LIMIT";
-    public static float DYNAMIC_OPTIMIZE_LIMIT_DEFAULT = 0;
+    public static float DYNAMIC_OPTIMIZE_LIMIT_DEFAULT = 10;
 
     // 通知中心显示亮度控制器
     public static String BRIGHTNESS_CONTROLLER = "BRIGHTNESS_CONTROLLER";

@@ -37,7 +37,7 @@ class ReceiverLock(private var callbacks: Handler) : BroadcastReceiver() {
 
     companion object {
         private var receiver: ReceiverLock? = null
-        public fun autoRegister(context: Context, callbacks: Handler): ReceiverLock? {
+        fun autoRegister(context: Context, callbacks: Handler): ReceiverLock? {
             if (receiver != null) {
                 unRegister(context)
             }

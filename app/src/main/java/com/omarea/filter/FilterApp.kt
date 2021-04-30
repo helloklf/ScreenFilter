@@ -5,10 +5,10 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 
-public class FilterApp : Application() {
+class FilterApp : Application() {
     companion object {
-        public lateinit var context: Context
-        public val handler = Handler(Looper.getMainLooper())
+        lateinit var context: Context
+        val handler = Handler(Looper.getMainLooper())
     }
 
     override fun attachBaseContext(base: Context?) {

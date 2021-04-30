@@ -8,7 +8,6 @@ import android.hardware.SensorEventListener
 import android.net.Uri
 import android.os.Handler
 import android.provider.Settings
-import android.util.Log
 import com.omarea.filter.GlobalStatus
 
 class LightSensorWatcher(private var context: Context, private var lightHandler: LightHandler) {

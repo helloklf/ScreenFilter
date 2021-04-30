@@ -51,7 +51,7 @@ class SampleData(private val context: Context) {
         return jsonObject
     }
 
-    public fun readConfig(officialOnlay: Boolean = false) {
+    fun readConfig(officialOnlay: Boolean = false) {
         try {
             val jsonObject = getOriginConfigObject(officialOnlay)
 
@@ -113,7 +113,7 @@ class SampleData(private val context: Context) {
     /**
      * 添加样本数据
      */
-    public fun addSample(lux: Int, sample: Int) {
+    fun addSample(lux: Int, sample: Int) {
         // 查找现存样本中与新增样本冲突的旧样本
         val invalidSamples = samples.filter {
             (it.key >= lux && it.value <= sample) || (it.key <= lux && it.value >= sample)
@@ -130,7 +130,7 @@ class SampleData(private val context: Context) {
     /**
      * 移除样本
      */
-    public fun removeSample(lux: Int) {
+    fun removeSample(lux: Int) {
         if (samples.containsKey(lux)) {
             samples.remove(lux)
         }
@@ -139,7 +139,7 @@ class SampleData(private val context: Context) {
     /**
      * 替换样本
      */
-    public fun replaceSample(lux: Int, sample: Int) {
+    fun replaceSample(lux: Int, sample: Int) {
         removeSample(lux)
         addSample(lux, sample)
     }
@@ -147,7 +147,7 @@ class SampleData(private val context: Context) {
     /**
      * 获取样本（）
      */
-    public fun getSample(lux: Int): Int {
+    fun getSample(lux: Int): Int {
         if (samples.containsKey(lux)) {
             return samples.get(lux) as Int
         }
@@ -159,7 +159,7 @@ class SampleData(private val context: Context) {
      * @param staticOffset 固定亮度增益 按总亮度的比例增加亮度
      * @param offsetpractical 按实际亮度的比例增加亮度
      */
-    public fun getFilterConfig(lux: Float, staticOffset: Double = 0.toDouble(), offsetpractical: Double = 0.toDouble()): FilterViewConfig {
+    fun getFilterConfig(lux: Float, staticOffset: Double = 0.toDouble(), offsetpractical: Double = 0.toDouble()): FilterViewConfig {
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
             val brightness = ((sampleValue + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * staticOffset)) * (1 + offsetpractical)).toInt()
@@ -172,25 +172,25 @@ class SampleData(private val context: Context) {
     /**
      * 根据意图亮度百分比，获取滤镜配置
      */
-    public fun getFilterConfigByRatio(ratio: Float): FilterViewConfig {
+    fun getFilterConfigByRatio(ratio: Float): FilterViewConfig {
         return FilterViewConfig.getConfigByRatio(ratio, screentMinLight)
     }
 
     /**
      * 根据意向屏幕亮度获取配置
      */
-    public fun getConfigByBrightness(brightness: Int): FilterViewConfig {
+    fun getConfigByBrightness(brightness: Int): FilterViewConfig {
         return FilterViewConfig.getConfigByBrightness(brightness, screentMinLight)
     }
 
-    public fun getVitualSample(lux: Int): Int? {
+    fun getVitualSample(lux: Int): Int? {
         return getVitualSample(lux.toFloat())
     }
 
     /**
      * 获取虚拟样本，根据已有样本计算数值
      */
-    public fun getVitualSample(lux: Float): Int? {
+    fun getVitualSample(lux: Float): Int? {
         if (samples.size > 1) {
             var sampleValue = 0
             val intValue = lux.toInt()
@@ -232,21 +232,21 @@ class SampleData(private val context: Context) {
     /**
      * 获取所有样本
      */
-    public fun getAllSamples(): HashMap<Int, Int> {
+    fun getAllSamples(): HashMap<Int, Int> {
         return this.samples
     }
 
     /**
      * 设置屏幕最低亮度百分比
      */
-    public fun getScreentMinLight(): Int {
+    fun getScreentMinLight(): Int {
         return screentMinLight
     }
 
     /**
      * 设置屏幕最低亮度百分比
      */
-    public fun setScreentMinLight(value: Int) {
+    fun setScreentMinLight(value: Int) {
         if (value > FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
             this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
         } else if (value < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
@@ -256,11 +256,11 @@ class SampleData(private val context: Context) {
         }
     }
 
-    public fun setFilterColor(color: Int) {
+    fun setFilterColor(color: Int) {
         this.filterColor = color
     }
 
-    public fun getFilterColor(): Int {
+    fun getFilterColor(): Int {
         return filterColor
     }
 }

@@ -9,9 +9,9 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.provider.Settings
-import android.support.v4.app.NotificationCompat
 import android.view.View
 import android.widget.RemoteViews
+import androidx.core.app.NotificationCompat
 import com.omarea.filter.GlobalStatus
 import com.omarea.filter.R
 import com.omarea.filter.SpfConfig
@@ -29,17 +29,17 @@ class NotificationHelper(private var context: Context) {
     fun updateNotification(autoMode: Boolean = true) {
         val config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
 
-        val minus = PendingIntent.getBroadcast(context, 11, Intent(context.getString(R.string.action_minus)), PendingIntent.FLAG_UPDATE_CURRENT);
-        val plus = PendingIntent.getBroadcast(context, 12, Intent(context.getString(R.string.action_plus)), PendingIntent.FLAG_UPDATE_CURRENT);
-        val on = PendingIntent.getBroadcast(context, 13, Intent(context.getString(R.string.action_on)), PendingIntent.FLAG_UPDATE_CURRENT);
-        val off = PendingIntent.getBroadcast(context, 14, Intent(context.getString(R.string.action_off)), PendingIntent.FLAG_UPDATE_CURRENT);
+        val minus = PendingIntent.getBroadcast(context, 11, Intent(context.getString(R.string.action_minus)), PendingIntent.FLAG_UPDATE_CURRENT)
+        val plus = PendingIntent.getBroadcast(context, 12, Intent(context.getString(R.string.action_plus)), PendingIntent.FLAG_UPDATE_CURRENT)
+        val on = PendingIntent.getBroadcast(context, 13, Intent(context.getString(R.string.action_on)), PendingIntent.FLAG_UPDATE_CURRENT)
+        val off = PendingIntent.getBroadcast(context, 14, Intent(context.getString(R.string.action_off)), PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val remoteViews = RemoteViews(context.getPackageName(), R.layout.notification);
-        remoteViews.setOnClickPendingIntent(R.id.brightness_minus, minus);
-        remoteViews.setOnClickPendingIntent(R.id.brightness_plus, plus);
+        val remoteViews = RemoteViews(context.packageName, R.layout.notification)
+        remoteViews.setOnClickPendingIntent(R.id.brightness_minus, minus)
+        remoteViews.setOnClickPendingIntent(R.id.brightness_plus, plus)
 
         if (autoMode) {
-            val brightnessManual = PendingIntent.getBroadcast(context, 15, Intent(context.getString(R.string.action_manual)), PendingIntent.FLAG_UPDATE_CURRENT);
+            val brightnessManual = PendingIntent.getBroadcast(context, 15, Intent(context.getString(R.string.action_manual)), PendingIntent.FLAG_UPDATE_CURRENT)
             remoteViews.setOnClickPendingIntent(R.id.brightness_auto_manual, brightnessManual)
             val levels = SpfConfig.BRIGTHNESS_OFFSET_LEVELS
             val offset = config.getInt(SpfConfig.BRIGTHNESS_OFFSET, SpfConfig.BRIGTHNESS_OFFSET_DEFAULT)
@@ -53,9 +53,9 @@ class NotificationHelper(private var context: Context) {
                     } else {
                         "--"
                     }
-            ))
+                    ))
         } else {
-            val brightnessAuto = PendingIntent.getBroadcast(context, 16, Intent(context.getString(R.string.action_auto)), PendingIntent.FLAG_UPDATE_CURRENT);
+            val brightnessAuto = PendingIntent.getBroadcast(context, 16, Intent(context.getString(R.string.action_auto)), PendingIntent.FLAG_UPDATE_CURRENT)
             remoteViews.setOnClickPendingIntent(R.id.brightness_auto_manual, brightnessAuto)
             remoteViews.setImageViewResource(R.id.brightness_auto_manual, R.drawable.icon_brightness_manual)
 
@@ -76,8 +76,8 @@ class NotificationHelper(private var context: Context) {
             val valueMax = if (current > max) current else max
             remoteViews.setProgressBar(R.id.brightness_current, valueMax, current, false)
             remoteViews.setTextViewText(R.id.brightness_value, "" + (
-                String.format("%.1f%%", current * 100f / valueMax)
-            ))
+                    String.format("%.1f%%", current * 100f / valueMax)
+                    ))
         }
 
         if (GlobalStatus.filterEnabled) {
@@ -94,7 +94,7 @@ class NotificationHelper(private var context: Context) {
                 .setContentTitle(context.getString(R.string.app_name)) // 创建通知的标题
                 .setContentText(context.getString(R.string.brightness_control)) // 创建通知的内容
                 .setSmallIcon(R.drawable.ic_lightbulb) // 创建通知的小图标
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher)) // 创建通知的大图标
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)) // 创建通知的大图标
                 /*
                  * 是使用自定义视图还是系统提供的视图，上面4的属性一定要设置，不然这个通知显示不出来
                   */
@@ -117,10 +117,10 @@ class NotificationHelper(private var context: Context) {
             notificationBuilder.setChannelId(channelId)
         }
 
-        val notification = notificationBuilder.build(); // 创建通知（每个通知必须要调用这个方法来创建）
+        val notification = notificationBuilder.build() // 创建通知（每个通知必须要调用这个方法来创建）
         notification!!.flags = Notification.FLAG_NO_CLEAR or Notification.FLAG_ONGOING_EVENT
 
-        notificationManager.notify(uniqueID, notification); // 发送通知
+        notificationManager.notify(uniqueID, notification) // 发送通知
 
         visible = true
     }

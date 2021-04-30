@@ -126,15 +126,15 @@ class FilterView : View {
             for (row in 0 until rows) {
                 for (col in 0 until cols) {
                     cacheCanvas.drawBitmap(
-                        textureSand,
-                        textureRect,
-                        Rect(
-                            col * textureWidth,
-                            row * textureHeight,
-                            (col + 1) * textureWidth,
-                            (row + 1) * textureHeight
-                        ),
-                        emptyPaint
+                            textureSand,
+                            textureRect,
+                            Rect(
+                                    col * textureWidth,
+                                    row * textureHeight,
+                                    (col + 1) * textureWidth,
+                                    (row + 1) * textureHeight
+                            ),
+                            emptyPaint
                     )
                 }
             }

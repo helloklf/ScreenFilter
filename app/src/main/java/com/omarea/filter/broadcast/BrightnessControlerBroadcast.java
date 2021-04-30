@@ -70,10 +70,7 @@ public class BrightnessControlerBroadcast extends BroadcastReceiver {
     }
 
     private boolean checkWriteSettings(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(context)) {
-            return true;
-        }
-        return false;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(context);
     }
 
     private void brightnessMinus(Context context) {

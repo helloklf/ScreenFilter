@@ -1,9 +1,9 @@
 package com.omarea.filter
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 
 class HelpActivity : AppCompatActivity() {
     private var filterEnabled = GlobalStatus.filterEnabled

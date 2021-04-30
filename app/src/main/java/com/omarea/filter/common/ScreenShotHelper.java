@@ -14,7 +14,8 @@ import android.media.projection.MediaProjectionManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
+
+import androidx.annotation.RequiresApi;
 
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
@@ -23,11 +24,12 @@ import java.nio.ByteBuffer;
 public class ScreenShotHelper {
 
     private final SoftReference<Context> mRefContext;
-    private OnScreenShotListener mOnScreenShotListener;
+    private final OnScreenShotListener mOnScreenShotListener;
 
-    private ImageReader mImageReader;
-    private MediaProjection mMediaProjection;
+    private final ImageReader mImageReader;
+    private final MediaProjection mMediaProjection;
     private VirtualDisplay mVirtualDisplay;
+
     public ScreenShotHelper(Context context, int resultCode, Intent data, OnScreenShotListener onScreenShotListener) {
         this.mOnScreenShotListener = onScreenShotListener;
         this.mRefContext = new SoftReference<Context>(context);

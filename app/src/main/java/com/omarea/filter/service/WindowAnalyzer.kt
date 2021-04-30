@@ -1,7 +1,6 @@
 package com.omarea.filter.service
 
 import android.graphics.Rect
-import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityWindowInfo
 
@@ -15,6 +14,13 @@ class WindowAnalyzer(private val service: FilterAccessibilityService) {
         }
     }
 
+    private val blackTypeList = arrayListOf(
+            AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY,
+            AccessibilityWindowInfo.TYPE_INPUT_METHOD,
+            AccessibilityWindowInfo.TYPE_SPLIT_SCREEN_DIVIDER,
+            AccessibilityWindowInfo.TYPE_SYSTEM
+    )
+
     // 新的前台应用窗口判定逻辑
     fun analysis(event: AccessibilityEvent? = null, handler: IWindowAnalyzerResult) {
         val windowsList = service.windows
@@ -22,10 +28,13 @@ class WindowAnalyzer(private val service: FilterAccessibilityService) {
             return
         } else if (windowsList.size > 1) {
             val effectiveWindows = windowsList.filter {
-                (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && it.isInPictureInPictureMode)) && (it.type == AccessibilityWindowInfo.TYPE_APPLICATION)
+                // 现在不过滤画中画应用了，因为有遇到像Telegram这样的应用，从画中画切换到全屏后仍检测到处于画中画模式，并且类型是 -1（可能是MIUI魔改出来的），但对用户来说全屏就是前台应用
+                !blackTypeList.contains(it.type)
+
+                // (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && it.isInPictureInPictureMode)) && (it.type == AccessibilityWindowInfo.TYPE_APPLICATION)
             } // .sortedBy { it.layer }
 
-            if (effectiveWindows.size > 0) {
+            if (effectiveWindows.isNotEmpty()) {
                 try {
                     var lastWindow: AccessibilityWindowInfo? = null
                     // TODO:
@@ -35,7 +44,6 @@ class WindowAnalyzer(private val service: FilterAccessibilityService) {
                     //      当然，这并不意味着完美，只是暂时没有更好的解决方案……
                     var lastWindowSize = 0
                     for (window in effectiveWindows) {
-
                         val outBounds = Rect()
                         window.getBoundsInScreen(outBounds)
 
@@ -82,11 +90,28 @@ class WindowAnalyzer(private val service: FilterAccessibilityService) {
     ) : Thread() {
         override fun run() {
             // 如果当前window锁属的APP处于未响应状态，此过程可能会等待5秒后超时返回null，因此需要在线程中异步进行此操作
-            val wp = (try {
-                windowInfo.root?.packageName
+            val root = (try {
+                windowInfo.root
             } catch (ex: Exception) {
                 null
             })
+            val wp = (try {
+                root?.packageName
+            } catch (ex: Exception) {
+                null
+            })
+            // MIUI 优化，打开MIUI多任务界面时当做没有发生应用切换
+            if (wp?.equals("com.miui.home") == true) {
+                /*
+                val node = root?.findAccessibilityNodeInfosByText("小窗应用")?.firstOrNull()
+                Log.d("Scene-MIUI", "" + node?.parent?.viewIdResourceName)
+                Log.d("Scene-MIUI", "" + node?.viewIdResourceName)
+                */
+                val node = root?.findAccessibilityNodeInfosByViewId("com.miui.home:id/txtSmallWindowContainer")?.firstOrNull()
+                if (node != null) {
+                    return
+                }
+            }
 
             if (lastParsingThread == tid && wp != null) {
                 handler.onWindowAnalyzerResult(wp.toString())

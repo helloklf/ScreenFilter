@@ -10,12 +10,13 @@ import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import com.omarea.filter.common.ViewHelper
+import kotlin.math.abs
+import kotlin.math.min
 
 class FilterViewManager(private var context: Context) {
     private val mWindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -125,7 +126,7 @@ class FilterViewManager(private var context: Context) {
     }
 
     // 读取配置设置纹理效果
-    fun updateTexture () {
+    fun updateTexture() {
         filterView?.run {
             val config = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
             if (
@@ -175,7 +176,7 @@ class FilterViewManager(private var context: Context) {
     fun close() {
         stopUpdate()
         try {
-            val contentResolver = context.getContentResolver()
+            val contentResolver = context.contentResolver
             val max = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE).getInt(SpfConfig.SCREENT_MAX_LIGHT, SpfConfig.SCREENT_MAX_LIGHT_DEFAULT)
             val b = ((lastBrightness / 1000f) * max).toInt()
             val v = if (b > max) max else b
@@ -211,20 +212,21 @@ class FilterViewManager(private var context: Context) {
         }
 
     // 停止正在运行的滤镜更新动画
-    public fun stopUpdate() {
+    fun stopUpdate() {
         if (valueAnimator != null && valueAnimator!!.isRunning) {
             valueAnimator!!.cancel()
             valueAnimator = null
         }
     }
 
-    public fun setBrightness(brightness: Int, smooth: Boolean = true) {
+    fun setBrightness(brightness: Int, smooth: Boolean = true) {
         if (filterPaused) {
             return
         }
 
         stopUpdate()
-        if (smooth) {
+        // 启用平滑亮度，且亮度变化较大时才使用渐变（降低功耗）
+        if (smooth && isGreatChange(lastBrightness, brightness)) {
             valueAnimator = ValueAnimator.ofInt(lastBrightness, brightness).apply {
                 var lastTick = -2
                 duration = filterFadeInDuration
@@ -241,6 +243,7 @@ class FilterViewManager(private var context: Context) {
                     var canceled = false
                     override fun onAnimationStart(animation: Animator?) {
                     }
+
                     override fun onAnimationEnd(animation: Animator?) {
                         if (!canceled) {
                             if (brightness != lastTick) {
@@ -250,9 +253,11 @@ class FilterViewManager(private var context: Context) {
                             }
                         }
                     }
+
                     override fun onAnimationCancel(animation: Animator?) {
                         canceled = true
                     }
+
                     override fun onAnimationRepeat(animation: Animator?) {
                     }
                 })
@@ -261,6 +266,28 @@ class FilterViewManager(private var context: Context) {
         } else {
             lastBrightness = brightness
             setBrightnessNow(brightness)
+        }
+    }
+
+    // 判断是否有较大幅度的亮度变化
+    private fun isGreatChange(currentBrightness: Int, toBrightness: Int): Boolean {
+        val min = min(currentBrightness, toBrightness)
+        val gap = abs(currentBrightness - toBrightness)
+        if (min > 700) {
+            // 如果亮度在70% 以上（亮度±5%才算大幅变化）
+            return gap > 50
+        } else if (min > 500) {
+            // 如果亮度在50% 以上（亮度±3%才算大幅变化）
+            return gap > 50
+        } else if (min > 200) {
+            // 如果亮度在20% 以上（亮度±2%才算大幅变化）
+            return gap > 20
+        } else if (min > 100) {
+            // 如果亮度在10% 以上（亮度±1%才算大幅变化）
+            return gap > 9
+        } else {
+            // 如果亮度在10% 以内（亮度±0.5%才算大幅变化）
+            return gap > 4
         }
     }
 
@@ -323,15 +350,18 @@ class FilterViewManager(private var context: Context) {
                     var canceled = false
                     override fun onAnimationStart(animation: Animator?) {
                     }
+
                     override fun onAnimationEnd(animation: Animator?) {
                         if (!canceled) {
                             next?.run()
                         }
                     }
+
                     override fun onAnimationCancel(animation: Animator?) {
                         canceled = true
                         filterPaused = false
                     }
+
                     override fun onAnimationRepeat(animation: Animator?) {
                     }
                 })
@@ -380,16 +410,19 @@ class FilterViewManager(private var context: Context) {
                 var canceled = false
                 override fun onAnimationStart(animation: Animator?) {
                 }
+
                 override fun onAnimationEnd(animation: Animator?) {
                     if (!canceled) {
                         lastTick = lastBrightness
                         setBrightnessNow(lastBrightness)
                     }
                 }
+
                 override fun onAnimationCancel(animation: Animator?) {
                     canceled = true
 
                 }
+
                 override fun onAnimationRepeat(animation: Animator?) {
                 }
             })

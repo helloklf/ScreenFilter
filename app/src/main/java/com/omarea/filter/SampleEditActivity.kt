@@ -1,6 +1,5 @@
 package com.omarea.filter
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
@@ -10,7 +9,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
@@ -18,17 +16,19 @@ import android.widget.CompoundButton
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import com.omarea.common.model.SelectItem
 import com.omarea.common.ui.DialogHelper
+import com.omarea.common.ui.DialogItemChooserMini
 import com.omarea.filter.common.UITools
 import com.omarea.filter.light.LightSensorManager
 import kotlinx.android.synthetic.main.activity_sample_edit.*
 import kotlinx.android.synthetic.main.content_main.*
-import org.w3c.dom.Text
 
 class SampleEditActivity : AppCompatActivity() {
     private var filterPopup: View? = null
     private var hasChange = false
-    private var alertDialog: AlertDialog? = null
+    private var alertDialog: DialogHelper.DialogWrap? = null
     private lateinit var config: SharedPreferences
     private lateinit var dynamicOptimize: DynamicOptimize
 
@@ -52,10 +52,10 @@ class SampleEditActivity : AppCompatActivity() {
      * 获取状态栏高度
      */
     fun getStatusHeight(): Int {
-        var result = 0;
-        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        var result = 0
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
-            result = resources.getDimensionPixelSize(resourceId);
+            result = resources.getDimensionPixelSize(resourceId)
         }
         return result
     }
@@ -98,21 +98,17 @@ class SampleEditActivity : AppCompatActivity() {
         dynamicOptimize = DynamicOptimize()
 
         // 全屏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         smaple_add.setOnClickListener {
             openSampleCreate()
         }
         smaple_clear.setOnClickListener {
-            DialogHelper.animDialog(AlertDialog.Builder(this)
-                    .setTitle(R.string.smaple_clear)
-                    .setPositiveButton(R.string.sample_edit_confirm) { _, _ ->
-                        GlobalStatus.sampleData!!.readConfig(true)
-                        this.hasChange = true
-                        updateChart()
-                    }
-                    .setNegativeButton(R.string.sample_edit_cancel) { _, _ ->
-                    })
+            DialogHelper.confirm(this, getString(R.string.smaple_clear), "", {
+                GlobalStatus.sampleData!!.readConfig(true)
+                this.hasChange = true
+                updateChart()
+            })
         }
 
         // 屏幕最低亮度调整
@@ -160,14 +156,20 @@ class SampleEditActivity : AppCompatActivity() {
         filter_texture.setOnClickListener {
             val checked = (it as CompoundButton).isChecked
             if (checked) {
-                DialogHelper.animDialog(AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.texture_chooser))
-                    .setSingleChoiceItems(R.array.filter_texture_items, -1) { dialog, index ->
-                        config.edit().putInt(SpfConfig.TEXTURE, index + 1).apply()
-                        dialog.dismiss()
-                        GlobalStatus.filterUpdateTexture?.run()
+                DialogItemChooserMini.singleChooser(this, resources.getStringArray(R.array.filter_texture_items), 0).setCallback(object : DialogItemChooserMini.Callback {
+                    override fun onConfirm(selected: List<SelectItem>, status: BooleanArray) {
+                        if (status.contains(true)) {
+                            config.edit().putInt(SpfConfig.TEXTURE, status.indexOf(true) + 1).apply()
+                            GlobalStatus.filterUpdateTexture?.run()
+                        } else {
+                            it.isChecked = false
+                        }
                     }
-                    .setCancelable(false))
+
+                    override fun onCancel() {
+                        it.isChecked = false
+                    }
+                }).setTitle(getString(R.string.texture_chooser)).show()
             } else {
                 config.edit().putInt(SpfConfig.TEXTURE, 0).apply()
                 GlobalStatus.filterUpdateTexture?.run()
@@ -213,7 +215,7 @@ class SampleEditActivity : AppCompatActivity() {
      * 选择滤镜颜色
      */
     private fun openColorPicker() {
-        val view: View = getLayoutInflater().inflate(R.layout.filter_color_picker, null)
+        val view: View = layoutInflater.inflate(R.layout.filter_color_picker, null)
         val currentColor: Int = GlobalStatus.sampleData!!.getFilterColor()
         val alphaBar = view.findViewById<SeekBar>(R.id.color_alpha)
         val redBar = view.findViewById<SeekBar>(R.id.color_red)
@@ -238,17 +240,17 @@ class SampleEditActivity : AppCompatActivity() {
         redBar.setOnSeekBarChangeListener(listener)
         greenBar.setOnSeekBarChangeListener(listener)
         blueBar.setOnSeekBarChangeListener(listener)
-        DialogHelper.animDialog(AlertDialog.Builder(this)
-                .setTitle(getString(R.string.choose_color))
-                .setView(view)
-                .setPositiveButton(android.R.string.ok) { dialog, which ->
+        DialogHelper.confirm(this,
+                getString(R.string.choose_color),
+                "",
+                view,
+                {
                     val color = Color.argb(alphaBar.progress, redBar.progress, greenBar.progress, blueBar.progress)
                     GlobalStatus.sampleData!!.setFilterColor(color)
                     val filterView = filterPopup?.findViewById<FilterView>(R.id.filter_view)
                     filterView?.setFilterColor(redBar.progress, greenBar.progress, blueBar.progress)
                     setViewBackground(filter_color, GlobalStatus.sampleData!!.getFilterColor())
-                }
-                .setNegativeButton(getString(android.R.string.cancel)) { dialog, which -> })
+                })
     }
 
     protected fun setViewBackground(view: View, color: Int) {
@@ -276,12 +278,7 @@ class SampleEditActivity : AppCompatActivity() {
         val filterAlpha = dialogView.findViewById<TextView>(R.id.filter_alpha)
         var currentLux = -1f
 
-        alertDialog = AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setCancelable(false)
-                .create()
-        DialogHelper.animDialog(alertDialog)
-        alertDialog?.getWindow()?.setDimAmount(0f)
+        alertDialog = DialogHelper.customDialog(this, dialogView).setCancelable(false)
 
         dialogView.findViewById<View>(R.id.sample_edit_cancel).setOnClickListener {
             // GlobalStatus.sampleData!!.removeSample(sampleBrightness.progress)

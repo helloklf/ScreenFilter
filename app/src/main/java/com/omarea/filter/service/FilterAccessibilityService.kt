@@ -31,11 +31,11 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
     private var dynamicOptimize: DynamicOptimize = DynamicOptimize()
     private var lightSensorWatcher: LightSensorWatcher? = null
     private var handler = Handler(Looper.getMainLooper())
-    private var isLandscape:Boolean
-        get () {
+    private var isLandscape: Boolean
+        get() {
             return GlobalStatus.isLandscape
         }
-        set (value) {
+        set(value) {
             GlobalStatus.isLandscape = value
         }
     private val lightHistory = LinkedList<LightHistory>()
@@ -47,8 +47,8 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
     private var filterBrightness = 0 // 当前由滤镜控制的屏幕亮度
     private var isFirstScreenCap = true
 
-    private var displayWidth: Int = 0;
-    private var displayHeight: Int = 0;
+    private var displayWidth: Int = 0
+    private var displayHeight: Int = 0
 
     // 当前手机屏幕是否处于开启状态
     private var screenOn = true
@@ -109,7 +109,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
                 }
             }
         }, {
-            if(screenOn == true) {
+            if (screenOn == true) {
                 return@ScreenEventHandler
             }
             Log.d("Filter", "ScreenON")
@@ -167,7 +167,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
         // 获取分辨率大小
         val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val point = Point()
-        wm.defaultDisplay.getRealSize(point);
+        wm.defaultDisplay.getRealSize(point)
 
         displayHeight = point.y
         displayWidth = point.x
@@ -358,7 +358,7 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             // 获取分辨率大小
             val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
             val point = Point()
-            wm.getDefaultDisplay().getRealSize(point);
+            wm.defaultDisplay.getRealSize(point)
 
             // 如果分辨率改变，则需要重新调整滤镜，以便完全遮盖屏幕了
             if ((displayHeight != point.y && displayWidth != point.y) || (displayHeight != point.x && displayWidth != point.x)) {
@@ -439,20 +439,64 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             smoothLightTimer!!.schedule(object : TimerTask() {
                 // 为了让从滤镜能在从室内走到室外时快速响应及时的提高亮度
                 // 同时又不至于因为短时间的手指遮挡屏幕导致屏幕突然变暗
-                // 这里加一个周期循环，0:正常调整滤镜亮度，1:只响应环境光线大幅提升
+                // 这里加一个周期循环，0:正常调整滤镜亮度，>0:只响应环境光线大幅提升
                 private var periodNum = 0
 
                 private var lastValue = -1f
                 override fun run() {
                     if (screenOn) {
                         handler.post {
-                            lastValue = smoothLightTimerTick(periodNum != 0, lastValue,if(periodNum != 0) 4000 else 8000) // 取最近10秒内的数据)
+                            lastValue = smoothLightTimerTick(periodNum != 0, lastValue, if (periodNum != 0) 2000 else 8000) // 取最近10秒内的数据)
                         }
                     }
                     periodNum += 1
-                    periodNum %= 2
+                    periodNum %= 4
                 }
-            }, 500, 4000)
+            }, 500, 2000)
+        }
+    }
+
+    /**
+     * 计算最近${range}毫秒内的环境光平均数值
+     */
+    private fun getTimeRangeAvgLux(range: Long): Float {
+        if (lightHistory.size > 0) {
+            // 计算一段时间内的绝对平均亮度(环境光)
+            val currentTime = System.currentTimeMillis()
+            val copy = LinkedList<LightHistory>().apply {
+                addAll(lightHistory)
+
+                // 虚拟一个样本，表示光线传感器最后一次上报数值，并数值保持至今
+                // 这样就可以让样本数据成为可以闭合的区间
+                val virtualSample = lightHistory.last.apply {
+                    time = currentTime
+                }
+                add(virtualSample)
+            }
+
+            var totalLux = 0.0
+            val rangeStart = currentTime - range
+            var lastHistory: LightHistory? = null
+            for (history in copy) {
+                if (history.time > rangeStart) {
+                    if (lastHistory != null) {
+                        val startTime = if (lastHistory.time < rangeStart) rangeStart else lastHistory.time
+                        val endTime = history.time
+                        val lux = lastHistory.lux
+                        totalLux += (lux * (endTime - startTime))
+                    }
+                }
+                lastHistory = history
+            }
+            val absAvgLux = (if (totalLux > 0.0) {
+                (totalLux / range).toFloat()
+            } else {
+                copy.last.lux
+            })
+
+            return absAvgLux
+        } else {
+            return -1F
         }
     }
 
@@ -463,42 +507,14 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
         var targetLux: Float = -1F
         try {
             if (lightHistory.size > 0) {
-                // 计算一段时间内的绝对平均亮度(环境光)
-                val currentTime = System.currentTimeMillis()
-                val copy = LinkedList<LightHistory>().apply {
-                    addAll(lightHistory)
-
-                    // 虚拟一个样本，表示光线传感器最后一次上报数值，并数值保持至今
-                    // 这样就可以让样本数据成为可以闭合的区间
-                    val virtualSample = lightHistory.last.apply {
-                        time = currentTime
+                targetLux = getTimeRangeAvgLux(range)
+                if (upOnly) {
+                    if (targetLux - lastValue > 200) {
+                        GlobalStatus.avgLux = targetLux
+                        updateFilterByLux(targetLux)
+                        lightHistory.clear()
                     }
-                    add(virtualSample)
-                }
-
-                var totalLux = 0.0
-                val rangeStart = currentTime - range
-                var lastHistory: LightHistory? = null
-                for (history in copy) {
-                    if (history.time > rangeStart) {
-                        if (lastHistory != null) {
-                            val startTime = if (lastHistory.time < rangeStart) rangeStart else lastHistory.time
-                            val endTime = history.time
-                            val lux = lastHistory.lux
-                            totalLux += (lux * (endTime - startTime))
-                        }
-                    }
-                    lastHistory = history
-                }
-                val absAvgLux = (if (totalLux > 0.0) {
-                    (totalLux / range).toFloat()
                 } else {
-                    copy.last.lux
-                })
-
-                targetLux = absAvgLux
-
-                if (!upOnly || (targetLux - lastValue > 200)) {
                     GlobalStatus.avgLux = targetLux
                     updateFilterByLux(targetLux)
                 }

@@ -3,8 +3,9 @@ package com.omarea.filter.service;
 import android.content.Intent;
 import android.os.Build;
 import android.service.quicksettings.TileService;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.omarea.filter.ScreenCapActivity;
 

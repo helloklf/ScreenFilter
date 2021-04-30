@@ -2,7 +2,6 @@ package com.omarea.filter
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
-import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,14 +13,15 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.omarea.common.ui.DialogHelper
 import com.omarea.filter.common.NotificationHelper
+import com.omarea.filter.common.RadioGroupSimulator
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
 
@@ -74,21 +74,6 @@ class MainActivity : AppCompatActivity() {
             GlobalStatus.sampleData = SampleData(applicationContext)
         }
         config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
-
-        if (!(config.contains(SpfConfig.SCREENT_MAX_LIGHT) && config.contains(SpfConfig.TARGET_DEVICE))) {
-            // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
-            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
-                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
-                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
-            } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
-                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
-                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
-            } else {
-                openGuide()
-            }
-        }
 
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -187,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 自动亮度
-        val contentResolver = getContentResolver()
+        val contentResolver = contentResolver
         auto_adjustment.isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
         auto_adjustment.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(this)) {
@@ -231,11 +216,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val p: PackageManager = getPackageManager()
-        val startActivity = ComponentName(getApplicationContext(), MainActivity::class.java)
+        val p: PackageManager = packageManager
+        val startActivity = ComponentName(applicationContext, MainActivity::class.java)
         hide_start_icon.setOnClickListener { v ->
             try {
-                if (hide_start_icon.isChecked()) {
+                if (hide_start_icon.isChecked) {
                     p.setComponentEnabledSetting(startActivity, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
                 } else {
                     p.setComponentEnabledSetting(startActivity, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
@@ -308,15 +293,32 @@ class MainActivity : AppCompatActivity() {
         systemBrightnessModeObserver = object : ContentObserver(Handler()) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 super.onChange(selfChange, uri)
-                auto_adjustment.isChecked = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+                auto_adjustment.isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
             }
         }
-        getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
+        contentResolver.registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
+
+        if (!(config.contains(SpfConfig.SCREENT_MAX_LIGHT) && config.contains(SpfConfig.TARGET_DEVICE))) {
+            // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
+            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
+                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
+                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
+                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
+            } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
+                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
+                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
+                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
+            } else {
+                Handler().postDelayed({
+                    openGuide()
+                }, 30)
+            }
+        }
     }
 
     override fun onPause() {
         stopTimer()
-        getContentResolver().unregisterContentObserver(systemBrightnessModeObserver)
+        contentResolver.unregisterContentObserver(systemBrightnessModeObserver)
         super.onPause()
     }
 
@@ -330,19 +332,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        /*
-        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (!Settings.canDrawOverlays(this)) {
-                    finishAndRemoveTask()
-                }
-            }
-        }
-        */
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -387,9 +376,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openGuide() {
-        val dialog = layoutInflater.inflate(R.layout.dialog_guide, null);
-        val guideAmoled = dialog.findViewById<RadioButton>(R.id.guide_amoled)
-        val guideLcd = dialog.findViewById<RadioButton>(R.id.guide_lcd)
+        val dialog = layoutInflater.inflate(R.layout.dialog_guide, null)
+        val guideAmoled = dialog.findViewById<CompoundButton>(R.id.guide_amoled)
+        val guideLcd = dialog.findViewById<CompoundButton>(R.id.guide_lcd)
+        RadioGroupSimulator(guideAmoled, guideLcd)
+        var dialogWrap: DialogHelper.DialogWrap? = null
         dialog.findViewById<View>(R.id.guide_next).setOnClickListener {
             if (guideAmoled.isChecked || guideLcd.isChecked) {
                 try {
@@ -403,9 +394,10 @@ class MainActivity : AppCompatActivity() {
                             config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
                         }
                         GlobalStatus.sampleData!!.readConfig(true)
-                        myHandler.postDelayed(Runnable {
+                        myHandler.postDelayed({
+                            dialogWrap?.dismiss()
                             recreate()
-                        }, 100)
+                        }, 200)
                     } else {
                         Toast.makeText(this, getString(R.string.step_warn), Toast.LENGTH_SHORT).show()
                     }
@@ -414,6 +406,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        DialogHelper.animDialog(AlertDialog.Builder(this).setView(dialog).setCancelable(false))
+        dialogWrap = DialogHelper.customDialog(this, dialog).setCancelable(false)
     }
 }

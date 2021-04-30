@@ -5,7 +5,7 @@ import java.nio.charset.Charset
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-public class FilterSample {
+class FilterSample {
     companion object {
         // 样本数据（lux, Sample）
         private var samples = TreeMap<Double, Int>()
@@ -30,7 +30,7 @@ public class FilterSample {
         }
     }
 
-    public fun getFilterAlpha(targetRatio: Int): Int? {
+    fun getFilterAlpha(targetRatio: Int): Int? {
         return getFilterAlpha(if (targetRatio > FilterViewConfig.FILTER_MAX_ALPHA) {
             1.0
         } else if (targetRatio < 1) {
@@ -40,7 +40,7 @@ public class FilterSample {
         })
     }
 
-    public fun getFilterAlpha(targetRatio: Double): Int? {
+    fun getFilterAlpha(targetRatio: Double): Int? {
         if (samples.isEmpty()) {
             init()
         }
