@@ -1,4 +1,5 @@
 {
+  "desc": "配置格式为[lux]:[brightness]，亮度值(brightness)范围是5~1000，环境光(lux)值范围是0~40000",
   "samples": {
     "0": 25,
     "1": 85,
@@ -10,5 +11,5 @@
     "10000": 900,
     "20000": 1000
   },
-  "screenMinLight": 10
+  "screenMinLight": "1000"
 }

@@ -83,7 +83,7 @@ class SampleEditActivity : AppCompatActivity() {
      * 更新图表
      */
     private fun updateChart() {
-        screen_light_min.progress = GlobalStatus.sampleData!!.getScreentMinLight()
+        screen_light_min.progress = GlobalStatus.sampleData!!.getScreenMinLight()
         screen_light_min_ratio.text = (screen_light_min.progress / 10.0).toString()
         filter_align_start.isChecked = config.getBoolean(SpfConfig.FILTER_ALIGN_START, SpfConfig.FILTER_ALIGN_START_DEFAULT)
         filter_texture.isChecked = config.getInt(SpfConfig.TEXTURE, SpfConfig.TEXTURE_DEFAULT) != 0
@@ -124,8 +124,8 @@ class SampleEditActivity : AppCompatActivity() {
                 if (progress < 1) {
                     value = 1
                 }
-                if (GlobalStatus.sampleData!!.getScreentMinLight() != value) {
-                    GlobalStatus.sampleData!!.setScreentMinLight(value)
+                if (GlobalStatus.sampleData!!.getScreenMinLight() != value) {
+                    GlobalStatus.sampleData!!.setScreenMinLight(value)
                     hasChange = true
                 }
                 screen_light_min_ratio.text = (value / 10.0).toString()

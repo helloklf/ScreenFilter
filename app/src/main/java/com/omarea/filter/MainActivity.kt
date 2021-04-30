@@ -23,9 +23,9 @@ import androidx.appcompat.widget.Toolbar
 import com.omarea.common.ui.DialogHelper
 import com.omarea.filter.common.NotificationHelper
 import com.omarea.filter.common.RadioGroupSimulator
+import com.omarea.filter.common.SystemProperty
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
-import java.util.jar.Manifest
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,9 +33,9 @@ class MainActivity : AppCompatActivity() {
     private var timer: Timer? = null
     private var myHandler = Handler()
     private lateinit var systemBrightnessModeObserver: ContentObserver
-    private val OVERLAY_PERMISSION_REQ_CODE = 0
 
     /*
+    private val OVERLAY_PERMISSION_REQ_CODE = 0
     private fun askForPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
@@ -86,12 +86,9 @@ class MainActivity : AppCompatActivity() {
 
         // 启用滤镜
         filter_switch.setOnClickListener { v ->
-            val filterSwitch = v as Switch
+            val filterSwitch = v as CompoundButton
             if (filterSwitch.isChecked) {
-                if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
-                    Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
-                    filterSwitch.isChecked = false
-                } else if (GlobalStatus.filterOpen == null) {
+                if (GlobalStatus.filterOpen == null) {
                     Toast.makeText(this, R.string.accessibility_service_required, Toast.LENGTH_SHORT).show()
                     filterSwitch.isChecked = false
                     try {
@@ -271,12 +268,12 @@ class MainActivity : AppCompatActivity() {
     private fun updateInfo() {
         myHandler.post {
             if (GlobalStatus.currentLux > -1) {
-                light_lux.text = GlobalStatus.currentLux.toString() + "lux"
+                light_lux.text = String.format("%.2flux", GlobalStatus.currentLux)
             } else {
                 light_lux.text = ""
             }
             if (GlobalStatus.avgLux > -1) {
-                light_lux_avg.text = GlobalStatus.avgLux.toString() + "lux"
+                light_lux_avg.text = String.format("%.2flux", GlobalStatus.avgLux)
             } else {
                 light_lux_avg.text = ""
             }
@@ -319,20 +316,9 @@ class MainActivity : AppCompatActivity() {
         contentResolver.registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
 
         if (!(config.contains(SpfConfig.SCREENT_MAX_LIGHT) && config.contains(SpfConfig.TARGET_DEVICE))) {
-            // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
-            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
-                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
-                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
-            } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
-                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
-                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
-            } else {
-                Handler().postDelayed({
-                    openGuide()
-                }, 30)
-            }
+            Handler().postDelayed({
+                openGuide()
+            }, 30)
         }
     }
 
@@ -400,6 +386,11 @@ class MainActivity : AppCompatActivity() {
         val guideAmoled = dialog.findViewById<CompoundButton>(R.id.guide_amoled)
         val guideLcd = dialog.findViewById<CompoundButton>(R.id.guide_lcd)
         RadioGroupSimulator(guideAmoled, guideLcd)
+
+        if (SystemProperty().isOLED()) {
+            guideAmoled.isChecked = true
+        }
+
         var dialogWrap: DialogHelper.DialogWrap? = null
         dialog.findViewById<View>(R.id.guide_next).setOnClickListener {
             if (guideAmoled.isChecked || guideLcd.isChecked) {

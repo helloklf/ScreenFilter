@@ -17,7 +17,7 @@
     <string name="filter_enable">启用滤镜</string>
     <string name="filter_disabled">禁用滤镜</string>
     <string name="screen_min_light">最低硬件亮度</string>
-    <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，可设为屏幕开启DC调光的亮度级别，对于全程PWM调光的屏幕，则应设为最高值。\n\n小米9、MIX3 建议设为30%，三星S8 建议设为95%，其它机型自测哦！</string>
+    <string name="screen_min_light_desc">若将此软件用于缓解PWM闪烁，则应设置此值为(类)DC调光激活的亮度阈值，例如：小米9、MIX3 建议设为30%，三星S8 建议设为95%。\n\n若仅用于代替系统自动亮度调节，则设为1%以内即可。</string>
     <string name="auto_adjustment">自动亮度</string>
     <string name="auto_adjustment_desc">此开关跟随系统自带的“自动亮度”开关</string>
     <string name="brightness_offset">亮度微调</string>
@@ -49,7 +49,6 @@
     <string name="sample_desc">样本数据用于计算不同环境光下的屏幕亮度\n图中 x轴表示环境光强度(lux)，y轴表示屏幕亮度。</string>
 
     <string name="accessibility_service_required">需要先启动辅助服务，才能使用本功能！</string>
-    <string name="overlays_required">还未授予“显示悬浮窗/在应用上层显示”权限</string>
     <string name="please_enable_filter">请先启用滤镜~</string>
 
     <string name="sample_add_title">添加样本数据</string>
@@ -82,7 +81,7 @@
     <string name="brightness_controller_desc">显示亮度控制功能的常驻通知</string>
 
     <string name="filter_align_start">左上对齐</string>
-    <string name="filter_align_start_desc">滤镜显示位置对齐左上角，如果滤镜无法完整覆盖屏幕，可尝试开启</string>
+    <string name="filter_align_start_desc">滤镜显示位置对齐左上角。如果滤镜有时无法完整覆盖屏幕，可尝试开启</string>
     <string name="filter_texture">质感纹理</string>
     <string name="filter_texture_desc">为屏幕显示添加纹理效果(会增加RAM占用)</string>
 

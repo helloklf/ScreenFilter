@@ -17,14 +17,14 @@ class SampleData(private val context: Context) {
     private var samples = HashMap<Int, Int>()
 
     // 屏幕亮度低于此值时才开启滤镜功能
-    private var screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+    private var screenMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
 
     // 滤镜颜色
     private var filterColor: Int = Color.BLACK
 
     private var filterConfig = Build.PRODUCT + ".json"
 
-    private val applicationGlobalConfig = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
+    private val globalConfig = context.getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
 
     init {
         this.readConfig()
@@ -35,11 +35,11 @@ class SampleData(private val context: Context) {
         val configFile = if ((!officialOnlay) && File(customConfig).exists()) {
             File(customConfig).readBytes()
         } else {
-            if (applicationGlobalConfig.getInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED) == SpfConfig.TARGET_DEVICE_AMOLED) {
+            if (globalConfig.getInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED) == SpfConfig.TARGET_DEVICE_AMOLED) {
                 try {
                     context.assets.open("for_" + Build.PRODUCT + ".json").readBytes()
                 } catch (ex: java.lang.Exception) {
-                    context.assets.open("amoled.json").readBytes()
+                    context.assets.open("oled.json").readBytes()
                 }
             } else {
                 context.assets.open("lcd.json").readBytes()
@@ -66,14 +66,14 @@ class SampleData(private val context: Context) {
                 }
                 this.samples.put(lux, filterAlpha)
             }
-            if (jsonObject.has("screentMinLight")) {
-                var screentMinLight = jsonObject.getInt("screentMinLight")
-                if (screentMinLight > FilterViewConfig.FILTER_BRIGHTNESS_MAX || screentMinLight < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
-                    screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+            if (jsonObject.has("screenMinLight") || jsonObject.has("screentMinLight")) { // 兼容以前拼写错误存储的数据(screentMinLight)
+                var screenMinLight = jsonObject.getInt(if (jsonObject.has("screentMinLight")) "screentMinLight" else "screenMinLight")
+                if (screenMinLight > FilterViewConfig.FILTER_BRIGHTNESS_MAX || screenMinLight < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
+                    screenMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
                 }
-                this.screentMinLight = screentMinLight
+                this.screenMinLight = screenMinLight
             } else {
-                this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                this.screenMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
             }
             if (jsonObject.has("filterColor")) {
                 this.filterColor = jsonObject.getInt("filterColor")
@@ -81,12 +81,28 @@ class SampleData(private val context: Context) {
                 this.filterColor = Color.BLACK
             }
             if (officialOnlay) {
+                /*
                 // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
                 if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
-                    setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
+                    setScreenMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
                 } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
-                    setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
+                    setScreenMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
                 }
+                */
+
+                val screenMinLightProp = (if (
+                        globalConfig.getInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED) == SpfConfig.TARGET_DEVICE_AMOLED &&
+                        jsonObject.has("screenMinLightDC")
+                ) {
+                    "screenMinLightDC"
+                } else {
+                    "screenMinLight"
+                })
+                var screenMinLight = jsonObject.getInt(screenMinLightProp)
+                if (screenMinLight > FilterViewConfig.FILTER_BRIGHTNESS_MAX || screenMinLight < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
+                    screenMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+                }
+                this.screenMinLight = screenMinLight
             }
         } catch (ex: Exception) {
             samples.put(0, FilterViewConfig.FILTER_BRIGHTNESS_MIN)
@@ -101,7 +117,7 @@ class SampleData(private val context: Context) {
         }
         val config = JSONObject()
         config.putOpt("samples", sampleConfig)
-        config.put("screentMinLight", this.screentMinLight)
+        config.put("screenMinLight", this.screenMinLight)
         config.put("filterColor", this.filterColor)
         val jsonStr = config.toString(2)
 
@@ -163,7 +179,7 @@ class SampleData(private val context: Context) {
         val sampleValue = getVitualSample(lux)
         if (sampleValue != null) {
             val brightness = ((sampleValue + (FilterViewConfig.FILTER_BRIGHTNESS_MAX * staticOffset)) * (1 + offsetpractical)).toInt()
-            return FilterViewConfig.getConfigByBrightness(brightness, screentMinLight)
+            return FilterViewConfig.getConfigByBrightness(brightness, screenMinLight)
         }
         return FilterViewConfig.getDefault()
     }
@@ -173,14 +189,14 @@ class SampleData(private val context: Context) {
      * 根据意图亮度百分比，获取滤镜配置
      */
     fun getFilterConfigByRatio(ratio: Float): FilterViewConfig {
-        return FilterViewConfig.getConfigByRatio(ratio, screentMinLight)
+        return FilterViewConfig.getConfigByRatio(ratio, screenMinLight)
     }
 
     /**
      * 根据意向屏幕亮度获取配置
      */
     fun getConfigByBrightness(brightness: Int): FilterViewConfig {
-        return FilterViewConfig.getConfigByBrightness(brightness, screentMinLight)
+        return FilterViewConfig.getConfigByBrightness(brightness, screenMinLight)
     }
 
     fun getVitualSample(lux: Int): Int? {
@@ -239,20 +255,20 @@ class SampleData(private val context: Context) {
     /**
      * 设置屏幕最低亮度百分比
      */
-    fun getScreentMinLight(): Int {
-        return screentMinLight
+    fun getScreenMinLight(): Int {
+        return screenMinLight
     }
 
     /**
      * 设置屏幕最低亮度百分比
      */
-    fun setScreentMinLight(value: Int) {
+    fun setScreenMinLight(value: Int) {
         if (value > FilterViewConfig.FILTER_BRIGHTNESS_MAX) {
-            this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
+            this.screenMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MAX
         } else if (value < FilterViewConfig.FILTER_BRIGHTNESS_MIN) {
-            this.screentMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MIN
+            this.screenMinLight = FilterViewConfig.FILTER_BRIGHTNESS_MIN
         } else {
-            this.screentMinLight = value
+            this.screenMinLight = value
         }
     }
 

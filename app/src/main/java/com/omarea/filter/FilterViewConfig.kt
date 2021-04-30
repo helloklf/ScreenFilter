@@ -30,7 +30,7 @@ class FilterViewConfig {
         /**
          * 根据所需的亮度值获取滤镜配置
          */
-        fun getConfigByBrightness(brightness: Int, screentMinLight: Int = FILTER_BRIGHTNESS_MAX): FilterViewConfig {
+        fun getConfigByBrightness(brightness: Int, screenMinLight: Int = FILTER_BRIGHTNESS_MAX): FilterViewConfig {
             val brightnessValue = if (brightness < FILTER_BRIGHTNESS_MIN) {
                 FILTER_BRIGHTNESS_MIN
             } else if (brightness > FILTER_BRIGHTNESS_MAX) {
@@ -39,13 +39,13 @@ class FilterViewConfig {
                 brightness
             }
 
-            if (screentMinLight == FILTER_BRIGHTNESS_MAX) {
+            if (screenMinLight == FILTER_BRIGHTNESS_MAX) {
                 val config = getDefault()
                 config.filterBrightness = FILTER_BRIGHTNESS_MAX
                 config.filterAlpha = filterSample.getFilterAlpha(brightnessValue)!!
                 return config
             } else {
-                return getConfigByRatio(getBrightnessRatio(brightnessValue), screentMinLight)
+                return getConfigByRatio(getBrightnessRatio(brightnessValue), screenMinLight)
             }
         }
 
@@ -61,7 +61,7 @@ class FilterViewConfig {
             return (brightness / 1000.0).toFloat()
         }
 
-        fun getConfigByRatio(ratio: Float, screentMinLight: Int): FilterViewConfig {
+        fun getConfigByRatio(ratio: Float, screenMinLight: Int): FilterViewConfig {
             val config = getDefault()
             var avalibRatio = ratio
             if (ratio > 1) {
@@ -70,18 +70,18 @@ class FilterViewConfig {
                 avalibRatio = 0.01f
             }
 
-            if (screentMinLight == FILTER_BRIGHTNESS_MAX) {
+            if (screenMinLight == FILTER_BRIGHTNESS_MAX) {
                 config.filterAlpha = filterSample.getFilterAlpha(avalibRatio.toDouble())!!
                 config.filterBrightness = FILTER_BRIGHTNESS_MAX
             } else {
                 // 如果亮度还没低于屏幕最低亮度限制
-                if (avalibRatio >= screentMinLight.toFloat() / FILTER_BRIGHTNESS_MAX) {
+                if (avalibRatio >= screenMinLight.toFloat() / FILTER_BRIGHTNESS_MAX) {
                     config.filterAlpha = 0
                     config.filterBrightness = (avalibRatio * FILTER_BRIGHTNESS_MAX).toInt()
                 } else {
-                    val filterAlpha = filterSample.getFilterAlpha(avalibRatio.toDouble() * FILTER_BRIGHTNESS_MAX / screentMinLight)!!
+                    val filterAlpha = filterSample.getFilterAlpha(avalibRatio.toDouble() * FILTER_BRIGHTNESS_MAX / screenMinLight)!!
                     config.filterAlpha = filterAlpha
-                    config.filterBrightness = screentMinLight
+                    config.filterBrightness = screenMinLight
                 }
             }
             return config

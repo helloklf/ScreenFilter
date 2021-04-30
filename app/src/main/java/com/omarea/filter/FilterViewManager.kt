@@ -320,7 +320,7 @@ class FilterViewManager(private var context: Context) {
         if (view != null && lp != null) {
             val toB = lastBrightness
             stopUpdate()
-            valueAnimator = ValueAnimator.ofInt(sampleData.getScreentMinLight(), 1).apply {
+            valueAnimator = ValueAnimator.ofInt(sampleData.getScreenMinLight(), 1).apply {
                 duration = 2000
                 var lastTick = -2
                 addUpdateListener { animation ->
@@ -380,7 +380,7 @@ class FilterViewManager(private var context: Context) {
         val view = filterView!!
         val lp = layoutParams!!
         stopUpdate()
-        valueAnimator = ValueAnimator.ofInt(1, sampleData.getScreentMinLight()).apply {
+        valueAnimator = ValueAnimator.ofInt(1, sampleData.getScreenMinLight()).apply {
             duration = filterFadeInDuration
             var lastTick = -2
             addUpdateListener { animation ->
