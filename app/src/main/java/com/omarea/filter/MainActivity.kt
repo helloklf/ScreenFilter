@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -81,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        setExcludeFromRecents()
         FilterSample().getFilterAlpha(40)
 
         // 启用滤镜
@@ -157,13 +157,6 @@ class MainActivity : AppCompatActivity() {
                 GlobalStatus.filterRefresh?.run()
             }
         })
-
-        // 从最近任务隐藏
-        hide_in_recent.isChecked = config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT)
-        hide_in_recent.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.HIDE_IN_RECENT, (it as Switch).isChecked).apply()
-            setExcludeFromRecents()
-        }
 
         // 息屏关闭
         lock_off.isChecked = config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)
@@ -364,20 +357,26 @@ class MainActivity : AppCompatActivity() {
         } else super.onOptionsItemSelected(item)
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            setExcludeFromRecents()
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     private fun setExcludeFromRecents(exclude: Boolean? = null) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
                 val service = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 for (task in service.appTasks) {
                     if (task.taskInfo.id == this.taskId) {
-                        val b = if (exclude == null) config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT) else exclude
-                        task.setExcludeFromRecents(b)
+                        task.setExcludeFromRecents(true)
                     }
                 }
             } catch (ex: Exception) {
             }
         } else {
-            Toast.makeText(this, "您的系统版本过低，暂不支持本功能~", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "您的系统版本过低，暂不支持隐藏后台功能~", Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -26,8 +26,7 @@
     <string name="dynamic_optimize">夜间模式</string>
     <string name="dynamic_optimize_desc">在夜间且环境光照不高于此值时激活</string>
 
-    <string name="hide_in_recent">从最近任务隐藏</string>
-    <string name="hide_in_recent_desc">不要在最近任务列表显示本应用</string>
+    <string name="hide_in_recent">使用[返回键/返回手势]即可从最近任务列表隐藏本应用</string>
 
     <string name="accessibility_description">通过辅助服务，提高滤镜显示层级，以便能够覆盖状态栏、导航栏、锁屏界面。</string>
     <string name="brightness_control">如何调节亮度</string>

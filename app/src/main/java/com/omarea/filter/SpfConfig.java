@@ -44,10 +44,6 @@ public class SpfConfig {
     public static String SCREENT_MIN_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MIN_LIGHT_DEFAULT = 255;
 
-    // 隐藏最近任务
-    public static String HIDE_IN_RECENT = "HIDE_IN_RECENT";
-    public static boolean HIDE_IN_RECENT_DEFAULT = false;
-
     // 动态优化（虚拟环境）
     public static String DYNAMIC_OPTIMIZE = "DYNAMIC_OPTIMIZE";
     public static boolean DYNAMIC_OPTIMIZE_DEFAULT = false;

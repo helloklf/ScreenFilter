@@ -279,21 +279,11 @@
                 android:text="@string/landscape_optimize_desc" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/card_bg"
-            android:orientation="vertical">
-            <Switch
-                android:id="@+id/hide_in_recent"
-                style="@style/option_title"
-                android:text="@string/hide_in_recent" />
-
-            <TextView
-                style="@style/option_desc"
-                android:text="@string/hide_in_recent_desc" />
-        </LinearLayout>
+        <TextView
+            android:layout_marginTop="16dp"
+            style="@style/option_desc"
+            android:textAlignment="center"
+            android:text="@string/hide_in_recent" />
 
         <LinearLayout
             android:visibility="gone"
