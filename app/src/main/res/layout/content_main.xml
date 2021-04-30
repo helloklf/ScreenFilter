@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="6dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="5dp"
+                android:layout_marginEnd="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/card_bg"
                 android:gravity="center">
@@ -40,7 +40,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/card_bg"
                 android:gravity="center_vertical"
@@ -129,13 +129,6 @@
 
         </LinearLayout>
 
-
-        <TextView
-            android:layout_marginTop="25dp"
-            style="@style/option_desc"
-            android:layout_marginBottom="0dp"
-            android:text="@string/automatic_brightness_config" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -151,85 +144,91 @@
             <TextView
                 style="@style/option_desc"
                 android:text="@string/auto_adjustment_desc" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/card_bg"
-            android:orientation="vertical">
-            <TextView
-                style="@style/option_title"
-                android:text="@string/brightness_offset" />
 
             <LinearLayout
+                android:id="@+id/auto_adjustment_more"
+                android:background="@drawable/in_card_item_inactive"
+                android:layout_marginTop="6dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content">
 
-                <SeekBar
-                    android:id="@+id/brightness_offset"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:max="20"
-                    android:min="0"
-                    android:progress="50" />
+                    android:layout_marginTop="4dp"
+                    android:orientation="vertical">
+                    <TextView
+                        style="@style/option_title"
+                        android:text="@string/brightness_offset" />
 
-                <TextView
-                    android:id="@+id/brightness_offset_text"
-                    android:layout_width="60dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/brightness_offset"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:max="20"
+                            android:min="0"
+                            android:progress="50" />
+
+                        <TextView
+                            android:id="@+id/brightness_offset_text"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:text="100%"
+                            android:textAlignment="textEnd" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="100%"
-                    android:textAlignment="textEnd" />
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+                    <Switch
+                        android:id="@+id/dynamic_optimize"
+                        style="@style/option_title"
+                        android:text="@string/dynamic_optimize" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/dynamic_optimize_limit"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:max="300"
+                            android:min="0" />
+
+                        <TextView
+                            android:id="@+id/dynamic_optimize_limit_text"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:text="0Lux"
+                            android:textAlignment="textEnd" />
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/option_desc"
+                        android:text="@string/dynamic_optimize_desc" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/card_bg"
-            android:orientation="vertical">
-            <Switch
-                android:id="@+id/dynamic_optimize"
-                style="@style/option_title"
-                android:text="@string/dynamic_optimize" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:id="@+id/dynamic_optimize_limit"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:max="300"
-                    android:min="0" />
-
-                <TextView
-                    android:id="@+id/dynamic_optimize_limit_text"
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="0Lux"
-                    android:textAlignment="textEnd" />
-            </LinearLayout>
-
-            <TextView
-                style="@style/option_desc"
-                android:text="@string/dynamic_optimize_desc" />
-        </LinearLayout>
-
-        <TextView
-            style="@style/option_desc"
-            android:layout_marginTop="25dp"
-            android:layout_marginBottom="0dp"
-            android:text="@string/other_config" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -295,7 +294,9 @@
                 style="@style/option_desc"
                 android:text="@string/hide_in_recent_desc" />
         </LinearLayout>
+
         <LinearLayout
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

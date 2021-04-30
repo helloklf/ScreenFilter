@@ -14,9 +14,6 @@
     <string name="filter_light">硬件亮度:</string>
     <string name="filter_alpha">滤镜浓度:</string>
 
-    <string name="automatic_brightness_config">自动亮度设置</string>
-    <string name="other_config">其它设置</string>
-
     <string name="filter_enable">启用滤镜</string>
     <string name="filter_disabled">禁用滤镜</string>
     <string name="screen_min_light">最低硬件亮度</string>
@@ -67,7 +64,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="guide_center">向导</string>
     <string name="pwm_amoled">为PWM调光的AMOLED屏幕而准备</string>
-    <string name="write_settings_unallowed">本应用没有修改系统设置的权限，请通过系统的“自动亮度开关进行切换”</string>
+    <string name="write_settings_unallowed">本应用没有修改系统设置的权限，请通过系统的“自动亮度开关”进行切换</string>
     <string name="write_settings_unsupported">本功能不支持Android M(6.0)以前的系统！</string>
     <string name="lock_off">息屏关闭滤镜</string>
     <string name="lock_off_desc">使用滤镜后AOD过暗的手机可以试试</string>
@@ -82,7 +79,7 @@
     <string name="action_off">com.omarea.filter.brightness.changed.off</string>
 
     <string name="brightness_controller">亮度控制器</string>
-    <string name="brightness_controller_desc">显示滤镜自带的亮度控制条</string>
+    <string name="brightness_controller_desc">显示亮度控制功能的常驻通知</string>
 
     <string name="filter_align_start">左上对齐</string>
     <string name="filter_align_start_desc">滤镜显示位置对齐左上角，如果滤镜无法完整覆盖屏幕，可尝试开启</string>

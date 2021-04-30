@@ -17,6 +17,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.omarea.common.ui.DialogHelper
@@ -24,6 +25,8 @@ import com.omarea.filter.common.NotificationHelper
 import com.omarea.filter.common.RadioGroupSimulator
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
+import java.util.jar.Manifest
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var config: SharedPreferences
@@ -173,20 +176,28 @@ class MainActivity : AppCompatActivity() {
 
         // 自动亮度
         val contentResolver = contentResolver
-        auto_adjustment.isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
-        auto_adjustment.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(this)) {
-                val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
-                if (current == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
-                } else {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
-                }
-            } else {
-                it.isEnabled = true
-                Toast.makeText(this, getString(R.string.write_settings_unallowed), Toast.LENGTH_LONG).show()
-                (it as Checkable).isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+        auto_adjustment.run {
+            setOnCheckedChangeListener { _, isChecked ->
+                auto_adjustment_more.visibility = if (isChecked) View.VISIBLE else View.GONE
             }
+            isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+
+            setOnClickListener {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(context)) {
+                    val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+                    if (current == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+                    } else {
+                        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
+                    }
+                } else {
+                    it.isEnabled = true
+                    Toast.makeText(context, getString(R.string.write_settings_unallowed), Toast.LENGTH_LONG).show()
+                    (it as Checkable).isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+                }
+            }
+
+            auto_adjustment_more.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
         // 亮度控制通知
@@ -198,8 +209,10 @@ class MainActivity : AppCompatActivity() {
                     if (!Settings.System.canWrite(this)) {
                         Toast.makeText(this, getString(R.string.write_settings_unallowed), Toast.LENGTH_SHORT).show()
                         checkable.isChecked = false
+                        requestWriteSettings()
                     }
                 } else {
+                    android.Manifest.permission.WRITE_SETTINGS
                     Toast.makeText(this, getString(R.string.write_settings_unsupported), Toast.LENGTH_SHORT).show()
                     checkable.isChecked = false
                 }
@@ -232,6 +245,13 @@ class MainActivity : AppCompatActivity() {
 
         val activityState = p.getComponentEnabledSetting(startActivity)
         hide_start_icon.isChecked = activityState != PackageManager.COMPONENT_ENABLED_STATE_ENABLED && activityState != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun requestWriteSettings() {
+        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+        intent.data = Uri.parse("package:$packageName")
+        startActivity(intent)
     }
 
     private fun restartFilter() {
