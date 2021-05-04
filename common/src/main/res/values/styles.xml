@@ -103,6 +103,21 @@
         <item name="android:alpha">0.45</item>
         <item name="android:background">@null</item>
     </style>
+    <style name="SceneSeekBarBig" parent="SceneSeekBar">
+        <item name="android:thumbOffset">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:splitTrack">false</item>
+        <item name="android:maxHeight">40dp</item>
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:indeterminateDrawable">?android:colorAccent</item>
+        <item name="android:progressDrawable">@drawable/seekbar_progress_big_drawable</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:thumb">@drawable/seekbar_big_thumb</item>
+        <item name="android:thumbTint">?android:colorAccent</item>
+        <item name="android:alpha">0.45</item>
+        <item name="android:background">@null</item>
+    </style>
     <style name="SceneSeekbarIcon">
         <item name="android:layout_width">20dp</item>
         <item name="android:layout_height">20dp</item>

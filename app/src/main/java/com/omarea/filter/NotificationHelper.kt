@@ -1,4 +1,4 @@
-package com.omarea.filter.common
+package com.omarea.filter
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -12,9 +12,7 @@ import android.provider.Settings
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import com.omarea.filter.GlobalStatus
-import com.omarea.filter.R
-import com.omarea.filter.SpfConfig
+import com.omarea.filter.broadcast.ControllerClickedReceiver
 
 class NotificationHelper(private var context: Context) {
     private val channelId = context.getString(R.string.channel_brightness_controller)
@@ -37,6 +35,20 @@ class NotificationHelper(private var context: Context) {
         val remoteViews = RemoteViews(context.packageName, R.layout.notification)
         remoteViews.setOnClickPendingIntent(R.id.brightness_minus, minus)
         remoteViews.setOnClickPendingIntent(R.id.brightness_plus, plus)
+
+
+        val clickIntent = if (GlobalStatus.filterEnabled) {
+            PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    Intent(context, ControllerClickedReceiver::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT)
+        } else {
+            null
+        }
+
+        // 点击亮度条显示悬浮窗
+        // remoteViews.setOnClickPendingIntent(R.id.brightness_current, clickIntent)
 
         if (autoMode) {
             val brightnessManual = PendingIntent.getBroadcast(context, 15, Intent(context.getString(R.string.action_manual)), PendingIntent.FLAG_UPDATE_CURRENT)
@@ -101,6 +113,7 @@ class NotificationHelper(private var context: Context) {
                 //.setDefaults(Notification.DEFAULT_ALL)  // 设置通知提醒方式为系统默认的提醒方式
                 .setAutoCancel(true)
                 .setWhen(System.currentTimeMillis())
+                .setContentIntent(clickIntent)
                 .setContent(remoteViews) // 通过设置RemoteViews对象来设置通知的布局，这里我们设置为自定义布局
                 .setPriority(NotificationCompat.PRIORITY_MIN)
 

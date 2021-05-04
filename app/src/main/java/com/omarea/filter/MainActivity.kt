@@ -22,7 +22,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.omarea.common.ui.DialogHelper
-import com.omarea.filter.common.NotificationHelper
 import com.omarea.filter.common.RadioGroupSimulator
 import com.omarea.filter.common.SystemProperty
 import kotlinx.android.synthetic.main.content_main.*

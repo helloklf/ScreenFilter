@@ -19,7 +19,7 @@ import android.widget.Toast
 import com.omarea.filter.*
 import com.omarea.filter.broadcast.BrightnessControlerBroadcast
 import com.omarea.filter.common.KeepShellPublic
-import com.omarea.filter.common.NotificationHelper
+import com.omarea.filter.NotificationHelper
 import com.omarea.filter.light.LightHandler
 import com.omarea.filter.light.LightHistory
 import com.omarea.filter.light.LightSensorWatcher
@@ -393,9 +393,15 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
             "com.qiyi.video",
             "com.qiyi.video.sdkplayer",
             "com.tencent.qqlive",
+            "com.tencent.videolite.android",
             "com.mxtech.videoplayer.pro",
             "com.mxtech.videoplayer.ad",
-            "com.netease.cloudmusic")
+            "com.netease.cloudmusic",
+            "com.youku.phone",
+            "com.hunantv.imgo.activity",
+            "org.videolan.vlc",
+            "com.google.android.youtube",
+            "com.netflix.mediaclient")
 
     // 是否在视频播放中
     private var videoPlaying = false

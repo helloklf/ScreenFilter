@@ -1,7 +1,9 @@
 package com.omarea.filter.service
 
 import android.graphics.Rect
+import android.util.LruCache
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
 
 class WindowAnalyzer(private val service: FilterAccessibilityService) {
@@ -21,6 +23,8 @@ class WindowAnalyzer(private val service: FilterAccessibilityService) {
             AccessibilityWindowInfo.TYPE_SYSTEM
     )
 
+    // 窗口id缓存（检测到相同的窗口id时，直接读取缓存的packageName，避免重复分析窗口节点获取packageName，降低性能消耗）
+    private val windowIdCaches = LruCache<Int, String>(3)
     // 新的前台应用窗口判定逻辑
     fun analysis(event: AccessibilityEvent? = null, handler: IWindowAnalyzerResult) {
         val windowsList = service.windows
@@ -70,7 +74,7 @@ class WindowAnalyzer(private val service: FilterAccessibilityService) {
                             handler.onWindowAnalyzerResult(pa.toString())
                         } else {
                             lastParsingThread = System.currentTimeMillis()
-                            val thread: Thread = WindowAnalyzeThread(lastWindow, lastParsingThread, handler)
+                            val thread: Thread = WindowAnalyzeThread(lastWindow, lastParsingThread, handler, windowIdCaches)
                             thread.start()
                         }
                     } else {
@@ -86,17 +90,30 @@ class WindowAnalyzer(private val service: FilterAccessibilityService) {
     class WindowAnalyzeThread constructor(
             private val windowInfo: AccessibilityWindowInfo,
             private val tid: Long,
-            private val handler: IWindowAnalyzerResult
+            private val handler: IWindowAnalyzerResult,
+            private val windowIdCaches: LruCache<Int, String>
     ) : Thread() {
         override fun run() {
-            // 如果当前window锁属的APP处于未响应状态，此过程可能会等待5秒后超时返回null，因此需要在线程中异步进行此操作
-            val root = (try {
-                windowInfo.root
-            } catch (ex: Exception) {
-                null
-            })
+            var root: AccessibilityNodeInfo? = null
+            val windowId = windowInfo.id
             val wp = (try {
-                root?.packageName
+                val cache = windowIdCaches.get(windowId)
+                if (cache == null) {
+                    // 如果当前window锁属的APP处于未响应状态，此过程可能会等待5秒后超时返回null，因此需要在线程中异步进行此操作
+                    root = (try {
+                        windowInfo.root
+                    } catch (ex: Exception) {
+                        null
+                    })
+                    root?.packageName.apply {
+                        if (this != null) {
+                            windowIdCaches.put(windowId, toString())
+                        }
+                    }
+                } else {
+                    // Log.d("@Scene", "windowCacheHit " + cache)
+                    cache
+                }
             } catch (ex: Exception) {
                 null
             })
