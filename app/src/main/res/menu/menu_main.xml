@@ -3,9 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.omarea.filter.MainActivity">
     <item
+        android:id="@+id/question"
+        android:orderInCategory="100"
+        android:title="@string/help_activity"
+        android:visible="true"
+        android:icon="@drawable/icon_question"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/other_settings"
+        android:orderInCategory="100"
+        android:visible="false"
+        android:icon="@drawable/icon_settings"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/sample_edit"
         android:orderInCategory="100"
-        android:title="@string/sample_edit"
+        android:title="@string/sample_edit_activity"
         android:visible="true"
-        app:showAsAction="never" />
+        android:icon="@drawable/icon_tuner"
+        app:showAsAction="always" />
 </menu>

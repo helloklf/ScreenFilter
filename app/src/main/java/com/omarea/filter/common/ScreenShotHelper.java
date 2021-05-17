@@ -14,7 +14,8 @@ import android.media.projection.MediaProjectionManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
+
+import androidx.annotation.RequiresApi;
 
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
@@ -22,16 +23,12 @@ import java.nio.ByteBuffer;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class ScreenShotHelper {
 
-    interface OnScreenShotListener {
-        void onFinish(Bitmap bitmap);
-    }
-
-    private OnScreenShotListener mOnScreenShotListener;
-
-    private ImageReader mImageReader;
-    private MediaProjection mMediaProjection;
-    private VirtualDisplay mVirtualDisplay;
     private final SoftReference<Context> mRefContext;
+    private final OnScreenShotListener mOnScreenShotListener;
+
+    private final ImageReader mImageReader;
+    private final MediaProjection mMediaProjection;
+    private VirtualDisplay mVirtualDisplay;
 
     public ScreenShotHelper(Context context, int resultCode, Intent data, OnScreenShotListener onScreenShotListener) {
         this.mOnScreenShotListener = onScreenShotListener;
@@ -39,6 +36,14 @@ public class ScreenShotHelper {
 
         mMediaProjection = getMediaProjectionManager().getMediaProjection(resultCode, data);
         mImageReader = ImageReader.newInstance(getScreenWidth(), getScreenHeight(), PixelFormat.RGBA_8888, 1);
+    }
+
+    public static int getScreenWidth() {
+        return Resources.getSystem().getDisplayMetrics().widthPixels;
+    }
+
+    public static int getScreenHeight() {
+        return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 
     public void startScreenShot() {
@@ -51,6 +56,32 @@ public class ScreenShotHelper {
                 new CreateBitmapTask().execute();
             }
         }, 1000);
+    }
+
+    private MediaProjectionManager getMediaProjectionManager() {
+        return (MediaProjectionManager) getContext().getSystemService(
+                Context.MEDIA_PROJECTION_SERVICE);
+    }
+
+    private void createVirtualDisplay() {
+        mVirtualDisplay = mMediaProjection.createVirtualDisplay(
+                "screen-mirror",
+                getScreenWidth(),
+                getScreenHeight(),
+                Resources.getSystem().getDisplayMetrics().densityDpi,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                mImageReader.getSurface(),
+                null,
+                null
+        );
+    }
+
+    private Context getContext() {
+        return mRefContext.get();
+    }
+
+    interface OnScreenShotListener {
+        void onFinish(Bitmap bitmap);
     }
 
     public class CreateBitmapTask extends AsyncTask<Image, Void, Bitmap> {
@@ -85,35 +116,5 @@ public class ScreenShotHelper {
                 mOnScreenShotListener.onFinish(bitmap);
             }
         }
-    }
-
-    private MediaProjectionManager getMediaProjectionManager() {
-        return (MediaProjectionManager) getContext().getSystemService(
-                Context.MEDIA_PROJECTION_SERVICE);
-    }
-
-    private void createVirtualDisplay() {
-        mVirtualDisplay = mMediaProjection.createVirtualDisplay(
-                "screen-mirror",
-                getScreenWidth(),
-                getScreenHeight(),
-                Resources.getSystem().getDisplayMetrics().densityDpi,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-                mImageReader.getSurface(),
-                null,
-                null
-        );
-    }
-
-    private Context getContext() {
-        return mRefContext.get();
-    }
-
-    public static int getScreenWidth() {
-        return Resources.getSystem().getDisplayMetrics().widthPixels;
-    }
-
-    public static int getScreenHeight() {
-        return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 }

@@ -6,6 +6,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:switchStyle">@style/SceneSwitch</item>
+        <item name="android:seekBarStyle">@style/SceneSeekBar</item>
+        <item name="android:checkboxStyle">@style/SceneCheckBox</item>
+        <item name="android:radioButtonStyle">@style/SceneRadioBox</item>
+        <item name="seekBarStyle">@style/SceneSeekBar</item>
     </style>
 
     <style name="AppThemeOFF" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -13,6 +18,11 @@
         <item name="colorPrimary">@color/colorPrimary2</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark2</item>
         <item name="colorAccent">@color/colorAccent2</item>
+        <item name="android:switchStyle">@style/SceneSwitch</item>
+        <item name="android:seekBarStyle">@style/SceneSeekBar</item>
+        <item name="android:checkboxStyle">@style/SceneCheckBox</item>
+        <item name="android:radioButtonStyle">@style/SceneRadioBox</item>
+        <item name="seekBarStyle">@style/SceneSeekBar</item>
     </style>
 
     <style name="AppTheme.Default" parent="AppTheme">>
@@ -36,22 +46,16 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="option_title">
-        <item name="android:textColor">#333333</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">15sp</item>
+    <style name="option_title" parent="textTitle">
         <item name="android:layout_width">match_parent</item>
+        <item name="android:gravity">center_vertical</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
     </style>
 
-    <style name="option_desc">
-        <item name="android:textStyle">normal</item>
-        <item name="android:textSize">12sp</item>
+    <style name="option_desc" parent="textSmall">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">20dp</item>
-        <item name="android:textColor">#999999</item>
     </style>
 
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
@@ -62,5 +66,51 @@
         <item name="android:layout_width">30dp</item>
         <item name="android:layout_height">30dp</item>
         <item name="android:layout_gravity">center_vertical</item>
+    </style>
+
+
+    <style name="textTitle" parent="@style/TextAppearance.AppCompat.Title">
+        <item name="fontFamily">sans-serif-black</item>
+        <item name="android:minHeight">22dp</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:alpha">0.8</item>
+    </style>
+
+    <style name="textSmallTitle" parent="textTitle">
+        <item name="android:textSize">11dp</item>
+    </style>
+
+    <style name="textDefault">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="textSmall">
+        <item name="android:textColor">#888888</item>
+        <item name="alpha">0.8</item>
+        <item name="android:textSize">11dp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="PowerSwitch" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:button">@drawable/power_switch_style</item>
+        <item name="android:background">@null</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="dialogAnim">
+        <item name="android:windowExitAnimation">@anim/dialog_exit</item>
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
     </style>
 </resources>

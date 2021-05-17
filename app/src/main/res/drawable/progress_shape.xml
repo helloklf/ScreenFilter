@@ -4,16 +4,19 @@
     <!--设置ProgressBar背景色-->
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="#f0f0f0" />
-            <corners android:radius="5dp" />
+            <solid android:color="#33888888" />
+            <corners android:radius="10dp" />
         </shape>
     </item>
 
     <!--设置ProgressBar进度条颜色-->
     <item android:id="@android:id/progress">
-        <scale
-            android:drawable="@drawable/progress_color"
-            android:scaleWidth="100%" />
+        <clip>
+            <shape>
+                <corners android:radius="10dp"/>
+                <solid android:color="#88888888"/>
+            </shape>
+        </clip>
     </item>
 
 </layer-list>

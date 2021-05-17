@@ -1,76 +1,71 @@
 <resources>
     <string name="app_name">屏幕滤镜</string>
+    <string name="help_activity">滤镜说明</string>
+    <string name="sample_edit_activity">高级设置</string>
     <string name="screenshot_tile">正常截图</string>
     <string name="screenshot_tile_fail">屏幕滤镜调用截图失败</string>
     <string name="screenshot_tile_output">保存路径：</string>
-    <string name="sample_edit">高级设置</string>
     <string name="shortcut_on">启用滤镜</string>
     <string name="shortcut_off">关闭滤镜</string>
 
-    <string name="ambient_light">环境光:</string>
-    <string name="filter_light">物理亮度:</string>
+    <string name="ambient_light">环境光照:</string>
+    <string name="ambient_light_avg">平均光照:</string>
+    <string name="ambient_light2">环境光照(Lux):</string>
+    <string name="filter_light">硬件亮度:</string>
     <string name="filter_alpha">滤镜浓度:</string>
-
-    <string name="automatic_brightness_config">自动亮度设置</string>
-    <string name="other_config">其它设置</string>
-    <string name="help_infos">帮助说明</string>
 
     <string name="filter_enable">启用滤镜</string>
     <string name="filter_disabled">禁用滤镜</string>
-    <string name="screen_min_light">最低屏幕亮度</string>
-    <string name="screen_min_light_desc">仅当屏幕亮度低于此值时才启用屏幕滤镜，可设为屏幕开启DC调光的亮度级别，对于全程PWM调光的屏幕，则应设为最高值。\n\n小米9、MIX3 建议设为30%，三星S8 建议设为95%，其它机型自测哦！</string>
+    <string name="screen_min_light">最低硬件亮度</string>
+    <string name="screen_min_light_desc">若将此软件用于缓解PWM闪烁，则应设置此值为(类)DC调光激活的亮度阈值，例如：小米9、MIX3 建议设为30%，三星S8 建议设为95%。\n\n若仅用于代替系统自动亮度调节，则设为1%以内即可。</string>
     <string name="auto_adjustment">自动亮度</string>
     <string name="auto_adjustment_desc">此开关跟随系统自带的“自动亮度”开关</string>
     <string name="brightness_offset">亮度微调</string>
     <string name="landscape_optimize">横屏优化</string>
-    <string name="landscape_optimize_desc">横屏时增加10%亮度，适合游戏玩家</string>
-    <string name="dynamic_optimize">夜间微调</string>
-    <string name="dynamic_optimize_desc">在深夜时亮度降到更低</string>
-    <string name="dynamic_optimize_lux_desc">环境光低于此值，夜间微调才生效</string>
+    <string name="landscape_optimize_desc">横屏时禁用质感纹理效果，并在部分视频应用中关闭滤镜</string>
+    <string name="dynamic_optimize">夜间模式</string>
+    <string name="dynamic_optimize_desc">在夜间且环境光照不高于此值时激活</string>
 
-    <string name="hide_in_recent">从最近任务隐藏</string>
-    <string name="hide_in_recent_desc">不要在最近任务列表显示本应用</string>
-    <string name="hardware_acceleration">硬件加速</string>
-    <string name="hardware_acceleration_desc">启用提高亮度变化平滑度，关闭可节省内存</string>
+    <string name="hide_in_recent">使用[返回键/返回手势]即可从最近任务列表隐藏本应用</string>
 
     <string name="accessibility_description">通过辅助服务，提高滤镜显示层级，以便能够覆盖状态栏、导航栏、锁屏界面。</string>
-    <string name="brightness_control">亮度控制</string>
-    <string name="brightness_control_content">滤镜的自动亮度开关、手动亮度调节都是跟随系统的。\n但本应用有独立的自动亮度控制逻辑，由于实际硬件差异，使用过程可能出现屏幕过亮或过暗的情况。\n你可以从右上角进入样本编辑，自行添加样本数据来修复此问题！</string>
+    <string name="brightness_control">如何调节亮度</string>
+    <string name="brightness_control_content">开启滤镜后你依然可以使用系统的亮度控制来调节屏幕亮度\n部分手机会自动禁用系统的亮度控制器(可开启滤镜自带的“亮度控制器”来调节亮度)</string>
+    <string name="help_breathing">夜间忽明忽暗</string>
+    <string name="help_breathing_desc">使用滤镜后夜间和暗光环境下屏幕屏幕忽明忽暗？\n使用屏下光线传感器大概率会遇到此问题，没有很好的解决方案</string>
+    <string name="help_deviation">自动亮度偏差</string>
+    <string name="help_deviation_desc">在室内使用屏幕过亮，在室外又过暗？\n你可以自己添加样本数据来解决此问题</string>
     <string name="statement">工作原理</string>
-    <string name="statement_content">大多数Amoled屏幕，在低亮度时会使用低频PWM调光，容易造成眼睛疲劳。\n\n本软件会限制屏幕最低亮度，再通过调整屏幕叠加层（滤镜）的不透明度，来实现视觉亮度调整，是民间一种“另辟蹊径”的手法，并非本应用首创！！！\n\n启用滤镜后，屏幕会根据亮度不同出现不同程度的色彩失真，并且会导致屏幕截图变暗！</string>
+    <string name="statement_content">OLED屏幕在低亮度时通常会使用低频PWM调光，部分敏感用户可能会眼睛酸痛。\n\n本软件通过限制屏幕最低亮度，并调整屏幕叠加层(滤镜)的不透明度来实现视觉亮度调整，是民间一种“另辟蹊径”的手法，并非本应用首创！</string>
+    <string name="help_warn_title">副作用</string>
+    <string name="help_warn">1.随亮度变化不同出现不同程度色彩失真\n2.导致屏幕截图和录屏变暗\n3.视频应用中的亮度滑动调节功能失效</string>
     <string name="author">—— 嘟嘟斯基\n http://vtools.omarea.com</string>
 
     <string name="quick_tile_on">已开启屏幕滤镜</string>
-    <string name="quick_tile_off">已开关闭幕滤镜</string>
+    <string name="quick_tile_off">已关闭屏幕滤镜</string>
 
     <string name="sample_chart">当前样本数据</string>
-    <string name="sample_desc_title">样本说明</string>
-    <string name="sample_desc">样本数据用于计算不同环境光下的屏幕亮度，上图中x轴表示环境光强度(lux)，y轴表示屏幕亮度。</string>
+    <string name="sample_desc">样本数据用于计算不同环境光下的屏幕亮度\n图中 x轴表示环境光强度(lux)，y轴表示屏幕亮度。</string>
 
     <string name="accessibility_service_required">需要先启动辅助服务，才能使用本功能！</string>
-    <string name="overlays_required">还未授予“显示悬浮窗/在应用上层显示”权限</string>
+    <string name="please_enable_filter">请先启用滤镜~</string>
 
-    <string name="sample_add_title">添加/覆盖 样本</string>
-    <string name="sample_edit_currentlux">当前环境光亮度(lux)：</string>
-    <string name="sample_brightness">屏幕亮度</string>
-    <string name="sample_brightness_desc">拖动滑块到屏幕亮度合适为止，然后点击确定保存样本</string>
+    <string name="sample_add_title">添加样本数据</string>
+    <string name="sample_edit_currentlux">当前传感器数值(lux)</string>
+    <string name="sample_brightness">屏幕亮度(%)</string>
     <string name="sample_edit_cancel">取消</string>
-    <string name="sample_edit_confirm">确定</string>
+    <string name="sample_edit_confirm">保存</string>
     <string name="sample_edit_applay">使用</string>
     <string name="sample_edit_delete">删除</string>
     <string name="smaple_clear">清空自定义</string>
 
     <string name="dummy_button">Dummy Button</string>
     <string name="guide_center">向导</string>
-    <string name="get_permission_fail">获取悬浮窗显示权限失败！</string>
     <string name="pwm_amoled">为PWM调光的AMOLED屏幕而准备</string>
-    <string name="permission_required">应用需要显示悬浮窗(叠加层)权限</string>
-    <string name="smooth_brightness">平均环境光</string>
-    <string name="smooth_brightness_desc">获取环境光亮度时，使用十秒内的平均值</string>
-    <string name="write_settings_unallowed">本应用没有修改系统设置的权限，请通过系统的“自动亮度开关进行切换”</string>
+    <string name="write_settings_unallowed">本应用没有修改系统设置的权限，请通过系统的“自动亮度开关”进行切换</string>
     <string name="write_settings_unsupported">本功能不支持Android M(6.0)以前的系统！</string>
     <string name="lock_off">息屏关闭滤镜</string>
-    <string name="lock_off_desc">为了AOD，[息屏/锁屏] 时关闭滤镜</string>
+    <string name="lock_off_desc">使用滤镜后AOD过暗的手机可以试试</string>
     <string name="channel_brightness_controller_text">亮度控制</string>
     <string name="channel_brightness_controller">brightness_controller</string>
 
@@ -78,20 +73,47 @@
     <string name="action_plus">com.omarea.filter.brightness.changed.plus</string>
     <string name="action_manual">com.omarea.filter.brightness.changed.manual</string>
     <string name="action_auto">com.omarea.filter.brightness.changed.auto</string>
+    <string name="action_on">com.omarea.filter.brightness.changed.on</string>
+    <string name="action_off">com.omarea.filter.brightness.changed.off</string>
 
     <string name="brightness_controller">亮度控制器</string>
-    <string name="brightness_controller_desc">显示滤镜自带的亮度控制条</string>
+    <string name="brightness_controller_desc">显示亮度控制功能的常驻通知</string>
+
+    <string name="filter_align_start">左上对齐</string>
+    <string name="filter_align_start_desc">滤镜显示位置对齐左上角。如果滤镜有时无法完整覆盖屏幕，可尝试开启</string>
+    <string name="filter_texture">质感纹理</string>
+    <string name="filter_texture_desc">为屏幕显示添加纹理效果(会增加RAM占用)</string>
 
     <string name="hide_start_icon">隐藏启动图标 </string>
     <string name="hide_start_icon_desc">打开此开关后，本应用将从桌面隐藏，如果需要再恢复请到辅助服务界面，选中本应用进行操作</string>
-    <string name="guide_desc">本应用会根据你的设置调整预设，务必认真完成向导！</string>
+    <string name="guide_desc">应用会根据你的选择调整预设，务必认真完成向导！</string>
     <string name="use_lcd">代替系统亮度调节</string>
+    <string name="use_lcd_desc">不限制屏幕亮度，仅适于本软件代替系统自动亮度调节</string>
     <string name="use_amoled">缓解PWM闪烁</string>
+    <string name="use_amoled_desc">限制屏幕最低亮度，并通过改变滤镜不透明度实现亮度调节</string>
     <string name="use_device">选择您使用本应用的目的：</string>
     <string name="step1">第一步</string>
     <string name="step2">第二步</string>
     <string name="step1_desc">请关掉自动亮度，并将屏幕调至最亮</string>
     <string name="step_next">下一步</string>
+    <string name="step_continue">继续</string>
     <string name="step_warn">请完成向导第一步！</string>
     <string name="guide_fail">初始化配置失败</string>
+
+    <string name="execute_success">执行成功</string>
+    <string name="execute_fail">执行失败</string>
+    <string name="execute_wait">正在执行，请稍等…</string>
+    <string name="btn_confirm">确定</string>
+    <string name="choose_color">选择颜色</string>
+    <string name="convert_result">换算结果：</string>
+    <string name="texture_chooser">选择纹理</string>
+
+    <string-array name="filter_texture_items">
+        <item>细磨砂 (暖阳)</item>
+        <item>细磨砂 (浅灰)</item>
+        <item>便签纸 (暖阳)</item>
+        <item>便签纸 (洁白)</item>
+        <item>条纹感 (暖阳)</item>
+        <item>条纹感 (洁白)</item>
+    </string-array>
 </resources>

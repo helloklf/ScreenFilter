@@ -3,43 +3,55 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.omarea.filter"
     android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen">
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
 
     <application
         android:name=".FilterApp"
-        android:hardwareAccelerated="false"
         android:allowBackup="true"
+        android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <receiver
+            android:name=".broadcast.ControllerClickedReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
 
         <meta-data
             android:name="com.google.android.actions"
             android:resource="@xml/filter_accessibility" />
-        <meta-data android:name="android.service.quicksettings.ACTIVE_TILE"
+        <meta-data
+            android:name="android.service.quicksettings.ACTIVE_TILE"
             android:value="true" />
 
         <activity
-            android:hardwareAccelerated="true"
             android:name=".MainActivity"
+            android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.OFF">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
@@ -47,37 +59,53 @@
 
         <activity-alias
             android:name=".SettingsActivity"
-            android:targetActivity="MainActivity">
+            android:targetActivity=".MainActivity">
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity-alias>
 
         <activity
-            android:hardwareAccelerated="true"
             android:name=".ScreenCapActivity"
-            android:screenOrientation="behind"
-            android:launchMode="singleTask"
-            android:label="@string/app_name"
-            android:exported="true"
             android:excludeFromRecents="true"
+            android:exported="true"
+            android:hardwareAccelerated="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:screenOrientation="behind"
             android:theme="@style/Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:hardwareAccelerated="true"
             android:name=".SampleEditActivity"
-            android:label="@string/app_name"
+            android:hardwareAccelerated="true"
+            android:label="@string/sample_edit_activity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Default">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".HelpActivity"
+            android:hardwareAccelerated="true"
+            android:label="@string/help_activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Default">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -97,31 +125,31 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/filter_accessibility" />
         </service>
-
-        <service android:name=".service.SwitchBrightnessModeService"
-            android:label="@string/auto_adjustment"
+        <service
+            android:name=".service.SwitchBrightnessModeService"
             android:icon="@drawable/brightness_auto"
+            android:label="@string/auto_adjustment"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
-
-        <service android:name=".service.QuickSettingService"
-            android:label="@string/app_name"
+        <service
+            android:name=".service.QuickSettingService"
             android:icon="@drawable/filter"
+            android:label="@string/app_name"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
-
-        <service android:name=".service.ScreenShotService"
-            android:label="@string/screenshot_tile"
+        <service
+            android:name=".service.ScreenShotService"
             android:icon="@drawable/glass"
+            android:label="@string/screenshot_tile"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
     </application>

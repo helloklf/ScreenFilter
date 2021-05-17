@@ -7,33 +7,67 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp">
-        <android.support.v7.widget.CardView
+        android:padding="6dp">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="120dp"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp">
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center">
+
+                <CheckBox
+                    android:id="@+id/filter_switch"
+                    android:textSize="18dp"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_marginBottom="0dp"
+                    style="@style/PowerSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:switchPadding="6dp"
+                    android:textColor="?android:colorAccent" />
+                <TextView
+                    style="@style/textSmall"
+                    android:textColor="?android:colorAccent"
+                    android:alpha="0.5"
+                    android:text="@string/filter_enable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_bg"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:alpha="0.7"
+                    android:layout_marginBottom="4dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
                     android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/ambient_light"
-                        android:textSize="11dp" />
+                        android:textSize="13dp" />
 
                     <TextView
                         android:id="@+id/light_lux"
@@ -41,21 +75,43 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:text="0"
-                        android:textSize="11dp" />
+                        android:textSize="13dp" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:alpha="0.7"
+                    android:layout_marginBottom="4dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ambient_light_avg"
+                        android:textSize="13dp" />
+
+                    <TextView
+                        android:id="@+id/light_lux_avg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="2dp"
+                        android:text="0"
+                        android:textSize="13dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:alpha="0.7"
+                    android:layout_marginBottom="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filter_light"
-                        android:textSize="11dp" />
+                        android:textSize="13dp" />
 
                     <TextView
                         android:id="@+id/filter_light"
@@ -63,21 +119,21 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:text="0"
-                        android:textSize="11dp" />
+                        android:textSize="13dp" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:alpha="0.7"
+                    android:layout_marginBottom="4dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
                     android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filter_alpha"
-                        android:textSize="11dp" />
+                        android:textSize="13dp" />
 
                     <TextView
                         android:id="@+id/filter_alpha"
@@ -85,259 +141,189 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:text="0"
-                        android:textSize="11dp" />
+                        android:textSize="13dp" />
                 </LinearLayout>
             </LinearLayout>
-        </android.support.v7.widget.CardView>
 
-        <Switch
-            android:id="@+id/filter_switch"
-            style="@style/option_title"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/filter_enable"
-            android:textColor="@color/colorAccent" />
+        </LinearLayout>
 
-        <TextView
-            style="@style/option_desc"
-            android:layout_marginBottom="0dp"
-            android:text="@string/automatic_brightness_config" />
-
-        <android.support.v7.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="4dp"
+            android:background="@drawable/card_bg"
+            android:padding="20dp"
+            android:orientation="vertical">
+
+            -u xu<Switch
+                android:id="@+id/auto_adjustment"
+                style="@style/option_title"
+                android:text="@string/auto_adjustment" />
+
+            <TextView
+                style="@style/option_desc"
+                android:text="@string/auto_adjustment_desc" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:id="@+id/auto_adjustment_more"
+                android:background="@drawable/in_card_item_inactive"
+                android:layout_marginTop="12dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
                 android:orientation="vertical"
-                android:padding="10dp">
-
-                <Switch
-                    android:id="@+id/auto_adjustment"
-                    style="@style/option_title"
-                    android:text="@string/auto_adjustment" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/auto_adjustment_desc" />
-
-                <TextView
-                    style="@style/option_title"
-                    android:text="@string/brightness_offset" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:orientation="horizontal">
-
-                    <SeekBar
-                        android:id="@+id/brightness_offset"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:max="40"
-                        android:min="0"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="6dp"
-                        android:progress="50" />
-
+                    android:layout_marginTop="4dp"
+                    android:orientation="vertical">
                     <TextView
-                        android:id="@+id/brightness_offset_text"
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:text="100"
-                        android:textAlignment="textEnd" />
+                        style="@style/option_title"
+                        android:text="@string/brightness_offset" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="%" />
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/brightness_offset"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="20"
+                            android:min="0"
+                            android:progress="50" />
+
+                        <TextView
+                            android:id="@+id/brightness_offset_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:textSize="12dp"
+                            android:text="100%" />
+                    </RelativeLayout>
                 </LinearLayout>
-
-                <Switch
-                    android:id="@+id/landscape_optimize"
-                    style="@style/option_title"
-                    android:text="@string/landscape_optimize" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/landscape_optimize_desc" />
-
-                <Switch
-                    android:id="@+id/dynamic_optimize"
-                    style="@style/option_title"
-                    android:text="@string/dynamic_optimize" />
-
-                <TextView
-                    android:layout_marginBottom="4dp"
-                    style="@style/option_desc"
-                    android:text="@string/dynamic_optimize_desc" />
 
                 <LinearLayout
-                    android:layout_marginBottom="4dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <SeekBar
-                        android:id="@+id/dynamic_optimize_limit"
-                        android:max="300"
-                        android:min="0"
-                        android:paddingEnd="6dp"
-                        android:paddingStart="6dp"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+                    <Switch
+                        android:id="@+id/dynamic_optimize"
+                        style="@style/option_title"
+                        android:text="@string/dynamic_optimize" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/dynamic_optimize_limit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="300"
+                            android:min="0" />
+
+                        <TextView
+                            android:id="@+id/dynamic_optimize_limit_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0Lux"
+                            android:textSize="12dp"
+                            android:layout_centerInParent="true" />
+                    </RelativeLayout>
 
                     <TextView
-                        android:id="@+id/dynamic_optimize_limit_text"
-                        android:layout_marginLeft="6dp"
-                        android:textAlignment="center"
-                        android:text="0Lux"
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_marginTop="4dp"
+                        style="@style/option_desc"
+                        android:text="@string/dynamic_optimize_desc" />
                 </LinearLayout>
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/dynamic_optimize_lux_desc" />
-
-                <Switch
-                    android:id="@+id/smooth_brightness"
-                    style="@style/option_title"
-                    android:text="@string/smooth_brightness" />
-
-                <TextView
-                    android:layout_marginBottom="0dp"
-                    style="@style/option_desc"
-                    android:text="@string/smooth_brightness_desc" />
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <Switch
+                android:id="@+id/brightness_controller"
+                style="@style/option_title"
+                android:text="@string/brightness_controller" />
+
+            <TextView
+                style="@style/option_desc"
+                android:text="@string/brightness_controller_desc" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/card_bg"
+            android:padding="20dp"
+            android:orientation="vertical">
+            <Switch
+                android:id="@+id/lock_off"
+                style="@style/option_title"
+                android:text="@string/lock_off" />
+
+            <TextView
+                style="@style/option_desc"
+                android:text="@string/lock_off_desc" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/card_bg"
+            android:padding="20dp"
+            android:orientation="vertical">
+            <Switch
+                android:id="@+id/landscape_optimize"
+                style="@style/option_title"
+                android:text="@string/landscape_optimize" />
+
+            <TextView
+                style="@style/option_desc"
+                android:text="@string/landscape_optimize_desc" />
+        </LinearLayout>
 
         <TextView
+            android:layout_marginTop="16dp"
             style="@style/option_desc"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="0dp"
-            android:text="@string/other_config" />
+            android:textAlignment="center"
+            android:text="@string/hide_in_recent" />
 
-        <android.support.v7.widget.CardView
+        <LinearLayout
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="4dp"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical">
+            <Switch
+                android:id="@+id/hide_start_icon"
+                style="@style/option_title"
+                android:text="@string/hide_start_icon" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-                <Switch
-                    android:id="@+id/brightness_controller"
-                    style="@style/option_title"
-                    android:text="@string/brightness_controller" />
+            <TextView
+                style="@style/option_desc"
+                android:layout_marginBottom="0dp"
+                android:text="@string/hide_start_icon_desc" />
+        </LinearLayout>
 
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/brightness_controller_desc" />
-
-                <Switch
-                    android:id="@+id/lock_off"
-                    style="@style/option_title"
-                    android:text="@string/lock_off" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/lock_off_desc" />
-
-                <Switch
-                    android:id="@+id/hardware_acceleration"
-                    style="@style/option_title"
-                    android:text="@string/hardware_acceleration" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/hardware_acceleration_desc" />
-
-                <Switch
-                    android:id="@+id/hide_in_recent"
-                    style="@style/option_title"
-                    android:text="@string/hide_in_recent" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/hide_in_recent_desc" />
-
-                <Switch
-                    android:id="@+id/hide_start_icon"
-                    android:text="@string/hide_start_icon"
-                    style="@style/option_title" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:layout_marginBottom="0dp"
-                    android:text="@string/hide_start_icon_desc" />
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-
-        <TextView
-            style="@style/option_desc"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="0dp"
-            android:text="@string/help_infos" />
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    style="@style/option_title"
-                    android:text="@string/brightness_control" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:layout_marginBottom="0dp"
-                    android:text="@string/brightness_control_content" />
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-        <!--声明-->
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    style="@style/option_title"
-                    android:text="@string/statement" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:text="@string/statement_content" />
-
-                <TextView
-                    style="@style/option_desc"
-                    android:layout_marginBottom="0dp"
-                    android:autoLink="all"
-                    android:gravity="end"
-                    android:text="@string/author" />
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
     </LinearLayout>
 </ScrollView>

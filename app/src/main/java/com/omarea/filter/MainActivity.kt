@@ -2,7 +2,6 @@ package com.omarea.filter
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
-import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,34 +13,39 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import com.omarea.filter.common.NotificationHelper
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import com.omarea.common.ui.DialogHelper
+import com.omarea.filter.common.RadioGroupSimulator
+import com.omarea.filter.common.SystemProperty
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var config: SharedPreferences
     private var timer: Timer? = null
     private var myHandler = Handler()
     private lateinit var systemBrightnessModeObserver: ContentObserver
-    private val OVERLAY_PERMISSION_REQ_CODE = 0
 
+    /*
+    private val OVERLAY_PERMISSION_REQ_CODE = 0
     private fun askForPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
-                Toast.makeText(this, getString(R.string.permission_required), Toast.LENGTH_LONG).show()
                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()))
                 startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
                 return
             }
         }
     }
-
+    */
 
     private var filterEnabled = GlobalStatus.filterEnabled
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,40 +78,20 @@ class MainActivity : AppCompatActivity() {
         }
         config = getSharedPreferences(SpfConfig.FILTER_SPF, Context.MODE_PRIVATE)
 
-        if (!(config.contains(SpfConfig.SCREENT_MAX_LIGHT) && config.contains(SpfConfig.TARGET_DEVICE))) {
-            // Xiaomi MIX3、CC9、CC9(Meitu)、M9、K20 Pro
-            if (Build.PRODUCT == "perseus" || Build.PRODUCT == "pyxis" || Build.PRODUCT == "vela" || Build.PRODUCT == "cepheus" || Build.PRODUCT == "raphael") {
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
-                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
-                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.3).toInt())
-            } else if (Build.PRODUCT == "tucana") { // Xiaomi CC9 Pro
-                config.edit().putInt(SpfConfig.SCREENT_MAX_LIGHT, 2047).apply()
-                config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
-                GlobalStatus.sampleData!!.setScreentMinLight((FilterViewConfig.FILTER_BRIGHTNESS_MAX * 0.7).toInt())
-            } else {
-                openGuide()
-            }
-        }
-
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        setExcludeFromRecents()
-        askForPermission()
+        FilterSample().getFilterAlpha(40)
 
         // 启用滤镜
         filter_switch.setOnClickListener { v ->
-            val filterSwitch = v as Switch
+            val filterSwitch = v as CompoundButton
             if (filterSwitch.isChecked) {
-                if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
-                    Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
-                    filterSwitch.isChecked = false
-                } else if (GlobalStatus.filterOpen == null) {
+                if (GlobalStatus.filterOpen == null) {
                     Toast.makeText(this, R.string.accessibility_service_required, Toast.LENGTH_SHORT).show()
                     filterSwitch.isChecked = false
                     try {
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        startActivity(intent)
+                        startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                     } catch (ex: java.lang.Exception) {
                     }
                 } else {
@@ -133,11 +117,11 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val lightLuxOffset = progress - (brightness_offset.max / 2)
                 config.edit().putInt(SpfConfig.BRIGTHNESS_OFFSET, lightLuxOffset).apply()
-                when {
-                    lightLuxOffset > 0 -> brightness_offset_text.text = "+$lightLuxOffset"
-                    lightLuxOffset < 0 -> brightness_offset_text.text = lightLuxOffset.toString()
-                    else -> brightness_offset_text.text = "100"
-                }
+                brightness_offset_text.text = (when {
+                    lightLuxOffset > 0 -> "+$lightLuxOffset"
+                    lightLuxOffset < 0 -> lightLuxOffset.toString()
+                    else -> "100"
+                }) + "%"
                 filterRefresh()
             }
         })
@@ -153,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         dynamic_optimize.isChecked = config.getBoolean(SpfConfig.DYNAMIC_OPTIMIZE, SpfConfig.DYNAMIC_OPTIMIZE_DEFAULT)
         dynamic_optimize.setOnClickListener {
             config.edit().putBoolean(SpfConfig.DYNAMIC_OPTIMIZE, (it as Switch).isChecked).apply()
-            restartFilter()
+            GlobalStatus.filterRefresh?.run()
         }
 
         val limitLux = config.getFloat(SpfConfig.DYNAMIC_OPTIMIZE_LIMIT, SpfConfig.DYNAMIC_OPTIMIZE_LIMIT_DEFAULT)
@@ -173,29 +157,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // 平滑光线传奇数值
-        smooth_brightness.isChecked = config.getBoolean(SpfConfig.SMOOTH_ADJUSTMENT, SpfConfig.SMOOTH_ADJUSTMENT_DEFAULT)
-        smooth_brightness.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.SMOOTH_ADJUSTMENT, (it as Switch).isChecked).apply()
-        }
-
-        // 从最近任务隐藏
-        hide_in_recent.isChecked = config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT)
-        hide_in_recent.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.HIDE_IN_RECENT, (it as Switch).isChecked).apply()
-            setExcludeFromRecents()
-        }
-
-        // 硬件加速
-        hardware_acceleration.isChecked = config.getBoolean(SpfConfig.HARDWARE_ACCELERATED, SpfConfig.HARDWARE_ACCELERATED_DEFAULT)
-        hardware_acceleration.setOnClickListener {
-            config.edit().putBoolean(SpfConfig.HARDWARE_ACCELERATED, (it as Switch).isChecked).apply()
-            if (GlobalStatus.filterEnabled) {
-                GlobalStatus.filterClose?.run()
-                GlobalStatus.filterOpen?.run()
-            }
-        }
-
         // 息屏关闭
         lock_off.isChecked = config.getBoolean(SpfConfig.SCREEN_OFF_CLOSE, SpfConfig.SCREEN_OFF_CLOSE_DEFAULT)
         lock_off.setOnClickListener {
@@ -203,21 +164,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 自动亮度
-        val contentResolver = getContentResolver()
-        auto_adjustment.isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
-        auto_adjustment.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(this)) {
-                val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
-                if (current == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
-                } else {
-                    Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
-                }
-            } else {
-                it.isEnabled = true
-                Toast.makeText(this, getString(R.string.write_settings_unallowed), Toast.LENGTH_LONG).show()
-                (it as Checkable).isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+        val contentResolver = contentResolver
+        auto_adjustment.run {
+            setOnCheckedChangeListener { _, isChecked ->
+                auto_adjustment_more.visibility = if (isChecked) View.VISIBLE else View.GONE
             }
+            isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+
+            setOnClickListener {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.System.canWrite(context)) {
+                    val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+                    if (current == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+                    } else {
+                        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
+                    }
+                } else {
+                    it.isEnabled = true
+                    Toast.makeText(context, getString(R.string.write_settings_unallowed), Toast.LENGTH_LONG).show()
+                    (it as Checkable).isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+                }
+            }
+
+            auto_adjustment_more.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
         // 亮度控制通知
@@ -229,8 +198,10 @@ class MainActivity : AppCompatActivity() {
                     if (!Settings.System.canWrite(this)) {
                         Toast.makeText(this, getString(R.string.write_settings_unallowed), Toast.LENGTH_SHORT).show()
                         checkable.isChecked = false
+                        requestWriteSettings()
                     }
                 } else {
+                    android.Manifest.permission.WRITE_SETTINGS
                     Toast.makeText(this, getString(R.string.write_settings_unsupported), Toast.LENGTH_SHORT).show()
                     checkable.isChecked = false
                 }
@@ -247,11 +218,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val p: PackageManager = getPackageManager()
-        val startActivity = ComponentName(getApplicationContext(), MainActivity::class.java)
+        val p: PackageManager = packageManager
+        val startActivity = ComponentName(applicationContext, MainActivity::class.java)
         hide_start_icon.setOnClickListener { v ->
             try {
-                if (hide_start_icon.isChecked()) {
+                if (hide_start_icon.isChecked) {
                     p.setComponentEnabledSetting(startActivity, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
                 } else {
                     p.setComponentEnabledSetting(startActivity, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
@@ -263,6 +234,13 @@ class MainActivity : AppCompatActivity() {
 
         val activityState = p.getComponentEnabledSetting(startActivity)
         hide_start_icon.isChecked = activityState != PackageManager.COMPONENT_ENABLED_STATE_ENABLED && activityState != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun requestWriteSettings() {
+        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+        intent.data = Uri.parse("package:$packageName")
+        startActivity(intent)
     }
 
     private fun restartFilter() {
@@ -281,7 +259,16 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateInfo() {
         myHandler.post {
-            light_lux.text = GlobalStatus.currentLux.toString() + "lux"
+            if (GlobalStatus.currentLux > -1) {
+                light_lux.text = String.format("%.2flux", GlobalStatus.currentLux)
+            } else {
+                light_lux.text = ""
+            }
+            if (GlobalStatus.avgLux > -1) {
+                light_lux_avg.text = String.format("%.2flux", GlobalStatus.avgLux)
+            } else {
+                light_lux_avg.text = ""
+            }
             if (GlobalStatus.filterEnabled) {
                 filter_light.text = (GlobalStatus.currentFilterBrightness / 10f).toString() + "%"
             } else {
@@ -315,15 +302,21 @@ class MainActivity : AppCompatActivity() {
         systemBrightnessModeObserver = object : ContentObserver(Handler()) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 super.onChange(selfChange, uri)
-                auto_adjustment.isChecked = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+                auto_adjustment.isChecked = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
             }
         }
-        getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
+        contentResolver.registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, systemBrightnessModeObserver)
+
+        if (!(config.contains(SpfConfig.SCREENT_MAX_LIGHT) && config.contains(SpfConfig.TARGET_DEVICE))) {
+            Handler().postDelayed({
+                openGuide()
+            }, 30)
+        }
     }
 
     override fun onPause() {
         stopTimer()
-        getContentResolver().unregisterContentObserver(systemBrightnessModeObserver)
+        contentResolver.unregisterContentObserver(systemBrightnessModeObserver)
         super.onPause()
     }
 
@@ -339,40 +332,35 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 1 && GlobalStatus.filterOpen != null) {
-            GlobalStatus.filterOpen!!.run()
-        } else if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (!Settings.canDrawOverlays(this)) {
-                    Toast.makeText(this, getString(R.string.get_permission_fail), Toast.LENGTH_LONG).show()
-                    finishAndRemoveTask()
-                }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-
         return if (id == R.id.sample_edit) {
-            if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(applicationContext)) {
-                Toast.makeText(this, R.string.overlays_required, Toast.LENGTH_LONG).show()
+            if (!GlobalStatus.filterEnabled) {
+                Toast.makeText(this, R.string.please_enable_filter, Toast.LENGTH_LONG).show()
                 return true
             }
 
             try {
                 val intent = Intent(this, SampleEditActivity::class.java)
                 startActivityForResult(intent, if (GlobalStatus.filterEnabled) 1 else 0)
-
-                if (GlobalStatus.filterClose != null) {
-                    GlobalStatus.filterClose!!.run()
-                }
+            } catch (ex: Exception) {
+            }
+            return true
+        } else if (id == R.id.question) {
+            try {
+                val intent = Intent(this, HelpActivity::class.java)
+                startActivity(intent)
             } catch (ex: Exception) {
             }
             return true
         } else super.onOptionsItemSelected(item)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            setExcludeFromRecents()
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun setExcludeFromRecents(exclude: Boolean? = null) {
@@ -381,21 +369,27 @@ class MainActivity : AppCompatActivity() {
                 val service = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 for (task in service.appTasks) {
                     if (task.taskInfo.id == this.taskId) {
-                        val b = if (exclude == null) config.getBoolean(SpfConfig.HIDE_IN_RECENT, SpfConfig.HIDE_IN_RECENT_DEFAULT) else exclude
-                        task.setExcludeFromRecents(b)
+                        task.setExcludeFromRecents(true)
                     }
                 }
             } catch (ex: Exception) {
             }
         } else {
-            Toast.makeText(this, "您的系统版本过低，暂不支持本功能~", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "您的系统版本过低，暂不支持隐藏后台功能~", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun openGuide() {
-        val dialog = layoutInflater.inflate(R.layout.dialog_guide, null);
-        val guideAmoled = dialog.findViewById<RadioButton>(R.id.guide_amoled)
-        val guideLcd = dialog.findViewById<RadioButton>(R.id.guide_lcd)
+        val dialog = layoutInflater.inflate(R.layout.dialog_guide, null)
+        val guideAmoled = dialog.findViewById<CompoundButton>(R.id.guide_amoled)
+        val guideLcd = dialog.findViewById<CompoundButton>(R.id.guide_lcd)
+        RadioGroupSimulator(guideAmoled, guideLcd)
+
+        if (SystemProperty().isOLED()) {
+            guideAmoled.isChecked = true
+        }
+
+        var dialogWrap: DialogHelper.DialogWrap? = null
         dialog.findViewById<View>(R.id.guide_next).setOnClickListener {
             if (guideAmoled.isChecked || guideLcd.isChecked) {
                 try {
@@ -409,7 +403,10 @@ class MainActivity : AppCompatActivity() {
                             config.edit().putInt(SpfConfig.TARGET_DEVICE, SpfConfig.TARGET_DEVICE_AMOLED).apply()
                         }
                         GlobalStatus.sampleData!!.readConfig(true)
-                        recreate()
+                        myHandler.postDelayed({
+                            dialogWrap?.dismiss()
+                            recreate()
+                        }, 200)
                     } else {
                         Toast.makeText(this, getString(R.string.step_warn), Toast.LENGTH_SHORT).show()
                     }
@@ -418,6 +415,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        AlertDialog.Builder(this).setView(dialog).setCancelable(false).create().show()
+        dialogWrap = DialogHelper.customDialog(this, dialog).setCancelable(false)
     }
 }

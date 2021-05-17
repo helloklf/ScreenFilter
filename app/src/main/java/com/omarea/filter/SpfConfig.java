@@ -4,7 +4,7 @@ public class SpfConfig {
     public static String FILTER_SPF = "FILTER_SPF";
 
     // 亮度偏移量（1表示1%,100表示100%）
-    public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET_V2";
+    public static String BRIGTHNESS_OFFSET = "BRIGTHNESS_OFFSET_V3";
     public static int BRIGTHNESS_OFFSET_DEFAULT = 0;
     public static int BRIGTHNESS_OFFSET_LEVELS = 50;
 
@@ -28,6 +28,9 @@ public class SpfConfig {
     public static String FILTER_AUTO_START = "FILTER_AUTO_START";
     public static boolean FILTER_AUTO_START_DEFAULT = false;
 
+    public static String FILTER_ALIGN_START = "FILTER_ALIGN_START";
+    public static boolean FILTER_ALIGN_START_DEFAULT = false;
+
     // 屏幕最大亮度数值（通常是1-255，但是也有发现最大值可到2047甚至4095的）
     public static String SCREENT_MAX_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MAX_LIGHT_DEFAULT = 255;
@@ -41,23 +44,19 @@ public class SpfConfig {
     public static String SCREENT_MIN_LIGHT = "SCREENT_MAX_LIGHT";
     public static int SCREENT_MIN_LIGHT_DEFAULT = 255;
 
-    // 隐藏最近任务
-    public static String HIDE_IN_RECENT = "HIDE_IN_RECENT";
-    public static boolean HIDE_IN_RECENT_DEFAULT = false;
-
     // 动态优化（虚拟环境）
     public static String DYNAMIC_OPTIMIZE = "DYNAMIC_OPTIMIZE";
     public static boolean DYNAMIC_OPTIMIZE_DEFAULT = false;
 
     // 动态优化（虚拟环境） 亮度限制(Lux)
     public static String DYNAMIC_OPTIMIZE_LIMIT = "DYNAMIC_OPTIMIZE_LIMIT";
-    public static float DYNAMIC_OPTIMIZE_LIMIT_DEFAULT = 0;
-
-    // 硬件加速
-    public static String HARDWARE_ACCELERATED = "HARDWARE_ACCELERATED";
-    public static boolean HARDWARE_ACCELERATED_DEFAULT = true;
+    public static float DYNAMIC_OPTIMIZE_LIMIT_DEFAULT = 10;
 
     // 通知中心显示亮度控制器
     public static String BRIGHTNESS_CONTROLLER = "BRIGHTNESS_CONTROLLER";
     public static boolean BRIGHTNESS_CONTROLLER_DEFAULT = false;
+
+    // 纹理素材
+    public static String TEXTURE = "TEXTURE";
+    public static int TEXTURE_DEFAULT = 0;
 }

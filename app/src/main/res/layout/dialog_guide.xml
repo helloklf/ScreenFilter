@@ -1,73 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/dialogRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="20dp" android:paddingRight="20dp">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_marginTop="20dp"
-        android:textColor="@android:color/black"
-        android:textSize="15sp"
-        android:textStyle="bold"
+    <LinearLayout
+        android:paddingBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/step1" />
-    <TextView
-        android:textColor="#ff0000"
-        android:textAlignment="center"
-        android:textSize="12sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/step1_desc" />
+        android:background="@drawable/confirm_dialog_bg"
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_marginTop="30dp"
-        android:textColor="@android:color/black"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/step2" />
-    <TextView
-        android:layout_marginBottom="10dp"
-        android:textSize="12sp"
-        android:text="@string/use_device"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:text="@string/step1"
+            style="@style/dialogTitle" />
 
-    <RadioGroup
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <RadioButton
-            android:id="@+id/guide_amoled"
-            android:textStyle="normal"
-            android:text="@string/use_amoled"
+        <TextView
+            android:layout_marginTop="10dp"
+            style="@style/dialogWarn"
+            android:text="@string/step1_desc"
+            android:textSize="14dp"
+            android:textAlignment="center"
+            android:textColor="#ff0000" />
+
+        <TextView
+            android:text="@string/step2"
+            style="@style/dialogTitle" />
+
+        <TextView
+            style="@style/dialogDesc"
+            android:text="@string/use_device" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <RadioButton
-            android:id="@+id/guide_lcd"
-            android:textStyle="normal"
-            android:text="@string/use_lcd"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:background="@drawable/in_card_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="70dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="6dp">
+
+                <ImageView
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/dialog_icon_bg"
+                    android:backgroundTint="@color/colorAccent"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginEnd="6dp"
+                    android:src="@drawable/confirm_dialog_bg"
+                    app:tint="@android:color/white" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/use_amoled" />
+                    <TextView
+                        style="@style/textSecondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/use_amoled_desc" />
+                </LinearLayout>
+
+                <Switch
+                    android:id="@+id/guide_amoled"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:background="@drawable/in_card_item"
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="70dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="6dp">
+
+                <ImageView
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/dialog_icon_bg"
+                    android:backgroundTint="@color/colorAccent2"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginEnd="6dp"
+                    android:src="@drawable/confirm_dialog_bg"
+                    app:tint="@android:color/white" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/use_lcd" />
+                    <TextView
+                        style="@style/textSecondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/use_lcd_desc"  />
+                </LinearLayout>
+
+                <Switch
+                    android:id="@+id/guide_lcd"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/dialogWarn"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </RadioGroup>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="@string/guide_desc" />
 
-    <TextView
-        android:layout_marginTop="20dp"
-        android:textSize="12sp"
-        android:text="@string/guide_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/guide_next"
+            style="@style/dialogConfirmBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_weight="@null"
+            android:text="@string/step_continue" />
 
-    <Button
-        android:id="@+id/guide_next"
-        android:layout_marginTop="10dp"
-        android:text="@string/step_next"
-        android:layout_gravity="end"
-        android:textColor="@color/colorAccent"
-        style="@style/Widget.AppCompat.ActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>
