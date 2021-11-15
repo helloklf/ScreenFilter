@@ -7,16 +7,21 @@ import android.view.Display
 import android.view.WindowManager
 
 class ScreenState(private var context: Context) {
-    fun isScreenLocked(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            val display = windowManager.defaultDisplay
-            if (display.state == Display.STATE_OFF) {
-                return true
-            }
+    private val mKeyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    private val screenOffStatus = intArrayOf(
+            Display.STATE_OFF,
+            Display.STATE_DOZE,
+            Display.STATE_DOZE_SUSPEND,
+            Display.STATE_ON_SUSPEND
+    ).toTypedArray()
+
+    private fun isScreenLocked(): Boolean {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val display = windowManager.defaultDisplay
+        if (screenOffStatus.contains(display.state)) {
+            return true
         }
 
-        val mKeyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             mKeyguardManager.isDeviceLocked || mKeyguardManager.isKeyguardLocked
         } else {
