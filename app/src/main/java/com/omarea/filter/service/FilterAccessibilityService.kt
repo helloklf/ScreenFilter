@@ -345,50 +345,48 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
     /**
      * 屏幕配置改变（旋转、分辨率更改、DPI更改等）
      */
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        if (newConfig != null) {
-            val currentLandscape = isLandscape
-            if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                isLandscape = false
-            } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                isLandscape = true
+        val currentLandscape = isLandscape
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            isLandscape = false
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            isLandscape = true
+        }
+
+        // 获取分辨率大小
+        val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val point = Point()
+        wm.defaultDisplay.getRealSize(point)
+
+        // 如果分辨率改变，则需要重新调整滤镜，以便完全遮盖屏幕了
+        if ((displayHeight != point.y && displayWidth != point.y) || (displayHeight != point.x && displayWidth != point.x)) {
+            displayHeight = point.y
+            displayWidth = point.x
+            if (GlobalStatus.filterEnabled) {
+                filterViewManager.updateSize()
             }
+        }
 
-            // 获取分辨率大小
-            val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            val point = Point()
-            wm.defaultDisplay.getRealSize(point)
-
-            // 如果分辨率改变，则需要重新调整滤镜，以便完全遮盖屏幕了
-            if ((displayHeight != point.y && displayWidth != point.y) || (displayHeight != point.x && displayWidth != point.x)) {
-                displayHeight = point.y
-                displayWidth = point.x
-                if (GlobalStatus.filterEnabled) {
-                    filterViewManager.updateSize()
+        // 判断是否发生了屏幕旋转
+        if (currentLandscape != isLandscape) {
+            if (isLandscape) {
+                if (
+                        config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT) &&
+                        config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)
+                ) {
+                    // 延迟检测窗口，以便等待动画完成窗口正确加载
+                    handler.postDelayed({
+                        if (isLandscape) {
+                            windowAnalyzer.analysis(null, this)
+                        }
+                    }, 500)
                 }
+            } else if (videoPlaying && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
+                onViedPlayerLeave()
             }
 
-            // 判断是否发生了屏幕旋转
-            if (currentLandscape != isLandscape) {
-                if (isLandscape) {
-                    if (
-                            config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT) &&
-                            config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)
-                    ) {
-                        // 延迟检测窗口，以便等待动画完成窗口正确加载
-                        handler.postDelayed({
-                            if (isLandscape) {
-                                windowAnalyzer.analysis(null, this)
-                            }
-                        }, 500)
-                    }
-                } else if (videoPlaying && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
-                    onViedPlayerLeave()
-                }
-
-                filterViewManager.updateTexture()
-            }
+            filterViewManager.updateTexture()
         }
     }
 

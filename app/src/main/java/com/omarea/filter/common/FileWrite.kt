@@ -175,7 +175,7 @@ object FileWrite {
             val codes = String(datas, 0, len).replace(Regex("\r\n"), "\n").replace(Regex("\r\t"), "\t")
             return codes.toByteArray(Charsets.UTF_8)
         } catch (ex: Exception) {
-            Log.e("script-parse", ex.message)
+            ex.message?.let { Log.e("script-parse", it) }
             return "".toByteArray()
         }
     }

@@ -10,12 +10,12 @@ android {
             storePassword 'asdf1234'
         }
     }
-    compileSdkVersion 28
+    compileSdkVersion 30
     defaultConfig {
         resConfigs "zh"
         applicationId "com.omarea.filter"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 224
         versionName "2.0.0 Beta4"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'

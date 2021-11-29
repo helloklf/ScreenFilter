@@ -10,11 +10,8 @@ import android.os.Message
  */
 
 internal class ScreenEventHandler(private var onSceenOff: () -> Unit, private var onSceenOn: () -> Unit) : Handler(Looper.getMainLooper()) {
-    override fun handleMessage(msg: Message?) {
+    override fun handleMessage(msg: Message) {
         super.handleMessage(msg)
-        if (msg == null) {
-            return
-        }
 
         when (msg.what) {
             7 -> onSceenOn()    //屏幕已解锁

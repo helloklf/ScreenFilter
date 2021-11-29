@@ -76,11 +76,11 @@ class KeepShell(private var rootMode: Boolean = true) {
                             Log.e("KeepShellPublic", errorReader.readLine())
                         }
                     } catch (ex: Exception) {
-                        Log.e("c", ex.message)
+                        ex.message?.let { Log.e("c", it) }
                     }
                 }).start()
             } catch (ex: Exception) {
-                Log.e("getRuntime", ex.message)
+                ex.message?.let { Log.e("getRuntime", it) }
             } finally {
                 enterLockTime = 0L
                 mLock.unlock()
@@ -128,7 +128,7 @@ class KeepShell(private var rootMode: Boolean = true) {
                         out.write(br)
                         out.flush()
                     } catch (ex: java.lang.Exception) {
-                        Log.e("out!!.write", ex.message)
+                        ex.message?.let { Log.e("out!!.write", it) }
                     }
 
                     val results = StringBuilder()
@@ -152,7 +152,7 @@ class KeepShell(private var rootMode: Boolean = true) {
                 }
             } catch (e: IOException) {
                 tryExit()
-                Log.e("KeepShellAsync", e.message)
+                e.message?.let { Log.e("KeepShellAsync", it) }
                 return "error"
             } finally {
                 enterLockTime = 0L
