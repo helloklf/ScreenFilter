@@ -376,7 +376,12 @@ class FilterAccessibilityService : AccessibilityService(), WindowAnalyzer.Compan
                             config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT) &&
                             config.getBoolean(SpfConfig.FILTER_AUTO_START, SpfConfig.FILTER_AUTO_START_DEFAULT)
                     ) {
-                        windowAnalyzer.analysis(null, this)
+                        // 延迟检测窗口，以便等待动画完成窗口正确加载
+                        handler.postDelayed({
+                            if (isLandscape) {
+                                windowAnalyzer.analysis(null, this)
+                            }
+                        }, 500)
                     }
                 } else if (videoPlaying && config.getBoolean(SpfConfig.LANDSCAPE_OPTIMIZE, SpfConfig.LANDSCAPE_OPTIMIZE_DEFAULT)) {
                     onViedPlayerLeave()
